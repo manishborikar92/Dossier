@@ -1,21 +1,35 @@
 const fs = require('fs');
 const path = require('path');
 const { detectBoundary } = require('./boundary-detector');
-const { inspectGit } = require('./git-inspector');
+const { checkGitFast, inspectGitDetails } = require('./git-inspector');
 const { computeFingerprint } = require('./fingerprint');
 const { parseProjectManifests } = require('./manifest-parser');
 const { inspectDocs } = require('./doc-inspector');
 const { mergeProjectCatalogs, saveCatalog, loadCatalogCache } = require('../knowledge/catalog-merger');
 
 /**
- * Executes a safe, read-only project discovery scan.
+ * Concurrently processes an array of items with a fixed concurrency limit.
+ */
+async function mapConcurrent(items, concurrency, fn) {
+  const results = [];
+  for (let i = 0; i < items.length; i += concurrency) {
+    const chunk = items.slice(i, i + concurrency);
+    const chunkResults = await Promise.all(chunk.map(fn));
+    results.push(...chunkResults);
+  }
+  return results;
+}
+
+/**
+ * Executes a safe, read-only project discovery scan with fast caching.
  *
- * @param {object} options - { rootDir, settingsPath, refresh, catalogPath, internalDocsPath }
+ * @param {object} options - { rootDir, settingsPath, refresh, catalogPath, internalDocsPath, concurrency }
  * @returns {Promise<object>} Complete scan results and summary statistics
  */
 async function scanProjects(options = {}) {
   const rootDir = options.rootDir || 'C:\\Users\\manis\\Projects';
   const refresh = Boolean(options.refresh);
+  const concurrency = options.concurrency || 6;
 
   // Load settings
   let settings = {};
@@ -40,7 +54,7 @@ async function scanProjects(options = {}) {
     }
   }
 
-  // Read root directory
+  // Read root directory entries
   let rootEntries = [];
   try {
     rootEntries = fs.readdirSync(rootDir, { withFileTypes: true });
@@ -48,10 +62,8 @@ async function scanProjects(options = {}) {
     throw new Error(`Failed to read projects root directory ${rootDir}: ${err.message}`);
   }
 
-  const scannedProjects = [];
   const excludedDirectories = [];
-  let cachedCount = 0;
-  let reanalyzedCount = 0;
+  const candidateDirectories = [];
 
   for (const entry of rootEntries) {
     if (!entry.isDirectory()) continue;
@@ -69,53 +81,75 @@ async function scanProjects(options = {}) {
       continue;
     }
 
-    // 1. Boundary Detection
+    // Boundary Detection
     const boundary = detectBoundary(dirPath, settings);
-    if (!boundary.isProject) {
-      excludedDirectories.push({ name: entry.name, path: dirPath, reason: boundary.reason });
+    if (!boundary.isResumeCandidate) {
+      excludedDirectories.push({
+        name: entry.name,
+        path: dirPath,
+        reason: boundary.reason,
+        type: boundary.type
+      });
       continue;
     }
 
-    // 2. Git Inspection & Fingerprinting
-    const gitMeta = await inspectGit(dirPath);
-    const fpInfo = await computeFingerprint(dirPath, gitMeta);
+    candidateDirectories.push({ entry, dirPath, boundary });
+  }
 
-    // 3. Cache Evaluation
+  let cachedCount = 0;
+  let reanalyzedCount = 0;
+
+  // Process candidate directories with concurrent batching
+  const scannedProjects = await mapConcurrent(candidateDirectories, concurrency, async ({ entry, dirPath, boundary }) => {
+    // 1. Fast Git status check & content-based fingerprinting
+    const gitFast = await checkGitFast(dirPath);
+    const fpInfo = await computeFingerprint(dirPath, gitFast);
+
+    // 2. Cache Evaluation
     const normPath = path.resolve(dirPath).toLowerCase();
     const cachedItem = cacheByPath.get(normPath);
 
     if (!refresh && cachedItem && cachedItem.fingerprint === fpInfo.fingerprint) {
-      // Fingerprint matches: reuse analysis
       cachedCount++;
-      scannedProjects.push({
+      return {
         name: cachedItem.name || entry.name,
         localPath: dirPath,
         isMonorepo: cachedItem.is_monorepo || false,
-        subcomponents: cachedItem.subcomponents || [],
+        subcomponents: cachedItem.subcomponents || boundary.subcomponents || [],
         technologies: cachedItem.primary_technologies || [],
         evidenceFiles: cachedItem.important_file_references || [],
         title: cachedItem.title || entry.name,
         purpose: cachedItem.purpose || null,
         liveUrls: cachedItem.live_url ? [cachedItem.live_url] : [],
         git: {
-          isGit: gitMeta.isGit,
-          headSha: gitMeta.headSha,
-          commitCount: cachedItem.commit_count || gitMeta.commitCount,
-          firstCommit: cachedItem.first_commit || gitMeta.firstCommit,
-          lastCommit: cachedItem.last_commit || gitMeta.lastCommit
+          isGit: gitFast.isGit,
+          headSha: gitFast.headSha,
+          commitCount: cachedItem.commit_count || 0,
+          firstCommit: cachedItem.first_commit || null,
+          lastCommit: cachedItem.last_commit || null
         },
         fingerprint: fpInfo.fingerprint,
+        type: boundary.type,
         wasCached: true
-      });
-      continue;
+      };
     }
 
-    // 4. Fresh Analysis
+    // 3. Fresh Analysis (Cache miss or modified)
     reanalyzedCount++;
-    const manifests = parseProjectManifests(dirPath);
-    const docs = inspectDocs(dirPath);
 
-    scannedProjects.push({
+    // Run deeper git inspection (commit count & dates) concurrently with manifest & doc parsing
+    const [gitDetails, manifests, docs] = await Promise.all([
+      gitFast.isGit && gitFast.headSha ? inspectGitDetails(dirPath) : Promise.resolve({ commitCount: 0, firstCommit: null, lastCommit: null }),
+      Promise.resolve(parseProjectManifests(dirPath)),
+      Promise.resolve(inspectDocs(dirPath))
+    ]);
+
+    const fullGit = {
+      ...gitFast,
+      ...gitDetails
+    };
+
+    return {
       name: entry.name,
       localPath: dirPath,
       isMonorepo: boundary.isMonorepo,
@@ -125,16 +159,17 @@ async function scanProjects(options = {}) {
       title: docs.title || entry.name,
       purpose: docs.purpose || manifests.description,
       liveUrls: docs.liveUrls,
-      git: gitMeta,
+      git: fullGit,
       fingerprint: fpInfo.fingerprint,
+      type: boundary.type,
       wasCached: false
-    });
-  }
+    };
+  });
 
-  // 5. Merge with Master Knowledge Base
-  const mergeResult = mergeProjectCatalogs(scannedProjects, internalDocsRoot, cachedCatalog);
+  // 4. Merge with Master Knowledge Base and Excluded Reference Folders
+  const mergeResult = mergeProjectCatalogs(scannedProjects, excludedDirectories, internalDocsRoot, cachedCatalog);
 
-  // 6. Save Catalog
+  // 5. Save Normalized Catalog
   saveCatalog(mergeResult.catalog, catalogPath);
 
   return {

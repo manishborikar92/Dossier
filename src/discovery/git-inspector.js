@@ -23,70 +23,40 @@ function runGit(cwd, args, timeoutMs = 5000) {
 }
 
 /**
- * Inspects a Git repository safely.
+ * Fast git status check used for fingerprinting and cache validation.
+ * Runs rev-parse and status --porcelain in parallel.
  *
- * @param {string} dirPath - Directory to inspect
- * @returns {Promise<object>} Git metadata
+ * @param {string} dirPath - Directory to check
+ * @returns {Promise<object>} { isGit, headSha, modifiedFiles, untrackedFiles, workingTreeClean }
  */
-async function inspectGit(dirPath) {
+async function checkGitFast(dirPath) {
   const gitDir = path.join(dirPath, '.git');
   if (!fs.existsSync(gitDir)) {
     return {
       isGit: false,
       headSha: null,
-      commitCount: 0,
-      firstCommit: null,
-      lastCommit: null,
       workingTreeClean: true,
       modifiedFiles: [],
       untrackedFiles: []
     };
   }
 
-  // Verify inside work tree
-  const isInside = await runGit(dirPath, ['rev-parse', '--is-inside-work-tree']);
-  if (isInside !== 'true') {
-    return {
-      isGit: false,
-      headSha: null,
-      commitCount: 0,
-      firstCommit: null,
-      lastCommit: null,
-      workingTreeClean: true,
-      modifiedFiles: [],
-      untrackedFiles: []
-    };
-  }
+  // Run HEAD check and status check concurrently
+  const [headSha, statusOutput] = await Promise.all([
+    runGit(dirPath, ['rev-parse', 'HEAD']),
+    runGit(dirPath, ['status', '--porcelain', '-uall'])
+  ]);
 
-  // 1. Get HEAD commit SHA
-  const headSha = await runGit(dirPath, ['rev-parse', 'HEAD']);
-
-  // If there are no commits yet (empty repo)
   if (!headSha) {
     return {
       isGit: true,
       headSha: null,
-      commitCount: 0,
-      firstCommit: null,
-      lastCommit: null,
       workingTreeClean: true,
       modifiedFiles: [],
       untrackedFiles: []
     };
   }
 
-  // 2. Commit count
-  const countStr = await runGit(dirPath, ['rev-list', '--count', 'HEAD']);
-  const commitCount = countStr ? parseInt(countStr, 10) || 0 : 0;
-
-  // 3. First commit date (ISO)
-  const firstCommit = await runGit(dirPath, ['log', '--reverse', '--format=%aI', '-n', '1']);
-
-  // 4. Last commit date (ISO)
-  const lastCommit = await runGit(dirPath, ['log', '-n', '1', '--format=%aI']);
-
-  // 5. Working tree status (staged, unstaged, untracked, renamed, deleted)
-  const statusOutput = await runGit(dirPath, ['status', '--porcelain', '-uall']);
   const modifiedFiles = [];
   const untrackedFiles = [];
 
@@ -107,16 +77,60 @@ async function inspectGit(dirPath) {
   return {
     isGit: true,
     headSha,
-    commitCount,
-    firstCommit: firstCommit ? firstCommit.split('T')[0] : null,
-    lastCommit: lastCommit ? lastCommit.split('T')[0] : null,
     workingTreeClean: modifiedFiles.length === 0 && untrackedFiles.length === 0,
     modifiedFiles,
     untrackedFiles
   };
 }
 
+/**
+ * Retrieves detailed commit statistics (commit count, date ranges).
+ * Deferred to cold scans or modified repositories to optimize warm cache performance.
+ *
+ * @param {string} dirPath - Directory to inspect
+ * @returns {Promise<object>} { commitCount, firstCommit, lastCommit }
+ */
+async function inspectGitDetails(dirPath) {
+  const [countStr, firstCommit, lastCommit] = await Promise.all([
+    runGit(dirPath, ['rev-list', '--count', 'HEAD']),
+    runGit(dirPath, ['log', '--reverse', '--format=%aI', '-n', '1']),
+    runGit(dirPath, ['log', '-n', '1', '--format=%aI'])
+  ]);
+
+  return {
+    commitCount: countStr ? parseInt(countStr, 10) || 0 : 0,
+    firstCommit: firstCommit ? firstCommit.split('T')[0] : null,
+    lastCommit: lastCommit ? lastCommit.split('T')[0] : null
+  };
+}
+
+/**
+ * Full git inspection (fast check + commit statistics).
+ *
+ * @param {string} dirPath - Directory to inspect
+ * @returns {Promise<object>} Complete Git metadata
+ */
+async function inspectGit(dirPath) {
+  const fast = await checkGitFast(dirPath);
+  if (!fast.isGit || !fast.headSha) {
+    return {
+      ...fast,
+      commitCount: 0,
+      firstCommit: null,
+      lastCommit: null
+    };
+  }
+
+  const details = await inspectGitDetails(dirPath);
+  return {
+    ...fast,
+    ...details
+  };
+}
+
 module.exports = {
   runGit,
+  checkGitFast,
+  inspectGitDetails,
   inspectGit
 };

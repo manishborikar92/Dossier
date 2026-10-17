@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const fs = require('fs');
 const path = require('path');
-const { inspectGit } = require('./git-inspector');
+const { checkGitFast } = require('./git-inspector');
 
 // File extensions and patterns considered relevant for project analysis
 const RELEVANT_EXTENSIONS = new Set([
@@ -119,11 +119,11 @@ function collectRelevantFiles(dirPath, currentDepth = 0, maxDepth = 4, baseDir =
  * Computes a robust, content-based project fingerprint.
  *
  * @param {string} dirPath - Project directory
- * @param {object} gitMeta - Optional pre-computed git metadata from inspectGit
+ * @param {object} gitMeta - Optional pre-computed git metadata from checkGitFast
  * @returns {Promise<object>} { fingerprint, strategy, fileCount, modifiedCount }
  */
 async function computeFingerprint(dirPath, gitMeta = null) {
-  const git = gitMeta || (await inspectGit(dirPath));
+  const git = gitMeta || (await checkGitFast(dirPath));
   const hasher = crypto.createHash('sha256');
 
   if (git.isGit && git.headSha) {

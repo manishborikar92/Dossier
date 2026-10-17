@@ -2,45 +2,57 @@ const fs = require('fs');
 const path = require('path');
 
 const BOUNDARY_TYPES = {
-  STANDALONE: 'STANDALONE',
-  MONOREPO: 'MONOREPO',
-  UTILITY: 'UTILITY',
-  NON_PROJECT: 'NON_PROJECT'
+  STANDALONE: 'standalone_project',
+  MONOREPO: 'monorepo',
+  UTILITY: 'utility',
+  REFERENCE: 'reference_directory',
+  SELF: 'application_self',
+  INACCESSIBLE: 'inaccessible'
 };
 
 /**
- * Determines project boundary type and discovers nested subprojects.
+ * Determines project boundary type, physical availability, and resume eligibility.
  *
  * @param {string} dirPath - Absolute path to inspect
  * @param {object} settings - Application settings
- * @returns {object} { type, isProject, isMonorepo, subcomponents, reason }
+ * @returns {object} { type, isProject, isResumeCandidate, isMonorepo, physicalAvailability, subcomponents, reason }
  */
 function detectBoundary(dirPath, settings = {}) {
   const dirName = path.basename(dirPath);
-  const nonProjects = new Set(
-    (settings.scanner?.non_project_directories || [
-      'InternalDocs',
-      'Notes',
-      'manishborikar92',
-      'Git-and-Github-Commands',
-      'Resume-Builder'
-    ]).map(s => s.toLowerCase())
-  );
+  const lowerName = dirName.toLowerCase();
 
-  // 1. Check if explicitly in non-project list
-  if (nonProjects.has(dirName.toLowerCase())) {
+  // 1. Self exclusion (Resume-Builder itself)
+  if (lowerName === 'resume-builder') {
     return {
-      type: BOUNDARY_TYPES.NON_PROJECT,
+      type: BOUNDARY_TYPES.SELF,
       isProject: false,
+      isResumeCandidate: false,
       isMonorepo: false,
+      physicalAvailability: true,
       subcomponents: [],
-      reason: `Configured as non-project directory (${dirName})`
+      reason: 'Application self-directory (Resume-Builder excluded to prevent self-evaluation)'
     };
   }
 
-  // 2. Check if utility / scaffold repository
-  const utilityNames = new Set(['boilerplate', 'pre-built tools']);
-  const isUtility = utilityNames.has(dirName.toLowerCase());
+  // 2. Reference / documentation / profile repositories on disk
+  const referenceNames = new Set([
+    'internaldocs',
+    'notes',
+    'manishborikar92',
+    'git-and-github-commands'
+  ]);
+
+  if (referenceNames.has(lowerName)) {
+    return {
+      type: BOUNDARY_TYPES.REFERENCE,
+      isProject: false,
+      isResumeCandidate: false,
+      isMonorepo: false,
+      physicalAvailability: true,
+      subcomponents: [],
+      reason: `Reference or documentation repository (${dirName})`
+    };
+  }
 
   // 3. Inspect directory entries
   let entries = [];
@@ -48,18 +60,24 @@ function detectBoundary(dirPath, settings = {}) {
     entries = fs.readdirSync(dirPath, { withFileTypes: true });
   } catch (err) {
     return {
-      type: BOUNDARY_TYPES.NON_PROJECT,
+      type: BOUNDARY_TYPES.INACCESSIBLE,
       isProject: false,
+      isResumeCandidate: false,
       isMonorepo: false,
+      physicalAvailability: false,
       subcomponents: [],
       reason: `Inaccessible directory: ${err.message}`
     };
   }
 
+  // 4. Check if utility / scaffold repository
+  const utilityNames = new Set(['boilerplate', 'pre-built tools']);
+  const isUtility = utilityNames.has(lowerName);
+
   const fileNames = new Set(entries.filter(e => e.isFile()).map(e => e.name));
   const subDirs = entries.filter(e => e.isDirectory() && !e.name.startsWith('.'));
 
-  // 4. Check monorepo indicators
+  // 5. Check monorepo indicators
   let isMonorepo = false;
   let monorepoReason = '';
 
@@ -90,12 +108,11 @@ function detectBoundary(dirPath, settings = {}) {
     monorepoReason = monorepoReason || 'Contains dual-tier web/server or apps structure';
   }
 
-  // 5. Discover subcomponents
+  // 6. Discover subcomponents
   const subcomponents = [];
   if (isMonorepo) {
     for (const subDir of subDirs) {
       const subDirPath = path.join(dirPath, subDir.name);
-      // Avoid node_modules or build dirs
       if (['node_modules', 'dist', 'build', '.git', '.next', 'out'].includes(subDir.name)) {
         continue;
       }
@@ -115,7 +132,6 @@ function detectBoundary(dirPath, settings = {}) {
           }
         } catch {}
       } else {
-        // Direct sub-directory (e.g. web, server, admin, client, simulation)
         subcomponents.push({
           name: subDir.name,
           path: subDir.name,
@@ -134,7 +150,9 @@ function detectBoundary(dirPath, settings = {}) {
   return {
     type: finalType,
     isProject: true,
+    isResumeCandidate: true,
     isMonorepo,
+    physicalAvailability: true,
     subcomponents,
     reason: isMonorepo ? monorepoReason : isUtility ? 'Scaffold or developer utility' : 'Standalone repository'
   };

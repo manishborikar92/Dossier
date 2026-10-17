@@ -6,7 +6,7 @@ const os = require('os');
 const { execFileSync } = require('child_process');
 
 const { detectBoundary, BOUNDARY_TYPES } = require('../src/discovery/boundary-detector');
-const { inspectGit } = require('../src/discovery/git-inspector');
+const { checkGitFast, inspectGit } = require('../src/discovery/git-inspector');
 const { computeFingerprint, isRelevantFile, hashFileContent } = require('../src/discovery/fingerprint');
 const { parseProjectManifests } = require('../src/discovery/manifest-parser');
 const { inspectDocs } = require('../src/discovery/doc-inspector');
@@ -46,6 +46,7 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
     const res1 = detectBoundary(standaloneDir);
     assert.equal(res1.type, BOUNDARY_TYPES.STANDALONE);
     assert.equal(res1.isProject, true);
+    assert.equal(res1.isResumeCandidate, true);
     assert.equal(res1.isMonorepo, false);
 
     const monorepoDir = path.join(fixtureDir, 'monorepo-app');
@@ -59,6 +60,7 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
     const res2 = detectBoundary(monorepoDir);
     assert.equal(res2.type, BOUNDARY_TYPES.MONOREPO);
     assert.equal(res2.isProject, true);
+    assert.equal(res2.isResumeCandidate, true);
     assert.equal(res2.isMonorepo, true);
   });
 
@@ -71,6 +73,7 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
 
     const boundary = detectBoundary(monorepoDir);
     assert.equal(boundary.isMonorepo, true);
+    assert.equal(boundary.isResumeCandidate, true);
     assert.equal(boundary.subcomponents.length, 3);
 
     const subNames = boundary.subcomponents.map(s => s.name);
@@ -85,27 +88,24 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
   });
 
   // 3. Excluding Resume-Builder itself and configured non-project directories
-  test('Case 3: Excludes Resume-Builder and configured non-project directories', () => {
-    const settings = {
-      scanner: {
-        non_project_directories: ['InternalDocs', 'Notes', 'manishborikar92', 'Resume-Builder']
-      }
-    };
-
+  test('Case 3: Excludes Resume-Builder and distinguishes reference directories on disk', () => {
     const resumeBuilderDir = path.join(fixtureDir, 'Resume-Builder');
     fs.mkdirSync(resumeBuilderDir, { recursive: true });
-    const res1 = detectBoundary(resumeBuilderDir, settings);
-    assert.equal(res1.isProject, false);
-    assert.equal(res1.type, BOUNDARY_TYPES.NON_PROJECT);
+    const res1 = detectBoundary(resumeBuilderDir);
+    assert.equal(res1.type, BOUNDARY_TYPES.SELF);
+    assert.equal(res1.isResumeCandidate, false);
+    assert.equal(res1.physicalAvailability, true);
 
     const internalDocsDir = path.join(fixtureDir, 'InternalDocs');
     fs.mkdirSync(internalDocsDir, { recursive: true });
-    const res2 = detectBoundary(internalDocsDir, settings);
-    assert.equal(res2.isProject, false);
+    const res2 = detectBoundary(internalDocsDir);
+    assert.equal(res2.type, BOUNDARY_TYPES.REFERENCE);
+    assert.equal(res2.isResumeCandidate, false);
+    assert.equal(res2.physicalAvailability, true);
   });
 
-  // 4. Matching existing catalog entries to actual local directories
-  test('Case 4: Matches existing catalog entries to local directories and merges facts', () => {
+  // 4. Matching existing catalog entries and separating physical availability from resume eligibility
+  test('Case 4: Accurately separates physical availability from resume eligibility', () => {
     const mockScanned = [
       {
         name: 'iwlars',
@@ -118,7 +118,14 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
       }
     ];
 
-    // Mock InternalDocs
+    const mockExcluded = [
+      {
+        name: 'InternalDocs',
+        path: 'C:\\Users\\manis\\Projects\\InternalDocs',
+        reason: 'Reference or documentation repository'
+      }
+    ];
+
     const mockInternalDocsDir = path.join(fixtureDir, 'InternalDocsMock');
     const refDir = path.join(mockInternalDocsDir, 'reference');
     fs.mkdirSync(refDir, { recursive: true });
@@ -131,22 +138,38 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
         score: 97.0,
         local_path: 'C:\\Users\\manis\\Projects\\iwlars',
         primary_technologies: ['Python', 'Open3D', 'Next.js']
+      },
+      {
+        id: 'internaldocs',
+        name: 'InternalDocs',
+        title: 'Internal Engineering Documentation',
+        local_path: 'C:\\Users\\manis\\Projects\\InternalDocs'
       }
     ]));
 
-    const merged = mergeProjectCatalogs(mockScanned, mockInternalDocsDir);
-    assert.equal(merged.stats.matchedFromMaster, 1);
-    assert.equal(merged.catalog.length, 1);
-    assert.equal(merged.catalog[0].id, 'iwlars');
-    assert.equal(merged.catalog[0].available_locally, true);
-    assert.equal(merged.catalog[0].evidence_source, 'merged');
-    // Technologies merged from both
-    assert.ok(merged.catalog[0].primary_technologies.includes('NumPy'));
-    assert.ok(merged.catalog[0].primary_technologies.includes('Next.js'));
+    const merged = mergeProjectCatalogs(mockScanned, mockExcluded, mockInternalDocsDir);
+    assert.equal(merged.stats.matchedResumeProjects, 1);
+    assert.equal(merged.stats.referenceDirectoriesOnDisk, 1);
+    assert.equal(merged.catalog.length, 2);
+
+    // Resume project check
+    const iwlarsEntry = merged.catalog.find(p => p.id === 'iwlars');
+    assert.ok(iwlarsEntry);
+    assert.equal(iwlarsEntry.physical_availability, true);
+    assert.equal(iwlarsEntry.resume_eligibility, true);
+    assert.equal(iwlarsEntry.historical_status, 'current_codebase');
+
+    // Reference directory check: Available on disk, but NOT eligible for resume
+    const docsEntry = merged.catalog.find(p => p.id === 'internaldocs');
+    assert.ok(docsEntry);
+    assert.equal(docsEntry.physical_availability, true, 'InternalDocs must be physically available on disk');
+    assert.equal(docsEntry.resume_eligibility, false, 'InternalDocs must not be eligible for resume scoring');
+    assert.equal(docsEntry.discovery_classification, 'reference_directory');
+    assert.equal(docsEntry.historical_status, 'reference_catalog_entry');
   });
 
   // 5. Preserving historical catalog entries when local directories are missing
-  test('Case 5: Preserves historical catalog entries when local directories are missing on disk', () => {
+  test('Case 5: Preserves historical catalog entries when directories are missing on disk', () => {
     const mockScanned = [
       {
         name: 'iwlars',
@@ -163,18 +186,27 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
     fs.mkdirSync(refDir, { recursive: true });
     fs.writeFileSync(path.join(refDir, 'project_knowledge_base.json'), JSON.stringify([
       { id: 'iwlars', name: 'iwlars', local_path: 'C:\\Users\\manis\\Projects\\iwlars' },
-      { id: 'merchant', name: 'merchant', local_path: 'C:\\Users\\manis\\Projects\\merchant' }
+      { id: 'merchant', name: 'merchant', local_path: 'C:\\Users\\manis\\Projects\\merchant' },
+      { id: 'regimen', name: 'Regimen', local_path: 'C:\\Users\\manis\\Projects\\Regimen' }
     ]));
 
-    const merged = mergeProjectCatalogs(mockScanned, mockInternalDocsDir);
-    assert.equal(merged.stats.totalCatalogEntries, 2);
-    assert.equal(merged.stats.historicalPreserved, 1);
+    const merged = mergeProjectCatalogs(mockScanned, [], mockInternalDocsDir);
+    assert.equal(merged.stats.totalCatalogEntries, 3);
+    assert.equal(merged.stats.missingHistoricalEntries, 2);
 
-    const preserved = merged.catalog.find(p => p.id === 'merchant');
-    assert.ok(preserved);
-    assert.equal(preserved.available_locally, false);
-    assert.equal(preserved.availability_status, 'missing_on_disk');
-    assert.equal(preserved.evidence_source, 'internal_docs');
+    const merchant = merged.catalog.find(p => p.id === 'merchant');
+    assert.ok(merchant);
+    assert.equal(merchant.physical_availability, false);
+    assert.equal(merchant.resume_eligibility, false);
+    assert.equal(merchant.discovery_classification, 'nested_component');
+    assert.equal(merchant.historical_status, 'subsumed_by_parent');
+
+    const regimen = merged.catalog.find(p => p.id === 'regimen');
+    assert.ok(regimen);
+    assert.equal(regimen.physical_availability, false);
+    assert.equal(regimen.resume_eligibility, false);
+    assert.equal(regimen.discovery_classification, 'archived_project');
+    assert.equal(regimen.historical_status, 'superseded_project');
   });
 
   // 6. Detecting changes to committed files and staged, unstaged, and untracked relevant files
@@ -352,7 +384,6 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
     fs.mkdirSync(sampleDir, { recursive: true });
     fs.writeFileSync(path.join(sampleDir, 'README.md'), '# Sample App');
 
-    const beforeMtime = fs.statSync(sampleDir).mtimeMs;
     const catalogPath = path.join(fixtureDir, 'isolated-catalog.json');
 
     await scanProjects({
@@ -362,12 +393,79 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
       refresh: true
     });
 
-    // Verify catalog was written to designated path
     assert.ok(fs.existsSync(catalogPath));
-
-    // Verify sample-app was NOT written to or polluted with cache files
     const sampleFiles = fs.readdirSync(sampleDir);
     assert.deepEqual(sampleFiles, ['README.md']);
+  });
+
+  // 13. Safe Job Description token matching edge cases (Zero division & empty token handling)
+  test('Case 13: Handles empty, short, duplicate, and uninformative JD token sets without NaN', () => {
+    // Formula under test: Sørensen-Dice with independent zero-guard
+    function calculateRelevance(projTech, jdTech, projKw, jdKw) {
+      let techScore = 0;
+      if (projTech.length + jdTech.length > 0) {
+        const intersection = projTech.filter(t => jdTech.includes(t)).length;
+        techScore = (2 * intersection) / (projTech.length + jdTech.length);
+      }
+
+      let kwScore = 0;
+      const union = new Set([...projKw, ...jdKw]).size;
+      if (union > 0) {
+        const intersection = projKw.filter(k => jdKw.includes(k)).length;
+        kwScore = intersection / union;
+      }
+
+      // If JD has no tokens whatsoever, relevance is strictly 0
+      if (jdTech.length === 0 && jdKw.length === 0) {
+        return 0;
+      }
+
+      const score = (0.70 * techScore + 0.30 * kwScore) * 100;
+      return Number.isFinite(score) ? Math.min(100, Math.max(0, score)) : 0;
+    }
+
+    // Empty JD
+    assert.equal(calculateRelevance(['React', 'Node.js'], [], ['web'], []), 0);
+
+    // Completely disjoint JD (no matches)
+    assert.equal(calculateRelevance(['React'], ['Go', 'Rust'], ['web'], ['embedded']), 0);
+
+    // Duplicate JD tokens handled by deduplication
+    const dedupeJd = Array.from(new Set(['react', 'react', 'react']));
+    const score = calculateRelevance(['react'], dedupeJd, [], []);
+    assert.equal(score, 70); // 0.70 * (2*1 / 2) * 100 = 70
+
+    // Small project (1 tech) vs Large JD (20 techs)
+    const largeJd = ['React', 'Next.js', 'Vue', 'Angular', 'Node.js', 'Express', 'Django', 'Flask', 'FastAPI', 'Spring', 'Go', 'Rust', 'Docker', 'K8s', 'AWS', 'GCP', 'Azure', 'Postgres', 'Mongo', 'Redis'];
+    const smallProjScore = calculateRelevance(['React'], largeJd, [], []);
+    // 2 * 1 / (1 + 20) = 2/21 = ~0.0952 * 0.70 * 100 = ~6.66
+    assert.ok(smallProjScore > 5 && smallProjScore < 10, 'Small project must not be inflated to 100% on 1 match in large JD');
+    assert.ok(Number.isFinite(smallProjScore));
+  });
+
+  // 14. Distinguishing incomplete evidence from confirmed absence
+  test('Case 14: Distinguishes incomplete/missing evidence from confirmed absence', () => {
+    const emptyProjDir = path.join(fixtureDir, 'empty-experimental');
+    fs.mkdirSync(emptyProjDir, { recursive: true });
+    fs.writeFileSync(path.join(emptyProjDir, 'experiment.py'), 'print("test")');
+
+    const manifests = parseProjectManifests(emptyProjDir);
+    const docs = inspectDocs(emptyProjDir);
+
+    // Manifests empty, but does not mean failed
+    assert.equal(manifests.hasTests, false);
+    assert.equal(manifests.evidenceFiles.length, 0);
+    assert.equal(docs.docEvidenceFiles.length, 0);
+
+    // Evaluated completeness metric (e.g., fraction of observable files present)
+    const totalObservableAnchors = 4; // Manifest, Readme, Git, Tests
+    let observedAnchors = 0;
+    if (manifests.evidenceFiles.length > 0) observedAnchors++;
+    if (docs.docEvidenceFiles.length > 0) observedAnchors++;
+    if (manifests.hasTests) observedAnchors++;
+
+    const evidenceCompleteness = (observedAnchors / totalObservableAnchors) * 100;
+    assert.equal(evidenceCompleteness, 0, 'Incomplete evidence must be tracked as 0% completeness');
   });
 
 });

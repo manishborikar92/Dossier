@@ -25,20 +25,23 @@ function loadMasterKnowledgeBase(internalDocsRoot) {
     const raw = fs.readFileSync(jsonPath, 'utf8');
     const data = JSON.parse(raw);
     return Array.isArray(data) ? data : [];
-  } catch (err) {
+  } catch {
     return [];
   }
 }
 
 /**
- * Merges freshly scanned project evidence with master catalog entries and cached state.
+ * Merges freshly scanned project evidence with master catalog entries,
+ * strictly separating physical availability, discovery classification,
+ * resume eligibility, and historical status.
  *
- * @param {Array<object>} scannedProjects - Projects inspected from disk
+ * @param {Array<object>} scannedProjects - Resume-eligible projects inspected from disk
+ * @param {Array<object>} excludedDirectories - Directories excluded from resume candidacy
  * @param {string} internalDocsRoot - Path to InternalDocs
  * @param {object|null} existingCatalog - Previously cached catalog data if available
  * @returns {object} { catalog: Array<object>, stats: object }
  */
-function mergeProjectCatalogs(scannedProjects, internalDocsRoot, existingCatalog = null) {
+function mergeProjectCatalogs(scannedProjects, excludedDirectories = [], internalDocsRoot = '', existingCatalog = null) {
   const masterEntries = loadMasterKnowledgeBase(internalDocsRoot);
   const masterByPath = new Map();
   const masterByName = new Map();
@@ -56,30 +59,30 @@ function mergeProjectCatalogs(scannedProjects, internalDocsRoot, existingCatalog
   }
 
   const mergedCatalog = [];
-  const matchedMasterIds = new Set();
+  const processedMasterIds = new Set();
 
-  let matchedCount = 0;
+  let matchedResumeCount = 0;
   let newDiscoveredCount = 0;
+  let referenceExcludedCount = 0;
+  let missingHistoricalCount = 0;
 
-  // 1. Process all scanned projects on disk
+  // 1. Process all resume-eligible projects on disk
   for (const scanned of scannedProjects) {
     const normScannedPath = normalizePath(scanned.localPath);
     const scannedName = scanned.name.toLowerCase();
 
-    // Find match in master catalog
+    // Match in master catalog
     let masterMatch = masterByPath.get(normScannedPath) || masterByName.get(scannedName);
 
     if (masterMatch) {
-      matchedMasterIds.add(masterMatch.id || masterMatch.name);
-      matchedCount++;
+      processedMasterIds.add(masterMatch.id || masterMatch.name);
+      matchedResumeCount++;
 
-      // Combine technologies from code manifests and catalog
       const techSet = new Set([
         ...(scanned.technologies || []),
         ...(masterMatch.primary_technologies || [])
       ]);
 
-      // Prioritize verified production deployment URLs from master knowledge base
       const liveUrl = masterMatch.live_url || scanned.liveUrls?.[0] || null;
 
       mergedCatalog.push({
@@ -89,7 +92,7 @@ function mergeProjectCatalogs(scannedProjects, internalDocsRoot, existingCatalog
         rank: masterMatch.rank || null,
         score: masterMatch.score || null,
         score_breakdown: masterMatch.score_breakdown || null,
-        purpose: scanned.purpose || masterMatch.purpose || null,
+        purpose: masterMatch.purpose || scanned.purpose || null,
         primary_technologies: Array.from(techSet).sort(),
         architecture: masterMatch.architecture || (scanned.isMonorepo ? 'Monorepo application architecture' : 'Standalone architecture'),
         technical_analysis: masterMatch.technical_analysis || null,
@@ -110,16 +113,23 @@ function mergeProjectCatalogs(scannedProjects, internalDocsRoot, existingCatalog
         last_commit: scanned.git?.lastCommit || masterMatch.last_commit || null,
         commit_count: scanned.git?.isGit ? scanned.git.commitCount : (masterMatch.commit_count || 0),
         local_path: scanned.localPath,
+
+        // ── 4-Way Status Distinction ─────────────────────────────────────────
+        physical_availability: true,
         available_locally: true,
-        availability_status: 'verified_on_disk',
+        discovery_classification: scanned.isMonorepo ? 'monorepo' : (scanned.type === 'utility' ? 'utility' : 'standalone_project'),
+        resume_eligibility: true,
+        is_resume_candidate: true,
+        historical_status: 'current_codebase',
         evidence_source: 'merged',
+
         is_monorepo: scanned.isMonorepo,
         subcomponents: scanned.subcomponents || [],
         fingerprint: scanned.fingerprint,
         analyzed_at: new Date().toISOString()
       });
     } else {
-      // Newly discovered project on disk
+      // Newly discovered on disk
       newDiscoveredCount++;
       const techSet = new Set(scanned.technologies || []);
       const liveUrl = scanned.liveUrls?.[0] || null;
@@ -128,7 +138,7 @@ function mergeProjectCatalogs(scannedProjects, internalDocsRoot, existingCatalog
         id: scanned.name.toLowerCase().replace(/[^a-z0-9_-]/g, '-'),
         name: scanned.name,
         title: scanned.title || scanned.name,
-        rank: null, // Scored in Phase 3
+        rank: null,
         score: null,
         score_breakdown: null,
         purpose: scanned.purpose || 'Discovered software project repository',
@@ -154,9 +164,16 @@ function mergeProjectCatalogs(scannedProjects, internalDocsRoot, existingCatalog
         last_commit: scanned.git?.lastCommit || null,
         commit_count: scanned.git?.commitCount || 0,
         local_path: scanned.localPath,
+
+        // ── 4-Way Status Distinction ─────────────────────────────────────────
+        physical_availability: true,
         available_locally: true,
-        availability_status: 'newly_discovered',
+        discovery_classification: scanned.isMonorepo ? 'monorepo' : (scanned.type === 'utility' ? 'utility' : 'standalone_project'),
+        resume_eligibility: true,
+        is_resume_candidate: true,
+        historical_status: 'newly_discovered',
         evidence_source: 'codebase',
+
         is_monorepo: scanned.isMonorepo,
         subcomponents: scanned.subcomponents || [],
         fingerprint: scanned.fingerprint,
@@ -165,18 +182,77 @@ function mergeProjectCatalogs(scannedProjects, internalDocsRoot, existingCatalog
     }
   }
 
-  // 2. Preserve historical catalog entries whose directories are missing on disk
-  let historicalPreservedCount = 0;
+  // 2. Process excluded directories that exist physically on disk
+  // (e.g. InternalDocs, Notes, manishborikar92)
+  for (const exc of excludedDirectories) {
+    const normExcPath = normalizePath(exc.path);
+    const excName = exc.name.toLowerCase();
+
+    // Check if this excluded directory was in the master catalog
+    const masterMatch = masterByPath.get(normExcPath) || masterByName.get(excName);
+
+    if (masterMatch) {
+      processedMasterIds.add(masterMatch.id || masterMatch.name);
+      referenceExcludedCount++;
+
+      mergedCatalog.push({
+        ...masterMatch,
+        local_path: exc.path,
+
+        // ── 4-Way Status Distinction ─────────────────────────────────────────
+        physical_availability: true, // It physically exists on disk!
+        available_locally: true,
+        discovery_classification: 'reference_directory',
+        resume_eligibility: false, // NOT eligible for resume project selection
+        is_resume_candidate: false,
+        historical_status: 'reference_catalog_entry',
+        evidence_source: 'internal_docs',
+        exclusion_reason: exc.reason || 'Engineering reference or documentation; excluded from resume candidates',
+
+        analyzed_at: new Date().toISOString()
+      });
+    }
+  }
+
+  // 3. Process remaining historical master catalog entries NOT found on disk
   for (const master of masterEntries) {
     const key = master.id || master.name;
-    if (!matchedMasterIds.has(key)) {
-      historicalPreservedCount++;
+    if (!processedMasterIds.has(key)) {
+      missingHistoricalCount++;
+
+      // Distinguish sub-modules, superseded projects, and practice repos
+      let classification = 'archived_project';
+      let historicalStatus = 'missing_on_disk';
+      let missingReason = 'Directory not found at root of projects directory';
+
+      const lowerId = (master.id || '').toLowerCase();
+      if (lowerId === 'merchant' || lowerId === 'evercut-customer') {
+        classification = 'nested_component';
+        historicalStatus = 'subsumed_by_parent';
+        missingReason = 'Historical extraction sub-module belonging to EverCut platform';
+      } else if (lowerId === 'regimen') {
+        classification = 'archived_project';
+        historicalStatus = 'superseded_project';
+        missingReason = 'Predecessor habit-tracking application; superseded by Vritta';
+      } else if (lowerId === 'frontend-projects' || lowerId === 'git-and-github-commands') {
+        classification = 'practice_repository';
+        historicalStatus = 'missing_on_disk';
+        missingReason = 'Historical learning exercises or cheat sheet repository';
+      }
+
       mergedCatalog.push({
         ...master,
+
+        // ── 4-Way Status Distinction ─────────────────────────────────────────
+        physical_availability: false, // Truly missing from disk
         available_locally: false,
-        availability_status: 'missing_on_disk',
+        discovery_classification: classification,
+        resume_eligibility: false,
+        is_resume_candidate: false,
+        historical_status: historicalStatus,
         evidence_source: 'internal_docs',
-        missing_reason: 'Directory not found at root of projects directory (may be sub-module, renamed, or historical archive)',
+        missing_reason: missingReason,
+
         analyzed_at: new Date().toISOString()
       });
     }
@@ -186,10 +262,12 @@ function mergeProjectCatalogs(scannedProjects, internalDocsRoot, existingCatalog
     catalog: mergedCatalog,
     stats: {
       totalCatalogEntries: mergedCatalog.length,
-      availableLocally: scannedProjects.length,
-      matchedFromMaster: matchedCount,
-      newlyDiscovered: newDiscoveredCount,
-      historicalPreserved: historicalPreservedCount
+      physicallyAvailable: scannedProjects.length + referenceExcludedCount,
+      resumeEligible: scannedProjects.length,
+      matchedResumeProjects: matchedResumeCount,
+      newlyDiscoveredProjects: newDiscoveredCount,
+      referenceDirectoriesOnDisk: referenceExcludedCount,
+      missingHistoricalEntries: missingHistoricalCount
     }
   };
 }

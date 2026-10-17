@@ -22,28 +22,29 @@ async function main() {
     console.log(pc.green(`✔ Scan completed successfully in ${duration}s\n`));
 
     console.log(pc.bold('📊 Filesystem & Catalog Audit:'));
-    console.log(`  • Total Root Directories on Disk:   ${pc.bold(result.totalRootDirectories)}`);
-    console.log(`  • Projects Discovered on Disk:      ${pc.bold(pc.green(result.scannedProjectsCount))}`);
-    console.log(`  • Non-Project Folders Excluded:     ${pc.bold(pc.yellow(result.excludedCount))}`);
-    console.log(`  • Analysis Reused from Cache:       ${pc.bold(result.cachedCount)}`);
-    console.log(`  • Freshly Analyzed / Updated:       ${pc.bold(result.reanalyzedCount)}`);
-    console.log(`  • Newly Discovered (Not in Master): ${pc.bold(pc.cyan(result.stats.newlyDiscovered))}`);
-    console.log(`  • Historical Master Preserved:      ${pc.bold(result.stats.historicalPreserved)}`);
-    console.log(`  • Total Catalog Entries in Cache:   ${pc.bold(result.stats.totalCatalogEntries)}\n`);
+    console.log(`  • Total Root Directories on Disk:        ${pc.bold(result.totalRootDirectories)}`);
+    console.log(`  • Resume-Eligible Projects on Disk:     ${pc.bold(pc.green(result.scannedProjectsCount))}`);
+    console.log(`  • Reference / Non-Project Excluded:      ${pc.bold(pc.yellow(result.excludedCount))}`);
+    console.log(`  • Analysis Reused from Cache:            ${pc.bold(result.cachedCount)}`);
+    console.log(`  • Freshly Analyzed / Updated:            ${pc.bold(result.reanalyzedCount)}`);
+    console.log(`  • Newly Discovered Projects (on disk):   ${pc.bold(pc.cyan(result.stats.newlyDiscoveredProjects))}`);
+    console.log(`  • Reference Folders Preserved (on disk): ${pc.bold(result.stats.referenceDirectoriesOnDisk)}`);
+    console.log(`  • Historical Missing Entries Preserved:  ${pc.bold(result.stats.missingHistoricalEntries)}`);
+    console.log(`  • Total Catalog Entries in Cache:        ${pc.bold(result.stats.totalCatalogEntries)}\n`);
 
     if (result.excludedDirectories.length > 0) {
-      console.log(pc.bold('🚫 Excluded Directories:'));
+      console.log(pc.bold('🚫 Excluded Directories (Not Candidate Projects):'));
       for (const exc of result.excludedDirectories) {
         console.log(`  - ${pc.dim(exc.name)}: ${exc.reason}`);
       }
       console.log('');
     }
 
-    console.log(pc.bold('📁 Discovered Projects Breakdown (On Disk):'));
-    const onDisk = result.catalog.filter(p => p.available_locally);
-    for (const p of onDisk) {
+    console.log(pc.bold('📁 Discovered Resume-Eligible Projects (On Disk):'));
+    const candidates = result.catalog.filter(p => p.resume_eligibility);
+    for (const p of candidates) {
       const typeBadge = p.is_monorepo ? pc.magenta('[MONOREPO]') : pc.blue('[STANDALONE]');
-      const statusBadge = p.availability_status === 'newly_discovered'
+      const statusBadge = p.historical_status === 'newly_discovered'
         ? pc.green('[NEW]')
         : pc.dim('[VERIFIED]');
       const liveBadge = p.live_url ? pc.cyan('🌐 ' + p.live_url) : pc.dim('No live URL');
@@ -57,12 +58,16 @@ async function main() {
       }
     }
 
-    if (result.stats.historicalPreserved > 0) {
-      console.log(pc.bold('\n📦 Preserved Master Catalog Entries (Missing on Disk):'));
-      const missing = result.catalog.filter(p => !p.available_locally);
-      for (const m of missing) {
-        console.log(`  ${pc.yellow('[ARCHIVED/SUB-MODULE]')} ${pc.bold(m.name)}`);
-        console.log(`     ${pc.dim('Reason:')} ${m.missing_reason}`);
+    const nonEligible = result.catalog.filter(p => !p.resume_eligibility);
+    if (nonEligible.length > 0) {
+      console.log(pc.bold('\n📦 Preserved Master Catalog Entries (Non-Candidate or Missing):'));
+      for (const item of nonEligible) {
+        const availBadge = item.physical_availability
+          ? pc.yellow('[ON DISK - REFERENCE]')
+          : pc.red('[MISSING ON DISK]');
+        console.log(`  ${availBadge} ${pc.bold(item.name)} (${item.discovery_classification})`);
+        const reason = item.exclusion_reason || item.missing_reason || 'Reference entry';
+        console.log(`     ${pc.dim('Status:')} ${reason}`);
       }
     }
 
