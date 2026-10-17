@@ -333,6 +333,26 @@ async function promptPreviewMenu(prompter = defaultPrompter) {
   return action;
 }
 
+/**
+ * Step 8: Prompt document export options.
+ *
+ * @param {object} [prompter=defaultPrompter]
+ * @returns {Promise<string | symbol>}
+ */
+async function promptExportMenu(prompter = defaultPrompter) {
+  const choice = await prompter.select({
+    message: 'Export finalized resume deliverables to output/?',
+    options: [
+      { value: 'both', label: '📄 Export both Word (.docx) and PDF (.pdf) deliverables', hint: 'Recommended' },
+      { value: 'docx', label: '📝 Export Word document (.docx) only', hint: 'Editable format' },
+      { value: 'pdf', label: '📑 Export PDF document (.pdf) only', hint: 'Searchable vector PDF' },
+      { value: 'skip', label: '⏭ Skip document export', hint: 'Finalize in-memory model only' }
+    ]
+  });
+
+  return choice;
+}
+
 module.exports = {
   defaultPrompter,
   promptSelectRole,
@@ -343,5 +363,7 @@ module.exports = {
   promptReorderProjects,
   promptEditBulletPoints,
   promptProfileMenu,
-  promptPreviewMenu
+  promptPreviewMenu,
+  promptExportMenu
 };
+

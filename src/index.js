@@ -93,5 +93,10 @@ module.exports = {
   ...require('./ranking/jd-matcher'),
   ...require('./cli/session-state'),
   ...require('./cli/formatter'),
-  ...require('./cli/wizard')
+  ...require('./cli/wizard'),
+  ...require('./export/docx-generator'),
+  ...require('./export/pdf-generator'),
+  ...require('./export/html-template'),
+  ...require('./export/validator')
 };
+

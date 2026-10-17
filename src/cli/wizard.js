@@ -12,8 +12,12 @@ const {
   promptReorderProjects,
   promptEditBulletPoints,
   promptProfileMenu,
-  promptPreviewMenu
+  promptPreviewMenu,
+  promptExportMenu
 } = require('./prompts');
+const { generateResumeDocx } = require('../export/docx-generator');
+const { generateResumePdf } = require('../export/pdf-generator');
+const { validateDeliverables } = require('../export/validator');
 
 /**
  * Executes the complete step-by-step Resume Builder CLI wizard.
@@ -262,14 +266,73 @@ async function runWizard(options = {}) {
       }
 
       if (navAction === 'approve') {
+        const exportChoice = options.exportChoice || await promptExportMenu(prompter);
+        if (prompter.isCancel(exportChoice)) {
+          session.isCancelled = true;
+          prompter.cancel('Resume building session cancelled.');
+          return { sessionState: session, finalResumeModel: null, isCompleted: false, isCancelled: true };
+        }
+
+        const deliverables = {};
+        let validation = null;
+
+        if (exportChoice === 'both' || exportChoice === 'docx') {
+          try {
+            prompter.log.info('Generating Microsoft Word (.docx) resume...');
+            const docxRes = await generateResumeDocx(resumeModel);
+            deliverables.docx = docxRes;
+            prompter.log.success(`Generated DOCX: ${pc.bold(docxRes.filePath)} (${(docxRes.fileSize / 1024).toFixed(1)} KB)`);
+          } catch (err) {
+            prompter.log.error(`DOCX export failed: ${err.message}`);
+          }
+        }
+
+        if (exportChoice === 'both' || exportChoice === 'pdf') {
+          try {
+            prompter.log.info('Generating Microsoft Edge headless vector PDF resume...');
+            const pdfRes = await generateResumePdf(resumeModel);
+            deliverables.pdf = pdfRes;
+            prompter.log.success(`Generated PDF: ${pc.bold(pdfRes.filePath)} (${(pdfRes.fileSize / 1024).toFixed(1)} KB, ${pdfRes.pageCount} page(s))`);
+          } catch (err) {
+            prompter.log.error(`PDF export failed: ${err.message}`);
+          }
+        }
+
+        if (deliverables.docx || deliverables.pdf) {
+          validation = await validateDeliverables(
+            { docxPath: deliverables.docx?.filePath, pdfPath: deliverables.pdf?.filePath },
+            resumeModel
+          );
+
+          if (validation.pdf) {
+            if (validation.pdf.valid) {
+              prompter.log.success(pc.green(`✔ PDF validation passed: Exactly ${validation.pdf.pageCount} page(s), valid reading order & text selectability.`));
+            } else {
+              prompter.log.warn(pc.yellow(`⚠ PDF validation issues detected:`));
+              validation.pdf.errors.forEach(e => prompter.log.error(`  - ${e}`));
+            }
+          }
+
+          if (validation.docx) {
+            if (validation.docx.valid) {
+              prompter.log.success(pc.green(`✔ DOCX validation passed: Valid OpenXML structure.`));
+            } else {
+              validation.docx.errors.forEach(e => prompter.log.error(`  - ${e}`));
+            }
+          }
+        }
+
         session.isCompleted = true;
-        prompter.outro(pc.bold(pc.green('✔ Resume Content Model Finalized & Ready for Document Export!')));
+        prompter.outro(pc.bold(pc.green('✔ Resume Content Model Finalized & Exported Successfully!')));
         prompter.log.success(`Target Role: ${pc.bold(resumeModel.metadata.targetRoleTitle)}`);
         prompter.log.success(`Format Budget: ${pc.bold(resumeModel.metadata.resumeLength.toUpperCase())}`);
         prompter.log.success(`Selected Projects: ${pc.bold(resumeModel.projects.map(p => p.name).join(', '))}`);
+
         return {
           sessionState: session,
           finalResumeModel: resumeModel,
+          deliverables,
+          validation,
           isCompleted: true,
           isCancelled: false
         };

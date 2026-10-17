@@ -373,7 +373,8 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
         'done',          // Step 6: Bullets review for proj 2 -> done
         'done',          // Step 6: Bullets review for proj 3 -> done
         'continue',      // Step 7: Profile menu -> continue
-        'approve'        // Step 8: Preview menu -> approve & complete
+        'approve',       // Step 8: Preview menu -> approve & complete
+        'skip'           // Step 8: Export menu -> skip export
       ],
       multiselectQueue: [
         ['court-booking', 'lidar-core', 'ai-vector-search'] // Step 4: promptSelectProjects
