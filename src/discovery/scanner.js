@@ -27,7 +27,7 @@ async function mapConcurrent(items, concurrency, fn) {
  * @returns {Promise<object>} Complete scan results and summary statistics
  */
 async function scanProjects(options = {}) {
-  const rootDir = options.rootDir || 'C:\\Users\\manis\\Projects';
+  const rootDir = options.rootDir || options.projectsDir || 'C:\\Users\\manis\\Projects';
   const refresh = Boolean(options.refresh);
   const concurrency = options.concurrency || 6;
 

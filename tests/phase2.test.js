@@ -468,4 +468,214 @@ describe('Phase 2 Discovery, Boundary Detection & Caching Test Suite', () => {
     assert.equal(evidenceCompleteness, 0, 'Incomplete evidence must be tracked as 0% completeness');
   });
 
+  // 15. Non-Git: Unchanged project reuses cached analysis across scan passes
+  test('Case 15: Non-Git project reuses cached analysis when unchanged', async () => {
+    const testRoot = path.join(fixtureDir, 'nongit-cache-test');
+    const projDir = path.join(testRoot, 'standalone-nongit');
+    fs.mkdirSync(projDir, { recursive: true });
+    fs.writeFileSync(path.join(projDir, 'package.json'), JSON.stringify({ name: 'standalone-nongit', dependencies: { express: '^4.18.0' } }));
+    fs.writeFileSync(path.join(projDir, 'README.md'), '# Standalone Non-Git Project\n\nA standalone non-git project.');
+
+    const catalogPath = path.join(fixtureDir, 'nongit-catalog-15.json');
+    const scanOpts = {
+      rootDir: testRoot,
+      catalogPath,
+      internalDocsPath: path.join(fixtureDir, 'no-docs'),
+      refresh: false
+    };
+
+    // Cold scan
+    const run1 = await scanProjects(scanOpts);
+    assert.equal(run1.reanalyzedCount, 1);
+    assert.equal(run1.cachedCount, 0);
+
+    // Warm scan: Must reuse cache
+    const run2 = await scanProjects(scanOpts);
+    assert.equal(run2.reanalyzedCount, 0);
+    assert.equal(run2.cachedCount, 1);
+    assert.equal(run2.scannedProjectsCount, 1);
+  });
+
+  // 16. Non-Git: Content change with identical size and timestamp invalidates cache
+  test('Case 16: Non-Git content modification with identical size and mtime triggers re-analysis', async () => {
+    const testRoot = path.join(fixtureDir, 'nongit-samesize-test');
+    const projDir = path.join(testRoot, 'samesize-proj');
+    const srcDir = path.join(projDir, 'src');
+    fs.mkdirSync(srcDir, { recursive: true });
+    fs.writeFileSync(path.join(projDir, 'package.json'), JSON.stringify({ name: 'samesize-proj' }));
+
+    const targetSource = path.join(srcDir, 'app.js');
+    const fixedTime = new Date('2025-06-15T12:00:00Z');
+
+    // Initial content: 30 characters
+    fs.writeFileSync(targetSource, 'const version = "1.0.0-alpha";');
+    fs.utimesSync(targetSource, fixedTime, fixedTime);
+
+    const catalogPath = path.join(fixtureDir, 'nongit-catalog-16.json');
+    const scanOpts = {
+      rootDir: testRoot,
+      catalogPath,
+      internalDocsPath: path.join(fixtureDir, 'no-docs'),
+      refresh: false
+    };
+
+    // Baseline scan
+    const run1 = await scanProjects(scanOpts);
+    assert.equal(run1.reanalyzedCount, 1);
+
+    // Modify content with EXACT SAME SIZE (30 chars) and EXACT SAME MTIME
+    fs.writeFileSync(targetSource, 'const version = "2.0.0-final";');
+    fs.utimesSync(targetSource, fixedTime, fixedTime);
+
+    const stat = fs.statSync(targetSource);
+    assert.equal(stat.size, 30);
+    assert.equal(stat.mtime.getTime(), fixedTime.getTime());
+
+    // Second scan: Must detect content change, invalidate cache, and re-analyze
+    const run2 = await scanProjects(scanOpts);
+    assert.equal(run2.reanalyzedCount, 1, 'Scanner must re-analyze when content changes even if size and mtime are preserved');
+    assert.equal(run2.cachedCount, 0);
+  });
+
+  // 17. Non-Git: Adding, renaming, and deleting relevant files invalidates cache
+  test('Case 17: Non-Git file addition, rename, and deletion invalidate cache', async () => {
+    const testRoot = path.join(fixtureDir, 'nongit-mutation-test');
+    const projDir = path.join(testRoot, 'mutation-proj');
+    const srcDir = path.join(projDir, 'src');
+    fs.mkdirSync(srcDir, { recursive: true });
+    fs.writeFileSync(path.join(projDir, 'package.json'), JSON.stringify({ name: 'mutation-proj' }));
+    fs.writeFileSync(path.join(srcDir, 'handler.ts'), 'export const handler = () => true;');
+
+    const catalogPath = path.join(fixtureDir, 'nongit-catalog-17.json');
+    const scanOpts = {
+      rootDir: testRoot,
+      catalogPath,
+      internalDocsPath: path.join(fixtureDir, 'no-docs'),
+      refresh: false
+    };
+
+    // 1. Initial scan
+    await scanProjects(scanOpts);
+
+    // 2. Add relevant file
+    fs.writeFileSync(path.join(srcDir, 'service.ts'), 'export const service = () => ({});');
+    const addRun = await scanProjects(scanOpts);
+    assert.equal(addRun.reanalyzedCount, 1, 'Adding a relevant file must invalidate cache');
+
+    // 3. Rename relevant file
+    fs.renameSync(path.join(srcDir, 'service.ts'), path.join(srcDir, 'service-renamed.ts'));
+    const renameRun = await scanProjects(scanOpts);
+    assert.equal(renameRun.reanalyzedCount, 1, 'Renaming a relevant file must invalidate cache');
+
+    // 4. Delete relevant file
+    fs.unlinkSync(path.join(srcDir, 'service-renamed.ts'));
+    const deleteRun = await scanProjects(scanOpts);
+    assert.equal(deleteRun.reanalyzedCount, 1, 'Deleting a relevant file must invalidate cache');
+  });
+
+  // 18. Non-Git: Changes to source files and documentation are detected (not only manifests)
+  test('Case 18: Non-Git changes to source files and documentation are detected', async () => {
+    const testRoot = path.join(fixtureDir, 'nongit-source-doc-test');
+    const projDir = path.join(testRoot, 'src-doc-proj');
+    fs.mkdirSync(path.join(projDir, 'src'), { recursive: true });
+    fs.writeFileSync(path.join(projDir, 'package.json'), JSON.stringify({ name: 'src-doc-proj' }));
+    fs.writeFileSync(path.join(projDir, 'README.md'), '# Initial Documentation');
+    fs.writeFileSync(path.join(projDir, 'src', 'main.py'), 'def run(): pass');
+
+    const catalogPath = path.join(fixtureDir, 'nongit-catalog-18.json');
+    const scanOpts = {
+      rootDir: testRoot,
+      catalogPath,
+      internalDocsPath: path.join(fixtureDir, 'no-docs'),
+      refresh: false
+    };
+
+    // Initial baseline
+    await scanProjects(scanOpts);
+
+    // Modify source file only (manifest is completely unchanged)
+    fs.writeFileSync(path.join(projDir, 'src', 'main.py'), 'def run(): return "updated logic"');
+    const srcRun = await scanProjects(scanOpts);
+    assert.equal(srcRun.reanalyzedCount, 1, 'Source code modification must invalidate cache even when manifest is untouched');
+
+    // Warm cache verification
+    const warmRun = await scanProjects(scanOpts);
+    assert.equal(warmRun.cachedCount, 1);
+
+    // Modify documentation file only (manifest and source untouched)
+    fs.writeFileSync(path.join(projDir, 'README.md'), '# Updated Documentation\n\nNew project features described here.');
+    const docRun = await scanProjects(scanOpts);
+    assert.equal(docRun.reanalyzedCount, 1, 'Documentation modification must invalidate cache even when manifest is untouched');
+  });
+
+  // 19. Non-Git: Explicit --refresh bypasses cached analysis
+  test('Case 19: Non-Git explicit refresh flag bypasses cached analysis', async () => {
+    const testRoot = path.join(fixtureDir, 'nongit-refresh-test');
+    const projDir = path.join(testRoot, 'refresh-proj');
+    fs.mkdirSync(projDir, { recursive: true });
+    fs.writeFileSync(path.join(projDir, 'package.json'), JSON.stringify({ name: 'refresh-proj' }));
+
+    const catalogPath = path.join(fixtureDir, 'nongit-catalog-19.json');
+    const scanOpts = {
+      rootDir: testRoot,
+      catalogPath,
+      internalDocsPath: path.join(fixtureDir, 'no-docs'),
+      refresh: false
+    };
+
+    // Initial scan
+    await scanProjects(scanOpts);
+
+    // Normal scan reuses cache
+    const warmRun = await scanProjects(scanOpts);
+    assert.equal(warmRun.cachedCount, 1);
+    assert.equal(warmRun.reanalyzedCount, 0);
+
+    // Refresh scan forces re-analysis
+    const refreshRun = await scanProjects({ ...scanOpts, refresh: true });
+    assert.equal(refreshRun.cachedCount, 0, 'Forced refresh must not reuse cache');
+    assert.equal(refreshRun.reanalyzedCount, 1, 'Forced refresh must re-analyze project');
+  });
+
+  // 20. Non-Git: Sensitive files and excluded build/dependency directories remain excluded
+  test('Case 20: Non-Git sensitive files and ignored directories do not invalidate cache', async () => {
+    const testRoot = path.join(fixtureDir, 'nongit-sensitive-test');
+    const projDir = path.join(testRoot, 'sensitive-proj');
+    fs.mkdirSync(projDir, { recursive: true });
+    fs.writeFileSync(path.join(projDir, 'package.json'), JSON.stringify({ name: 'sensitive-proj' }));
+    fs.writeFileSync(path.join(projDir, 'README.md'), '# Security Project');
+
+    const catalogPath = path.join(fixtureDir, 'nongit-catalog-20.json');
+    const scanOpts = {
+      rootDir: testRoot,
+      catalogPath,
+      internalDocsPath: path.join(fixtureDir, 'no-docs'),
+      refresh: false
+    };
+
+    // Initial scan to populate cache
+    await scanProjects(scanOpts);
+
+    // Add sensitive files: .env, credentials.json, id_rsa, cert.pem
+    fs.writeFileSync(path.join(projDir, '.env'), 'SECRET_API_KEY=super-secret-123');
+    fs.writeFileSync(path.join(projDir, '.env.production'), 'DB_PASS=production-pass');
+    fs.writeFileSync(path.join(projDir, 'credentials.json'), '{"private_key": "private"}');
+    fs.writeFileSync(path.join(projDir, 'server.pem'), '-----BEGIN RSA PRIVATE KEY-----');
+    fs.writeFileSync(path.join(projDir, 'app.key'), 'binary-key-data');
+
+    // Add ignored directories: node_modules, dist, build, .cache
+    const nodeModulesDir = path.join(projDir, 'node_modules', 'some-pkg');
+    fs.mkdirSync(nodeModulesDir, { recursive: true });
+    fs.writeFileSync(path.join(nodeModulesDir, 'index.js'), 'module.exports = {};');
+
+    const distDir = path.join(projDir, 'dist');
+    fs.mkdirSync(distDir, { recursive: true });
+    fs.writeFileSync(path.join(distDir, 'bundle.js'), 'console.log("dist bundle");');
+
+    // Scan again: Cache MUST NOT be invalidated by sensitive or build files
+    const run = await scanProjects(scanOpts);
+    assert.equal(run.cachedCount, 1, 'Sensitive and build files must not invalidate cache');
+    assert.equal(run.reanalyzedCount, 0, 'No re-analysis should occur for sensitive/build changes');
+  });
+
 });

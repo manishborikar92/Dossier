@@ -5,15 +5,16 @@ const { checkGitFast } = require('./git-inspector');
 
 // File extensions and patterns considered relevant for project analysis
 const RELEVANT_EXTENSIONS = new Set([
-  '.json', '.js', '.jsx', '.ts', '.tsx', '.py', '.go', '.rs', '.php', '.dart',
-  '.md', '.txt', '.toml', '.yaml', '.yml', '.prisma', '.sql', '.html'
+  '.json', '.js', '.jsx', '.ts', '.tsx', '.mjs', '.cjs', '.py', '.go', '.rs', '.php', '.dart',
+  '.c', '.cpp', '.h', '.hpp', '.cs', '.java', '.kt', '.swift',
+  '.md', '.txt', '.toml', '.yaml', '.yml', '.prisma', '.sql', '.html', '.css', '.scss'
 ]);
 
 const RELEVANT_FILENAMES = new Set([
   'package.json', 'package-lock.json', 'pnpm-lock.yaml', 'pnpm-workspace.yaml',
   'yarn.lock', 'requirements.txt', 'pyproject.toml', 'pipfile', 'setup.py',
-  'cargo.toml', 'composer.json', 'dockerfile', 'docker-compose.yml',
-  'readme.md', 'architecture.md', 'license', 'license.md'
+  'cargo.toml', 'composer.json', 'dockerfile', 'docker-compose.yml', 'makefile',
+  'cmakelists.txt', 'gemfile', 'readme.md', 'architecture.md', 'license', 'license.md'
 ]);
 
 const IGNORED_DIRS = new Set([
@@ -73,7 +74,7 @@ function hashFileContent(filePath) {
 /**
  * Recursively collects relevant files from a directory up to maxDepth.
  */
-function collectRelevantFiles(dirPath, currentDepth = 0, maxDepth = 4, baseDir = dirPath) {
+function collectRelevantFiles(dirPath, currentDepth = 0, maxDepth = 6, baseDir = dirPath) {
   const results = [];
   if (currentDepth > maxDepth) return results;
 
