@@ -11,6 +11,7 @@
 
 const fs = require('fs');
 const path = require('path');
+const JSZip = require('jszip');
 const { PDFParse } = require('pdf-parse');
 
 /**
@@ -340,22 +341,212 @@ async function validateDocxResume(docxPath, resumeModel) {
   // Check valid ZIP PK header (0x50, 0x4B, 0x03, 0x04)
   if (buf[0] !== 0x50 || buf[1] !== 0x4B) {
     errors.push('File is not a valid OpenXML ZIP archive (missing PK signature).');
+    return {
+      valid: false,
+      format: 'docx',
+      filePath: resolvedPath,
+      fileSize: stats.size,
+      errors,
+      warnings,
+      metrics: { fileSize: stats.size }
+    };
   }
 
-  const bufStr = buf.toString('latin1');
-  if (!bufStr.includes('word/document.xml')) {
-    errors.push('DOCX archive missing mandatory word/document.xml entry.');
+  let zip;
+  try {
+    zip = await JSZip.loadAsync(buf);
+  } catch (err) {
+    errors.push(`Failed to unpack DOCX archive: ${err.message}`);
+    return {
+      valid: false,
+      format: 'docx',
+      filePath: resolvedPath,
+      fileSize: stats.size,
+      errors,
+      warnings,
+      metrics: { fileSize: stats.size }
+    };
   }
+
+  const docXmlFile = zip.file('word/document.xml');
+  if (!docXmlFile) {
+    errors.push('DOCX archive missing mandatory word/document.xml entry.');
+    return {
+      valid: false,
+      format: 'docx',
+      filePath: resolvedPath,
+      fileSize: stats.size,
+      errors,
+      warnings,
+      metrics: { fileSize: stats.size }
+    };
+  }
+
+  const docXml = await docXmlFile.async('text');
+
+  // ── 1. Prohibited Table & Multi-Column Layout Verification (ATS Compliance) ──
+  const hasTable = docXml.includes('<w:tbl') || docXml.includes('<w:tbl>');
+  if (hasTable) {
+    errors.push(
+      'Prohibited layout structure found in DOCX: Document contains <w:tbl> table elements. ATS-compliant resumes must use single-column paragraph layouts with tab stops, not layout tables.'
+    );
+  }
+
+  if (/<w:cols[^>]*w:num="[2-9]"/i.test(docXml)) {
+    errors.push(
+      'Prohibited multi-column layout structure found in DOCX: ATS-compliant resumes must use single-column body layouts.'
+    );
+  }
+
+  // ── 2. Sequential Text Extraction & Paragraph Reconstruction ─────────────────
+  const pRegex = /<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g;
+  const tRegex = /<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>/g;
+  const paragraphs = [];
+  let pMatch;
+  while ((pMatch = pRegex.exec(docXml)) !== null) {
+    const pContent = pMatch[1];
+    let pText = '';
+    let tMatch;
+    const cleanContent = pContent.replace(/<w:tab\/>/g, ' \t ');
+    while ((tMatch = tRegex.exec(cleanContent)) !== null) {
+      pText += tMatch[1];
+    }
+    if (pText.trim().length > 0) {
+      paragraphs.push(pText.trim());
+    }
+  }
+
+  const extractedText = paragraphs.join('\n');
+  if (extractedText.length === 0) {
+    errors.push('Extracted DOCX text is empty; document does not contain readable paragraph content.');
+  }
+
+  // ── 3. Content Integrity & Reading Order Checks ─────────────────────────────
+  const sectionPositions = [];
+  if (resumeModel && typeof resumeModel === 'object') {
+    const personal = resumeModel.personal || {};
+
+    if (personal.name && !extractedText.toLowerCase().includes(personal.name.toLowerCase())) {
+      errors.push(`Candidate name "${personal.name}" was not found in extracted DOCX text.`);
+    }
+
+    if (personal.email && !extractedText.toLowerCase().includes(personal.email.toLowerCase())) {
+      errors.push(`Contact email "${personal.email}" was not found in extracted DOCX text.`);
+    }
+
+    if (resumeModel.summary && resumeModel.summary.trim().length > 0) {
+      const sampleSummary = resumeModel.summary.trim().slice(0, 40).toLowerCase();
+      if (!extractedText.toLowerCase().includes(sampleSummary)) {
+        warnings.push('Professional Summary snippet was not detected in extracted DOCX text.');
+      }
+    }
+
+    // Check Selected Projects & Order
+    const projectPositions = [];
+    if (Array.isArray(resumeModel.projects)) {
+      for (const proj of resumeModel.projects) {
+        const projTitle = (proj.title || proj.name || '').toLowerCase();
+        const pos = extractedText.toLowerCase().indexOf(projTitle);
+        if (pos === -1) {
+          errors.push(`Approved project "${proj.title || proj.name}" was not found in extracted DOCX text.`);
+        } else {
+          projectPositions.push({ id: proj.id, name: proj.title || proj.name, pos });
+        }
+      }
+
+      for (let i = 0; i < projectPositions.length - 1; i++) {
+        if (projectPositions[i].pos > projectPositions[i + 1].pos) {
+          errors.push(
+            `Project order mismatch in DOCX: "${projectPositions[i].name}" was expected before "${projectPositions[i + 1].name}", but appears after in the extracted text.`
+          );
+        }
+      }
+    }
+
+    // Check Professional Experience
+    if (Array.isArray(resumeModel.experience)) {
+      for (const exp of resumeModel.experience) {
+        if (exp.company && !extractedText.toLowerCase().includes(exp.company.toLowerCase())) {
+          errors.push(`Experience employer "${exp.company}" was not found in extracted DOCX text.`);
+        }
+      }
+    }
+
+    // Check Education
+    if (Array.isArray(resumeModel.education)) {
+      for (const edu of resumeModel.education) {
+        if (edu.institution && !extractedText.toLowerCase().includes(edu.institution.toLowerCase())) {
+          errors.push(`Education institution "${edu.institution}" was not found in extracted DOCX text.`);
+        }
+      }
+    }
+
+    // ── 4. Single-Column Reading Order Sequencing Check ───────────────────────
+    const sectionsToCheck = [
+      { name: 'Professional Summary', token: 'professional summary', required: Boolean(resumeModel.summary) },
+      { name: 'Technical Skills', token: 'technical skills', required: Array.isArray(resumeModel.skills) && resumeModel.skills.length > 0 },
+      { name: 'Professional Experience', token: 'professional experience', required: Array.isArray(resumeModel.experience) && resumeModel.experience.length > 0 },
+      { name: 'Projects & Deliverables', token: 'projects', required: Array.isArray(resumeModel.projects) && resumeModel.projects.length > 0 },
+      { name: 'Education', token: 'education', required: Array.isArray(resumeModel.education) && resumeModel.education.length > 0 }
+    ];
+
+    let lastIndex = -1;
+
+    for (const sec of sectionsToCheck) {
+      if (!sec.required) continue;
+      const idx = extractedText.toLowerCase().indexOf(sec.token);
+      if (idx !== -1) {
+        sectionPositions.push({ section: sec.name, index: idx });
+        if (idx < lastIndex) {
+          errors.push(
+            `DOCX Reading order anomaly: Section "${sec.name}" (at char ${idx}) appears before previous section (at char ${lastIndex}), indicating broken single-column layout flow.`
+          );
+        }
+        lastIndex = idx;
+      }
+    }
+
+    // ── 5. Hyperlink Preservation in Relationships ────────────────────────────
+    const relsFile = zip.file('word/_rels/document.xml.rels');
+    const detectedDocxUris = [];
+    if (relsFile) {
+      const relsXml = await relsFile.async('text');
+      const relRegex = /<Relationship\s+([^>]+)\/>/g;
+      let relMatch;
+      while ((relMatch = relRegex.exec(relsXml)) !== null) {
+        const attrs = relMatch[1];
+        const isHyperlink = attrs.includes('/relationships/hyperlink') || attrs.includes('TargetMode="External"');
+        if (isHyperlink) {
+          const targetMatch = /Target="([^"]+)"/.exec(attrs);
+          if (targetMatch) {
+            detectedDocxUris.push(targetMatch[1]);
+          }
+        }
+      }
+    }
+
+    for (const uri of detectedDocxUris) {
+      if (!/^(https?:\/\/|mailto:|tel:)/i.test(uri)) {
+        errors.push(`Unsafe or invalid URI scheme found in DOCX relationship: "${uri}"`);
+      }
+    }
+  }
+
+  const isValid = errors.length === 0;
 
   return {
-    valid: errors.length === 0,
+    valid: isValid,
     format: 'docx',
     filePath: resolvedPath,
     fileSize: stats.size,
     errors,
     warnings,
     metrics: {
-      fileSize: stats.size
+      fileSize: stats.size,
+      paragraphCount: paragraphs.length,
+      extractedTextLength: extractedText.length,
+      hasTable,
+      sectionOrder: sectionPositions.map(s => s.section)
     }
   };
 }

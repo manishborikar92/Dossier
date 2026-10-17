@@ -83,10 +83,11 @@ async function generateResumePdf(resumeModel, options = {}) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
+  const candidateSlug = (resumeModel.personal?.name || 'Candidate').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
   const targetRoleSlug = (resumeModel.metadata?.targetRole || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
   const targetLength = resumeModel.metadata?.resumeLength || '2page';
   const timestamp = Date.now();
-  const defaultFilename = `Manish_Borikar_${targetRoleSlug}_${targetLength}_${timestamp}.pdf`;
+  const defaultFilename = `${candidateSlug}_${targetRoleSlug}_${targetLength}_${timestamp}.pdf`;
 
   const finalPdfPath = options.outputPath
     ? path.resolve(options.outputPath)

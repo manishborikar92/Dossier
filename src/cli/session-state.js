@@ -5,30 +5,43 @@ const { parseJobDescription } = require('../ranking/jd-matcher');
 const { loadRoleProfiles } = require('../ranking/role-profiles');
 
 /**
- * Loads baseline profile from config/profile.json or fallback example.
+ * Loads baseline profile from config/profile.json or specified customPath.
+ * Never silently loads profile.example.json as user's personal information.
  *
  * @param {string} [customPath]
+ * @param {object} [options]
+ * @param {boolean} [options.allowMissing=false] - If true, returns an empty schema when file does not exist
  * @returns {object} Profile object
  */
-function loadProfile(customPath = null) {
+function loadProfile(customPath = null, options = {}) {
   const profilePath = customPath || path.resolve(__dirname, '../../config/profile.json');
-  const examplePath = path.resolve(__dirname, '../../config/profile.example.json');
 
   if (fs.existsSync(profilePath)) {
-    return JSON.parse(fs.readFileSync(profilePath, 'utf8'));
+    try {
+      const content = fs.readFileSync(profilePath, 'utf8');
+      return JSON.parse(content);
+    } catch (err) {
+      throw new Error(`Profile configuration file at "${profilePath}" contains invalid JSON: ${err.message}`);
+    }
   }
-  if (fs.existsSync(examplePath)) {
-    return JSON.parse(fs.readFileSync(examplePath, 'utf8'));
+
+  if (options.allowMissing) {
+    return {
+      personal: { name: '', email: '', phone: '', location: '', linkedin: '', github: '', portfolio: '' },
+      summary: '',
+      skills: {},
+      experience: [],
+      education: [],
+      certifications: [],
+      leadership: []
+    };
   }
-  return {
-    personal: { name: 'MANISH BORIKAR', email: 'manishborikar92@gmail.com' },
-    summary: '',
-    skills: {},
-    experience: [],
-    education: [],
-    certifications: [],
-    leadership: []
-  };
+
+  throw new Error(
+    `Profile configuration file not found at: "${profilePath}".\n` +
+    `The application will not use placeholder or example profile data as your personal resume.\n` +
+    `Please configure your verified personal details in "config/profile.json" before running the resume builder.`
+  );
 }
 
 /**
@@ -95,7 +108,7 @@ function prioritizeSkillsByRole(skills = {}, role = 'general') {
  * @returns {object} Session State instance
  */
 function createSession(options = {}) {
-  const profileData = loadProfile(options.profilePath);
+  const profileData = loadProfile(options.profilePath, { allowMissing: Boolean(options.allowMissingProfile) });
 
   const state = {
     targetRole: 'general',

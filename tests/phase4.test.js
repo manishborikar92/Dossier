@@ -487,7 +487,7 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
       const nonExistentPath = path.resolve(__dirname, '../data/non-existent-profile.tmp.json');
       if (fs.existsSync(nonExistentPath)) fs.unlinkSync(nonExistentPath);
 
-      const emptySession = createSession({ catalog: mockCatalog, profilePath: nonExistentPath });
+      const emptySession = createSession({ catalog: mockCatalog, profilePath: nonExistentPath, allowMissingProfile: true });
       emptySession.updateSummary('Transient text');
       emptySession.revertProfileEdits();
       assert.equal(fs.existsSync(nonExistentPath), false, 'Non-existent profile file must not be created on cancellation');

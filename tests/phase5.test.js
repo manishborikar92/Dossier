@@ -3,8 +3,9 @@ const assert = require('node:assert/strict');
 const fs = require('fs');
 const path = require('path');
 const { PDFParse } = require('pdf-parse');
+const JSZip = require('jszip');
 
-const { createSession } = require('../src/cli/session-state');
+const { createSession, loadProfile } = require('../src/cli/session-state');
 const { generateResumeHtml, escapeHtml, sanitizeUrl } = require('../src/export/html-template');
 const { generateResumeDocx } = require('../src/export/docx-generator');
 const { generateResumePdf, resolveEdgePath } = require('../src/export/pdf-generator');
@@ -493,5 +494,112 @@ describe('Phase 5 Document Exporters and Output Validation Test Suite', () => {
     if (fs.existsSync(result.deliverables.pdf.filePath)) {
       fs.unlinkSync(result.deliverables.pdf.filePath);
     }
+  });
+
+  // Case 14: ATS Layout Validation: Detects and rejects prohibited layout tables in DOCX
+  test('Case 14: ATS layout verification detects and rejects prohibited <w:tbl> layout tables in DOCX', async () => {
+    const session = createSession({ catalog: testCatalog });
+    session.setTargetRole('fullstack');
+    session.setResumeLength('1page');
+    session.selectProjects(['court-booking']);
+    const model = session.getFinalResumeModel();
+
+    const targetDocx = path.join(testOutputDir, 'test_table_detection.docx');
+    await generateResumeDocx(model, { outputPath: targetDocx });
+
+    // Legitimate DOCX has no tables
+    const validCheck = await validateDocxResume(targetDocx, model);
+    assert.equal(validCheck.valid, true);
+    assert.equal(validCheck.metrics.hasTable, false);
+
+    // Intentionally inject a layout table <w:tbl> into the DOCX zip archive
+    const docxBuf = fs.readFileSync(targetDocx);
+    const zip = await JSZip.loadAsync(docxBuf);
+    let docXml = await zip.file('word/document.xml').async('text');
+    docXml = docXml.replace('</w:body>', '<w:tbl><w:tr><w:tc><w:p><w:r><w:t>Injected Layout Table</w:t></w:r></w:p></w:tc></w:tr></w:tbl></w:body>');
+    zip.file('word/document.xml', docXml);
+    const tamperedBuf = await zip.generateAsync({ type: 'nodebuffer' });
+    fs.writeFileSync(targetDocx, tamperedBuf);
+
+    // Validate that our ATS inspector rejects the document with table structure
+    const tamperedCheck = await validateDocxResume(targetDocx, model);
+    assert.equal(tamperedCheck.valid, false);
+    assert.ok(tamperedCheck.errors.some(e => e.includes('Prohibited layout structure found in DOCX')));
+  });
+
+  // Case 15: DOCX sequential text extraction and single-column reading order
+  test('Case 15: DOCX text extraction verifies sequential single-column ATS reading order', async () => {
+    const session = createSession({ catalog: testCatalog });
+    session.setTargetRole('fullstack');
+    session.setResumeLength('1page');
+    session.selectProjects(['court-booking', 'ai-vector-search']);
+    const model = session.getFinalResumeModel();
+
+    const targetDocx = path.join(testOutputDir, 'test_reading_order.docx');
+    await generateResumeDocx(model, { outputPath: targetDocx });
+
+    const val = await validateDocxResume(targetDocx, model);
+    assert.equal(val.valid, true);
+    assert.ok(val.metrics.extractedTextLength > 500);
+    assert.ok(val.metrics.paragraphCount > 10);
+    assert.equal(val.metrics.hasTable, false);
+
+    // Verify sections appeared in strictly correct ATS sequential reading order
+    const expectedOrder = ['Professional Summary', 'Technical Skills', 'Professional Experience', 'Projects & Deliverables', 'Education'];
+    for (let i = 0; i < expectedOrder.length; i++) {
+      assert.equal(val.metrics.sectionOrder[i], expectedOrder[i]);
+    }
+  });
+
+  // Case 16: Profile loader safety: rejects missing profile configuration without falling back to sample data
+  test('Case 16: Profile loader rejects missing profile configuration without falling back to sample or placeholder data', () => {
+    const missingPath = path.resolve(__dirname, '../data/strictly-nonexistent-profile.json');
+    assert.throws(
+      () => loadProfile(missingPath),
+      /Profile configuration file not found/
+    );
+
+    // With allowMissing option, returns empty template without sample data
+    const emptyProfile = loadProfile(missingPath, { allowMissing: true });
+    assert.equal(emptyProfile.personal.name, '');
+    assert.equal(emptyProfile.personal.email, '');
+    assert.notEqual(emptyProfile.personal.name, 'Jane Doe');
+    assert.notEqual(emptyProfile.personal.email, 'jane.doe@example.com');
+  });
+
+  // Case 17: Profile loader rejects malformed JSON profiles with a descriptive syntax error
+  test('Case 17: Profile loader rejects malformed JSON profiles with a descriptive syntax error', () => {
+    const malformedPath = path.join(testOutputDir, 'malformed-profile.json');
+    fs.writeFileSync(malformedPath, '{ "personal": { "name": "Broken", } }', 'utf8');
+
+    try {
+      assert.throws(
+        () => loadProfile(malformedPath),
+        /contains invalid JSON/
+      );
+    } finally {
+      if (fs.existsSync(malformedPath)) {
+        fs.unlinkSync(malformedPath);
+      }
+    }
+  });
+
+  // Case 18: Stress test: handles very long job description and special characters deterministically
+  test('Case 18: System handles very long job description and non-ASCII Unicode characters gracefully', () => {
+    const session = createSession({ catalog: testCatalog });
+    session.setTargetRole('backend');
+
+    // Generate 25,000+ character JD with dense requirements, punctuation, and Unicode symbols
+    const longJdText = 'Seeking Principal Backend Architect proficient in Node.js, Express.js, PostgreSQL, Docker, and distributed systems. '
+      .repeat(250) + ' Special requirements: 🚀 microservices, high-throughput caching with Redis, & zero-downtime migrations.';
+
+    session.setJobDescription(longJdText);
+    assert.ok(session.rankedProjects.length > 0);
+    assert.ok(session.jdAnalysis);
+    assert.ok(session.jdAnalysis.effectiveAlpha > 0);
+
+    const model = session.getFinalResumeModel();
+    assert.ok(model);
+    assert.equal(model.metadata.targetRole, 'backend');
   });
 });

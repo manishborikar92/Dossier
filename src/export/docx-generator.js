@@ -128,10 +128,11 @@ async function generateResumeDocx(resumeModel, options = {}) {
     fs.mkdirSync(outputDir, { recursive: true });
   }
 
+  const candidateSlug = (personal.name || 'Candidate').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
   const targetRoleSlug = (resumeModel.metadata?.targetRole || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
   const targetLength = resumeModel.metadata?.resumeLength || '2page';
   const timestamp = Date.now();
-  const defaultFilename = `Manish_Borikar_${targetRoleSlug}_${targetLength}_${timestamp}.docx`;
+  const defaultFilename = `${candidateSlug}_${targetRoleSlug}_${targetLength}_${timestamp}.docx`;
 
   const finalDocxPath = options.outputPath
     ? path.resolve(options.outputPath)
@@ -140,21 +141,23 @@ async function generateResumeDocx(resumeModel, options = {}) {
   const children = [];
 
   // ── 1. Name ────────────────────────────────────────────────────────────────
-  children.push(
-    new Paragraph({
-      alignment: AlignmentType.CENTER,
-      spacing: { before: 0, after: is1Page ? 30 : 60 },
-      children: [
-        new TextRun({
-          text: personal.name || 'MANISH BORIKAR',
-          bold: true,
-          size: is1Page ? 32 : SIZES.NAME,
-          font: 'Arial',
-          color: COLORS.ACCENT
-        })
-      ]
-    })
-  );
+  if (personal.name && personal.name.trim().length > 0) {
+    children.push(
+      new Paragraph({
+        alignment: AlignmentType.CENTER,
+        spacing: { before: 0, after: is1Page ? 30 : 60 },
+        children: [
+          new TextRun({
+            text: personal.name.trim(),
+            bold: true,
+            size: is1Page ? 32 : SIZES.NAME,
+            font: 'Arial',
+            color: COLORS.ACCENT
+          })
+        ]
+      })
+    );
+  }
 
   // ── 2. Contact Information ─────────────────────────────────────────────────
   const contactChildren = [];
