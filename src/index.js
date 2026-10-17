@@ -85,4 +85,10 @@ if (require.main === module) {
   main();
 }
 
-module.exports = { main };
+module.exports = {
+  main,
+  scanProjects,
+  ...require('./ranking/scorer'),
+  ...require('./ranking/role-profiles'),
+  ...require('./ranking/jd-matcher')
+};
