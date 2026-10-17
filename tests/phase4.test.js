@@ -340,6 +340,7 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
   test('Case 10: Formatting helpers generate structured, readable terminal output', () => {
     const session = createSession({ catalog: mockCatalog });
     session.setTargetRole('general');
+    session.selectProjects(['court-booking']);
 
     // Format table
     const tableStr = formatProjectTable(session.rankedProjects, ['court-booking']);
@@ -361,17 +362,21 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
   });
 
   // Case 11: End-to-end wizard execution with simulated prompt responses (Happy Path)
-  test('Case 11: End-to-end wizard runs smoothly to completion with simulated prompt responses', async () => {
+  test('Case 11: End-to-end wizard runs smoothly to completion with explicit project selection', async () => {
     const mockPrompter = createMockPrompter({
       selectQueue: [
         'fullstack',     // Step 1: Role
         '2page',         // Step 3: Length
-        'continue',      // Step 4/5: Projects action menu -> continue
+        'select',        // Step 4: Projects action menu -> explicitly select projects
+        'continue',      // Step 4: Projects action menu -> continue to bullets
         'done',          // Step 6: Bullets review for proj 1 -> done
         'done',          // Step 6: Bullets review for proj 2 -> done
         'done',          // Step 6: Bullets review for proj 3 -> done
         'continue',      // Step 7: Profile menu -> continue
         'approve'        // Step 8: Preview menu -> approve & complete
+      ],
+      multiselectQueue: [
+        ['court-booking', 'lidar-core', 'ai-vector-search'] // Step 4: promptSelectProjects
       ],
       confirmQueue: [
         false            // Step 2: Wants JD? -> false
@@ -389,6 +394,7 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
     assert.ok(result.finalResumeModel);
     assert.equal(result.finalResumeModel.metadata.targetRole, 'fullstack');
     assert.equal(result.finalResumeModel.metadata.resumeLength, '2page');
+    assert.equal(result.finalResumeModel.projects.length, 3);
   });
 
   // Case 12: Wizard cancellation handling at step 1
@@ -407,6 +413,88 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
     assert.equal(result.isCompleted, false);
     assert.equal(result.isCancelled, true);
     assert.equal(result.finalResumeModel, null);
+  });
+
+  // Case 13: Project selection limits and deliberate choice verification
+  test('Case 13: Budget enforcement preserves user choices and handles fewer projects in 2-page mode without forcing lower-ranked projects', () => {
+    const session = createSession({ catalog: mockCatalog });
+
+    // 1-page compact: max 2 projects
+    session.setResumeLength('1page');
+    assert.equal(session.maxProjects, 2);
+    // User attempts to select 3 projects -> strictly capped at 2
+    session.selectProjects(['court-booking', 'lidar-core', 'ai-vector-search']);
+    assert.equal(session.selectedProjectIds.length, 2);
+    assert.deepEqual(session.selectedProjectIds, ['court-booking', 'lidar-core']);
+
+    // 2-page extended: user deliberately selects 1 project
+    session.setResumeLength('2page');
+    assert.equal(session.maxProjects, 4);
+    session.selectProjects(['court-booking']);
+    assert.equal(session.selectedProjectIds.length, 1);
+    assert.deepEqual(session.selectedProjectIds, ['court-booking'], 'Must not force lower-ranked projects to meet an arbitrary 3-project minimum');
+
+    // 2-page extended: user deliberately selects 2 projects
+    session.selectProjects(['court-booking', 'lidar-core']);
+    assert.equal(session.selectedProjectIds.length, 2);
+    assert.deepEqual(session.selectedProjectIds, ['court-booking', 'lidar-core'], 'Must accept 2 projects in 2-page mode without silent auto-fill');
+
+    // Switching back to 1-page keeps the 2 selected projects
+    session.setResumeLength('1page');
+    assert.equal(session.selectedProjectIds.length, 2);
+
+    // Switching to 2-page does not silently select more projects
+    session.setResumeLength('2page');
+    assert.equal(session.selectedProjectIds.length, 2, 'Switching from 1-page to 2-page must not silently add projects');
+  });
+
+  // Case 14: Profile cancellation and save safety
+  test('Case 14: Cancelling the wizard or declining to save leaves profile file on disk completely untouched', () => {
+    const crypto = require('crypto');
+    const tempProfilePath = path.resolve(__dirname, '../data/test-cancel-profile.tmp.json');
+    const initialProfile = {
+      personal: { name: 'Original Name', email: 'orig@example.com' },
+      summary: 'Original Pristine Summary',
+      skills: { languages: ['Python'] },
+      experience: []
+    };
+    fs.writeFileSync(tempProfilePath, JSON.stringify(initialProfile, null, 2), 'utf8');
+    const initialHash = crypto.createHash('sha256').update(fs.readFileSync(tempProfilePath)).digest('hex');
+
+    try {
+      const session = createSession({ catalog: mockCatalog, profilePath: tempProfilePath });
+
+      // Simulate modifications during wizard session
+      session.updateSummary('Modified Draft Summary that user decided NOT to save');
+      session.updateProfileField('personal', 'name', 'Draft Name');
+      assert.equal(session.profileModified, true);
+
+      // Verify file on disk is still identical byte-for-byte
+      const currentBytes = fs.readFileSync(tempProfilePath);
+      const currentHash = crypto.createHash('sha256').update(currentBytes).digest('hex');
+      assert.equal(currentHash, initialHash, 'Profile on disk must not change before explicit save');
+
+      // Revert edits (simulating cancellation or declining save)
+      session.revertProfileEdits();
+      assert.equal(session.profile.summary, 'Original Pristine Summary');
+      assert.equal(session.profileModified, false);
+
+      const finalHash = crypto.createHash('sha256').update(fs.readFileSync(tempProfilePath)).digest('hex');
+      assert.equal(finalHash, initialHash, 'Profile on disk must remain pristine after cancellation');
+
+      // Verify that if a non-existent path is used, cancelled session does not create it
+      const nonExistentPath = path.resolve(__dirname, '../data/non-existent-profile.tmp.json');
+      if (fs.existsSync(nonExistentPath)) fs.unlinkSync(nonExistentPath);
+
+      const emptySession = createSession({ catalog: mockCatalog, profilePath: nonExistentPath });
+      emptySession.updateSummary('Transient text');
+      emptySession.revertProfileEdits();
+      assert.equal(fs.existsSync(nonExistentPath), false, 'Non-existent profile file must not be created on cancellation');
+    } finally {
+      if (fs.existsSync(tempProfilePath)) {
+        fs.unlinkSync(tempProfilePath);
+      }
+    }
   });
 
 });

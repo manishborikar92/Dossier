@@ -112,16 +112,34 @@ async function promptResumeLength(prompter = defaultPrompter) {
 /**
  * Step 4/5: Prompt project catalog action menu.
  *
+ * @param {number|object} [selectedCountOrPrompter=0] - Number of currently selected projects or prompter
+ * @param {number} [maxAllowed=4] - Max projects allowed for current budget
  * @param {object} [prompter=defaultPrompter]
  * @returns {Promise<string | symbol>}
  */
-async function promptProjectActionMenu(prompter = defaultPrompter) {
+async function promptProjectActionMenu(selectedCountOrPrompter = 0, maxAllowed = 4, maybePrompter = defaultPrompter) {
+  let selectedCount = 0;
+  let max = 4;
+  let prompter = defaultPrompter;
+
+  if (typeof selectedCountOrPrompter === 'object' && selectedCountOrPrompter !== null && selectedCountOrPrompter.select) {
+    prompter = selectedCountOrPrompter;
+  } else {
+    selectedCount = typeof selectedCountOrPrompter === 'number' ? selectedCountOrPrompter : 0;
+    max = typeof maxAllowed === 'number' ? maxAllowed : 4;
+    prompter = maybePrompter || defaultPrompter;
+  }
+
+  const continueLabel = selectedCount > 0
+    ? `✔ Continue to bullet review (${selectedCount} selected)`
+    : '✔ Continue to bullet review (none selected)';
+
   const action = await prompter.select({
-    message: 'Project Selection & Inspection Options:',
+    message: `Project Selection & Inspection Options [${selectedCount}/${max} selected]:`,
     options: [
-      { value: 'continue', label: '✔ Continue with current project selection', hint: 'Proceed to content review' },
-      { value: 'select', label: '📝 Select / Deselect candidate projects', hint: 'Pick which projects appear' },
-      { value: 'reorder', label: '↕ Reorder selected projects', hint: 'Change display order on resume' },
+      { value: 'select', label: `📝 Select / Deselect candidate projects (${selectedCount} of max ${max} selected)`, hint: `Pick which projects appear (max ${max})` },
+      { value: 'continue', label: continueLabel, hint: 'Proceed to content review' },
+      { value: 'reorder', label: `↕ Reorder selected projects (${selectedCount} selected)`, hint: 'Change display order on resume' },
       { value: 'inspect', label: '🔍 Inspect project details & score card', hint: 'View 7-factor breakdown & evidence' }
     ]
   });

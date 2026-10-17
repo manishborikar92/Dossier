@@ -110,7 +110,7 @@ async function runWizard(options = {}) {
     else if (currentStep === 'projects') {
       console.log('\n' + formatProjectTable(session.rankedProjects, session.selectedProjectIds));
 
-      const action = await promptProjectActionMenu(prompter);
+      const action = await promptProjectActionMenu(session.selectedProjectIds.length, session.maxProjects, prompter);
       if (prompter.isCancel(action)) {
         session.isCancelled = true;
         prompter.cancel('Resume building session cancelled.');
@@ -119,8 +119,11 @@ async function runWizard(options = {}) {
 
       if (action === 'continue') {
         if (session.selectedProjectIds.length === 0) {
-          prompter.log.warn('Please select at least one project before continuing.');
+          prompter.log.warn('No projects selected. Please select at least one project before continuing.');
         } else {
+          if (session.resumeLength === '2page' && session.selectedProjectIds.length < 3) {
+            prompter.log.info(pc.cyan(`Note: Two-page extended format standard recommendation is 3 to 4 projects. You selected ${session.selectedProjectIds.length} project(s); proceeding with your deliberate selection without forcing additional projects.`));
+          }
           currentStep = 'bullets';
         }
       } else if (action === 'select') {
@@ -128,6 +131,9 @@ async function runWizard(options = {}) {
         if (!prompter.isCancel(selected)) {
           session.selectProjects(selected);
           prompter.log.success(`Selected ${session.selectedProjectIds.length} project(s).`);
+          if (session.resumeLength === '2page' && session.selectedProjectIds.length < 3 && session.selectedProjectIds.length > 0) {
+            prompter.log.info(pc.cyan(`Note: Two-page extended format typically showcases 3 to 4 projects. You have selected ${session.selectedProjectIds.length} project(s); respecting your choice.`));
+          }
         }
       } else if (action === 'reorder') {
         const selectedProjects = session.selectedProjectIds.map(id => session.getProjectDetails(id)).filter(Boolean);

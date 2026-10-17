@@ -203,9 +203,9 @@ function createSession(options = {}) {
         }
       }
 
-      // If no projects selected yet, select default top N matching budget
-      if (this.selectedProjectIds.length === 0 && this.rankedProjects.length > 0) {
-        this.selectedProjectIds = this.rankedProjects.slice(0, this.maxProjects).map(p => p.id);
+      // Retain previously selected projects if they remain eligible in catalog; never silently auto-select
+      if (this.selectedProjectIds.length > 0) {
+        this.selectedProjectIds = this.selectedProjectIds.filter(id => this.rankedProjects.some(p => p.id === id)).slice(0, this.maxProjects);
       }
     },
 
