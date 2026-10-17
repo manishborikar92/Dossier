@@ -66,7 +66,8 @@ describe('Phase 1 Scaffolding & Configuration Verification', () => {
       .reduce((sum, d) => sum + d.max_raw_points, 0);
     assert.equal(totalRawPoints, 100, 'Sum of max raw points across 7 dimensions must equal 100');
 
-    const expectedRoles = ['general', 'fullstack', 'backend', 'ai_ml_data', 'systems_3d'];
+    const expectedRoles = ['fullstack', 'backend', 'ai_ml_data', 'systems_3d'];
+    assert.equal(weightsConfig.role_presets.general, undefined, 'Legacy general preset must not exist');
     for (const role of expectedRoles) {
       assert.ok(weightsConfig.role_presets[role], `Missing role preset: ${role}`);
       for (const dim of expectedDims) {

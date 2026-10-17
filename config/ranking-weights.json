@@ -37,20 +37,8 @@
     }
   },
   "role_presets": {
-    "general": {
-      "label": "General-Purpose Software Developer",
-      "weights": {
-        "depth": 1.00,
-        "impact": 1.00,
-        "quality": 1.00,
-        "breadth": 1.00,
-        "uniqueness": 1.00,
-        "readiness": 1.00,
-        "storytelling": 1.00
-      }
-    },
     "fullstack": {
-      "label": "Full-Stack Developer",
+      "label": "Full Stack Developer",
       "weights": {
         "depth": 0.85,
         "impact": 1.30,

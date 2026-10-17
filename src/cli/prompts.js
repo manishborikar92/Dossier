@@ -27,13 +27,12 @@ async function promptSelectRole(prompter = defaultPrompter) {
   const roleChoice = await prompter.select({
     message: 'Step 1: Choose your target role for resume ranking:',
     options: [
-      { value: 'general', label: 'General-Purpose Software Developer (Default balanced scoring)', hint: 'No specific role bias' },
-      { value: 'fullstack', label: 'Full-Stack Developer', hint: 'Emphasizes multi-tier web integration, ORM, deployments & auth' },
+      { value: 'fullstack', label: 'Full Stack Developer (Default)', hint: 'Emphasizes multi-tier web integration, ORM, deployments & auth' },
       { value: 'backend', label: 'Backend / Systems Engineer', hint: 'Emphasizes relational schema design, concurrency & API reliability' },
       { value: 'ai_ml_data', label: 'AI / Machine Learning & Data Engineer', hint: 'Emphasizes embeddings, vector search, model pipelines & math' },
       { value: 'systems_3d', label: 'Systems / 3D Graphics / Computer Vision Developer', hint: 'Emphasizes spatial math, point clouds, binary protocols & WASM' },
       { value: 'custom', label: 'Custom Target Role...', hint: 'Specify your own job title and criteria' },
-      { value: 'skip', label: 'Skip role selection (Use General-Purpose)', hint: 'Quick start' }
+      { value: 'skip', label: 'Skip role selection (Use Full Stack Developer)', hint: 'Quick start with Full Stack Developer default' }
     ]
   });
 
@@ -42,7 +41,7 @@ async function promptSelectRole(prompter = defaultPrompter) {
   }
 
   if (roleChoice === 'skip') {
-    return { role: 'general' };
+    return { role: 'fullstack' };
   }
 
   if (roleChoice === 'custom') {

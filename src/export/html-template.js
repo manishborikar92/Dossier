@@ -3,7 +3,25 @@
  *
  * Generates single-column ATS-friendly HTML resumes styled for print output.
  * Fully offline: zero remote fonts, zero CDN links, zero external tracking.
+ * Consumes authoritative design tokens from ./design-spec.js and canonical
+ * normalization helpers from ../model/normalize.js.
  */
+
+const {
+  COLORS,
+  TYPOGRAPHY,
+  PAGE,
+  SPACING,
+  BORDERS,
+  BULLETS,
+  SECTIONS,
+  DEFAULT_ROLE_TITLE
+} = require('./design-spec');
+
+const {
+  normalizeCertification,
+  validateCanonicalModel
+} = require('../model/normalize');
 
 /**
  * Escapes HTML characters to prevent XSS and malformed markup.
@@ -33,80 +51,10 @@ function sanitizeUrl(url) {
   if (/^(https?:\/\/|mailto:|tel:)/i.test(trimmed)) {
     return trimmed;
   }
-  // If protocol-relative or bare domain like linkedin.com/...
   if (/^[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(\/.*)?$/i.test(trimmed)) {
     return 'https://' + trimmed;
   }
   return '';
-}
-
-/**
- * Normalizes certification entries from diverse schemas (raw strings or objects)
- * into canonical objects: { name, issuer, year, raw }.
- *
- * @param {string|object} cert - Raw certification entry
- * @returns {{ name: string, issuer: string, year: string, raw: string } | null}
- */
-function normalizeCertification(cert) {
-  if (!cert) return null;
-
-  if (typeof cert === 'string') {
-    const raw = cert.trim();
-    if (!raw) return null;
-
-    let text = raw;
-    let year = '';
-    let issuer = '';
-    let name = '';
-
-    const yearMatch = text.match(/(?:[·•\-|,]|\s+)\s*\(?(\b(?:19|20)\d{2}\b)\)?\s*$/);
-    if (yearMatch) {
-      year = yearMatch[1];
-      text = text.slice(0, yearMatch.index).trim();
-    } else {
-      const parenMatch = text.match(/\((\b(?:19|20)\d{2}\b)\)\s*$/);
-      if (parenMatch) {
-        year = parenMatch[1];
-        text = text.slice(0, parenMatch.index).trim();
-      }
-    }
-
-    const dashMatch = text.match(/\s*(?:—|–|\s-\s)\s*/);
-    if (dashMatch) {
-      const splitIdx = dashMatch.index;
-      name = text.slice(0, splitIdx).trim();
-      issuer = text.slice(splitIdx + dashMatch[0].length).trim();
-    } else {
-      name = text.trim();
-    }
-
-    return {
-      name: name || raw,
-      issuer: issuer || '',
-      year: year || '',
-      raw
-    };
-  }
-
-  if (typeof cert === 'object') {
-    const name = (cert.name || cert.title || cert.credentialName || '').trim();
-    const issuer = (cert.issuer || cert.organization || cert.issuingOrganization || cert.institution || '').trim();
-    const year = cert.year ? String(cert.year).trim() : (cert.date ? String(cert.date).trim() : '');
-    const raw = cert.raw || (name ? `${name}${issuer ? ' — ' + issuer : ''}${year ? ' · ' + year : ''}` : '');
-
-    if (!name && !issuer && !year) {
-      return null;
-    }
-
-    return {
-      name: name || issuer || 'Certification',
-      issuer,
-      year,
-      raw
-    };
-  }
-
-  return null;
 }
 
 /**
@@ -116,6 +64,13 @@ function normalizeCertification(cert) {
  * @returns {string} Complete HTML document string
  */
 function generateResumeHtml(model) {
+  if (!model || typeof model !== 'object') {
+    throw new Error('Invalid resumeModel provided to generateResumeHtml.');
+  }
+
+  // Validate canonical schema invariants
+  validateCanonicalModel(model);
+
   const is1Page = model.metadata?.resumeLength === '1page';
   const personal = model.personal || {};
 
@@ -134,12 +89,18 @@ function generateResumeHtml(model) {
   }
   if (personal.linkedin) {
     const linkUrl = sanitizeUrl(personal.linkedin);
-    const linkText = personal.linkedin.replace(/^https?:\/\/(www\.)?/i, '');
+    let linkText = personal.linkedin.replace(/^https?:\/\/(www\.)?/i, '').replace(/^linkedin\.com\//i, '');
+    if (!linkText.startsWith('in/')) {
+      linkText = 'in/' + linkText;
+    }
     contactParts.push(`<a href="${linkUrl}">${escapeHtml(linkText)}</a>`);
   }
   if (personal.github) {
     const gitUrl = sanitizeUrl(personal.github);
-    const gitText = personal.github.replace(/^https?:\/\/(www\.)?/i, '');
+    let gitText = personal.github.replace(/^https?:\/\/(www\.)?/i, '').replace(/^github\.com\//i, '');
+    if (!gitText.startsWith('github/')) {
+      gitText = 'github/' + gitText;
+    }
     contactParts.push(`<a href="${gitUrl}">${escapeHtml(gitText)}</a>`);
   }
   if (personal.portfolio) {
@@ -148,11 +109,18 @@ function generateResumeHtml(model) {
     contactParts.push(`<a href="${portUrl}">${escapeHtml(portText)}</a>`);
   }
 
-  // Styles tailored specifically for 1-page compact vs 2-page extended
+  const pageMargin = is1Page ? '0.38in 0.45in' : '0.45in 0.50in';
+  const nameSize = is1Page ? TYPOGRAPHY.onePage.name.pt : TYPOGRAPHY.twoPage.name.pt;
+  const sectionHeaderSize = is1Page ? TYPOGRAPHY.onePage.sectionHeader.pt : TYPOGRAPHY.twoPage.sectionHeader.pt;
+  const itemTitleSize = is1Page ? TYPOGRAPHY.onePage.itemTitle.pt : TYPOGRAPHY.twoPage.itemTitle.pt;
+  const bodySize = is1Page ? TYPOGRAPHY.onePage.body.pt : TYPOGRAPHY.twoPage.body.pt;
+  const metaSize = is1Page ? TYPOGRAPHY.onePage.meta.pt : TYPOGRAPHY.twoPage.meta.pt;
+  const contactSize = is1Page ? TYPOGRAPHY.onePage.contact.pt : TYPOGRAPHY.twoPage.contact.pt;
+
   const css = `
     @page {
-      size: letter;
-      margin: ${is1Page ? '0.38in 0.45in' : '0.52in 0.58in'};
+      size: ${PAGE.size};
+      margin: ${pageMargin};
     }
 
     * {
@@ -162,17 +130,17 @@ function generateResumeHtml(model) {
     }
 
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      color: #000000;
-      background: #ffffff;
-      font-size: ${is1Page ? '8.8pt' : '9.5pt'};
-      line-height: ${is1Page ? '1.24' : '1.34'};
+      font-family: ${TYPOGRAPHY.fontFamilyFallback};
+      color: #${COLORS.BLACK};
+      background: #${COLORS.WHITE};
+      font-size: ${bodySize}pt;
+      line-height: ${is1Page ? '1.24' : '1.28'};
       -webkit-print-color-adjust: exact;
       print-color-adjust: exact;
     }
 
     a {
-      color: #1F3864;
+      color: #${COLORS.ACCENT};
       text-decoration: none;
     }
 
@@ -186,16 +154,16 @@ function generateResumeHtml(model) {
     }
 
     .name {
-      font-size: ${is1Page ? '17pt' : '20pt'};
+      font-size: ${nameSize}pt;
       font-weight: bold;
-      color: #1F3864;
+      color: #${COLORS.ACCENT};
       letter-spacing: 0.5px;
       margin-bottom: 2px;
     }
 
     .contact-line {
-      font-size: ${is1Page ? '8pt' : '8.8pt'};
-      color: #444444;
+      font-size: ${contactSize}pt;
+      color: #${COLORS.GRAY};
       line-height: 1.3;
     }
 
@@ -204,50 +172,50 @@ function generateResumeHtml(model) {
     }
 
     .contact-line a {
-      color: #1F3864;
+      color: #${COLORS.GRAY};
     }
 
     .divider {
       border: 0;
-      border-top: 1px solid #1F3864;
+      border-top: ${BORDERS.divider.cssSize} solid #${BORDERS.divider.color};
       margin: ${is1Page ? '4px 0 6px 0' : '6px 0 10px 0'};
     }
 
     .section {
-      margin-bottom: ${is1Page ? '6px' : '10px'};
+      margin-bottom: ${is1Page ? '5px' : '7px'};
     }
 
     .section-title {
-      font-size: ${is1Page ? '10pt' : '11pt'};
+      font-size: ${sectionHeaderSize}pt;
       font-weight: bold;
-      color: #1F3864;
+      color: #${COLORS.ACCENT};
       text-transform: uppercase;
       letter-spacing: 0.3px;
-      border-bottom: 1.2px solid #1F3864;
+      border-bottom: ${BORDERS.sectionUnderline.cssSize} solid #${BORDERS.sectionUnderline.color};
       padding-bottom: 1px;
-      margin-bottom: ${is1Page ? '3px' : '5px'};
+      margin-bottom: ${is1Page ? '3px' : '4px'};
     }
 
     .summary-text {
       text-align: justify;
-      color: #000000;
-      font-size: ${is1Page ? '8.6pt' : '9.3pt'};
-      line-height: ${is1Page ? '1.24' : '1.34'};
+      color: #${COLORS.BLACK};
+      font-size: ${bodySize}pt;
+      line-height: ${is1Page ? '1.24' : '1.28'};
     }
 
     .skill-row {
-      margin-bottom: ${is1Page ? '2px' : '3px'};
-      font-size: ${is1Page ? '8.6pt' : '9.2pt'};
+      margin-bottom: ${is1Page ? '2px' : '2.5px'};
+      font-size: ${bodySize}pt;
     }
 
     .skill-label {
       font-weight: bold;
-      color: #000000;
+      color: #${COLORS.BLACK};
       display: inline;
     }
 
     .skill-items {
-      color: #222222;
+      color: #${COLORS.SUBTLE};
       display: inline;
     }
 
@@ -255,55 +223,62 @@ function generateResumeHtml(model) {
       display: flex;
       justify-content: space-between;
       align-items: baseline;
-      margin-top: ${is1Page ? '3px' : '6px'};
+      margin-top: ${is1Page ? '3px' : '5px'};
       margin-bottom: 1px;
     }
 
     .item-title-group {
-      font-size: ${is1Page ? '9.2pt' : '10pt'};
+      font-size: ${itemTitleSize}pt;
     }
 
     .item-title {
       font-weight: bold;
-      color: #000000;
+      color: #${COLORS.BLACK};
     }
 
     .item-subtitle {
-      color: #444444;
+      color: #${COLORS.GRAY};
     }
 
     .item-date {
-      font-size: ${is1Page ? '8.2pt' : '8.8pt'};
-      color: #444444;
+      font-size: ${metaSize}pt;
+      color: #${COLORS.GRAY};
       font-style: italic;
       text-align: right;
       white-space: nowrap;
     }
 
+    .item-gray-line {
+      font-size: ${metaSize}pt;
+      color: #${COLORS.GRAY};
+      margin-top: 1px;
+      margin-bottom: ${is1Page ? '2px' : '3px'};
+    }
+
     .project-tech {
-      font-size: ${is1Page ? '8.2pt' : '8.8pt'};
-      color: #444444;
+      font-size: ${metaSize}pt;
+      color: #${COLORS.GRAY};
       font-style: italic;
       margin-bottom: 2px;
     }
 
     .project-tech strong {
       font-style: normal;
-      color: #333333;
+      color: #${COLORS.GRAY};
     }
 
     ul.bullets {
       list-style-type: disc;
-      margin-left: ${is1Page ? '14px' : '18px'};
+      margin-left: ${BULLETS.leftIndentInches}in;
       margin-top: 1px;
-      margin-bottom: ${is1Page ? '2px' : '4px'};
+      margin-bottom: ${is1Page ? '2px' : '3px'};
     }
 
     ul.bullets li {
-      font-size: ${is1Page ? '8.5pt' : '9.1pt'};
-      color: #000000;
-      margin-bottom: ${is1Page ? '1.5px' : '2.5px'};
-      line-height: ${is1Page ? '1.23' : '1.32'};
+      font-size: ${bodySize}pt;
+      color: #${COLORS.BLACK};
+      margin-bottom: ${is1Page ? '1.5px' : '1.8px'};
+      line-height: ${is1Page ? '1.23' : '1.27'};
     }
 
     .page-break {
@@ -321,14 +296,14 @@ function generateResumeHtml(model) {
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>${escapeHtml(personal.name || 'Resume')} - ${escapeHtml(model.metadata?.targetRoleTitle || 'Resume')}</title>
+  <title>${escapeHtml(personal.name || 'Resume')} - ${escapeHtml(model.metadata?.targetRoleTitle || DEFAULT_ROLE_TITLE)}</title>
   <style>${css}</style>
 </head>
 <body>
   <div class="header">
     <div class="name">${escapeHtml(personal.name || 'MANISH BORIKAR')}</div>
     <div class="contact-line">
-      ${contactParts.join(' • ')}
+      ${contactParts.join('  \u00B7  ')}
     </div>
   </div>
   <hr class="divider" />
@@ -338,7 +313,7 @@ function generateResumeHtml(model) {
   if (model.summary && model.summary.trim().length > 0) {
     html += `
   <div class="section">
-    <div class="section-title">Professional Summary</div>
+    <div class="section-title">${SECTIONS.titles.summary}</div>
     <div class="summary-text">${escapeHtml(model.summary)}</div>
   </div>`;
   }
@@ -347,7 +322,7 @@ function generateResumeHtml(model) {
   if (Array.isArray(model.skills) && model.skills.length > 0) {
     html += `
   <div class="section">
-    <div class="section-title">Technical Skills</div>`;
+    <div class="section-title">${SECTIONS.titles.skills}</div>`;
     for (const skillCat of model.skills) {
       const itemsStr = Array.isArray(skillCat.items) ? skillCat.items.join(', ') : '';
       if (itemsStr.length > 0) {
@@ -366,7 +341,7 @@ function generateResumeHtml(model) {
   if (Array.isArray(model.experience) && model.experience.length > 0) {
     html += `
   <div class="section">
-    <div class="section-title">Professional Experience</div>`;
+    <div class="section-title">${SECTIONS.titles.experience}</div>`;
     for (const exp of model.experience) {
       const locationText = exp.location ? ` (${escapeHtml(exp.location)})` : '';
       html += `
@@ -395,14 +370,12 @@ function generateResumeHtml(model) {
   </div>`;
   }
 
-  // For 2-page extended, insert clean section break before projects if needed
-  const projectPageBreakClass = (!is1Page && (model.experience || []).length >= 2) ? 'avoid-break' : 'avoid-break';
-
   // 4. Projects & Technical Deliverables (if populated)
   if (Array.isArray(model.projects) && model.projects.length > 0) {
+    const projectBreakClass = is1Page ? 'avoid-break' : 'page-break';
     html += `
-  <div class="section ${projectPageBreakClass}">
-    <div class="section-title">Projects & Technical Deliverables</div>`;
+  <div class="section ${projectBreakClass}">
+    <div class="section-title">${SECTIONS.titles.projects}</div>`;
     for (const proj of model.projects) {
       const liveLink = proj.liveUrl ? sanitizeUrl(proj.liveUrl) : null;
       const liveLinkHtml = liveLink
@@ -442,17 +415,23 @@ function generateResumeHtml(model) {
   if (Array.isArray(model.education) && model.education.length > 0) {
     html += `
   <div class="section avoid-break">
-    <div class="section-title">Education</div>`;
+    <div class="section-title">${SECTIONS.titles.education}</div>`;
     for (const edu of model.education) {
-      const gradeText = edu.score ? ` • ${escapeHtml(edu.score)}` : '';
-      const locationText = edu.location ? ` — ${escapeHtml(edu.location)}` : '';
+      const sublineParts = [edu.institution, edu.location, edu.details || edu.score].filter(Boolean);
+      const sublineText = sublineParts.join('  |  ');
       html += `
-    <div class="item-header">
-      <div class="item-title-group">
-        <span class="item-title">${escapeHtml(edu.degree)}</span>
-        <span class="item-subtitle"> — ${escapeHtml(edu.institution)}${locationText}</span>
-      </div>
-      <div class="item-date">${escapeHtml(edu.dates || '')}${gradeText}</div>
+    <div class="avoid-break">
+      <div class="item-header">
+        <div class="item-title-group">
+          <span class="item-title">${escapeHtml(edu.degree)}</span>
+        </div>
+        <div class="item-date">${escapeHtml(edu.dates || '')}</div>
+      </div>`;
+      if (sublineText) {
+        html += `
+      <div class="item-gray-line">${escapeHtml(sublineText)}</div>`;
+      }
+      html += `
     </div>`;
     }
     html += `
@@ -465,15 +444,13 @@ function generateResumeHtml(model) {
     for (const rawCert of model.certifications) {
       const cert = normalizeCertification(rawCert);
       if (!cert || (!cert.name && !cert.raw)) continue;
-      const certName = cert.name || cert.raw;
-      const issuerText = cert.issuer ? ` — ${escapeHtml(cert.issuer)}` : '';
-      const yearText = cert.year ? ` (${escapeHtml(cert.year)})` : '';
-      certItems.push(`<li><strong>${escapeHtml(certName)}</strong>${issuerText}${yearText}</li>`);
+      const fullText = cert.raw || [cert.name, cert.issuer, cert.year].filter(Boolean).join(' — ');
+      certItems.push(`<li>${escapeHtml(fullText)}</li>`);
     }
     if (certItems.length > 0) {
       html += `
   <div class="section avoid-break">
-    <div class="section-title">Certifications & Credentials</div>
+    <div class="section-title">${SECTIONS.titles.certifications}</div>
     <ul class="bullets">
       ${certItems.join('\n      ')}
     </ul>
@@ -485,17 +462,41 @@ function generateResumeHtml(model) {
   if (Array.isArray(model.leadership) && model.leadership.length > 0) {
     html += `
   <div class="section avoid-break">
-    <div class="section-title">Leadership & Activities</div>
-    <ul class="bullets">`;
+    <div class="section-title">${SECTIONS.titles.leadership}</div>`;
     for (const lead of model.leadership) {
-      const text = typeof lead === 'string' ? lead : (lead.title || lead.description || '');
-      if (text) {
+      if (typeof lead === 'string') {
         html += `
-      <li>${escapeHtml(text)}</li>`;
+    <ul class="bullets">
+      <li>${escapeHtml(lead)}</li>
+    </ul>`;
+      } else if (lead && typeof lead === 'object') {
+        let desc = '';
+        if (lead.institution && Array.isArray(lead.bullets) && lead.bullets[0]) {
+          desc = `${lead.institution} — ${lead.bullets[0]}`;
+        } else if (lead.institution) {
+          desc = lead.institution;
+        } else if (Array.isArray(lead.bullets) && lead.bullets[0]) {
+          desc = lead.bullets[0];
+        } else if (lead.description) {
+          desc = lead.description;
+        }
+        html += `
+    <div class="avoid-break">
+      <div class="item-header">
+        <div class="item-title-group">
+          <span class="item-title">${escapeHtml(lead.title || '')}</span>
+        </div>
+        <div class="item-date">${escapeHtml(lead.dates || '')}</div>
+      </div>`;
+        if (desc) {
+          html += `
+      <div class="item-gray-line">${escapeHtml(desc)}</div>`;
+        }
+        html += `
+    </div>`;
       }
     }
     html += `
-    </ul>
   </div>`;
   }
 

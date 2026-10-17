@@ -84,7 +84,7 @@ async function generateResumePdf(resumeModel, options = {}) {
   }
 
   const candidateSlug = (resumeModel.personal?.name || 'Candidate').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
-  const targetRoleSlug = (resumeModel.metadata?.targetRole || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const targetRoleSlug = (resumeModel.metadata?.targetRole || 'fullstack').replace(/[^a-zA-Z0-9_-]/g, '_');
   const targetLength = resumeModel.metadata?.resumeLength || '2page';
   const timestamp = Date.now();
   const defaultFilename = `${candidateSlug}_${targetRoleSlug}_${targetLength}_${timestamp}.pdf`;

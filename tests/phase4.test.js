@@ -8,6 +8,8 @@ const {
   loadProfile,
   prioritizeSkillsByRole
 } = require('../src/cli/session-state');
+const { loadRoleProfiles } = require('../src/ranking/role-profiles');
+const { rankProjects } = require('../src/ranking/scorer');
 
 const {
   formatProjectTable,
@@ -178,6 +180,7 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
     const session = createSession({ catalog: mockCatalog });
 
     // Informative JD
+    session.setTargetRole('ai_ml_data');
     const techJd = 'Looking for an engineer with FastAPI, sentence-transformers, and PostgreSQL pgvector experience.';
     session.setJobDescription(techJd);
     assert.equal(session.jdAnalysis.isInformative, true);
@@ -339,7 +342,7 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
   // Case 10: Formatting helpers (table, detail card, preview) generate non-empty strings
   test('Case 10: Formatting helpers generate structured, readable terminal output', () => {
     const session = createSession({ catalog: mockCatalog });
-    session.setTargetRole('general');
+    session.setTargetRole('fullstack');
     session.selectProjects(['court-booking']);
 
     // Format table
@@ -498,4 +501,64 @@ describe('Phase 4 Interactive Terminal CLI Workflow Test Suite', () => {
     }
   });
 
+  // Dedicated Regression Suite: Role-Preset Architecture & Invariant Enforcement
+  test('Case 15: Role Preset Architecture enforces unique labels, fullstack default, and custom title isolation', () => {
+    const roleProfiles = loadRoleProfiles();
+    const presets = roleProfiles.rolePresets;
+
+    // 1. No duplicate preset labels
+    const labels = Object.values(presets).map(p => p.label);
+    const uniqueLabels = new Set(labels);
+    assert.equal(uniqueLabels.size, labels.length, `Role preset labels must be unique: found [${labels.join(', ')}]`);
+
+    // 2. general is absent from public preset configuration
+    assert.equal(presets.general, undefined, 'general must be completely absent from rolePresets');
+
+    // 3. fullstack is default with correct canonical weights
+    assert.ok(presets.fullstack, 'fullstack preset must exist');
+    assert.equal(presets.fullstack.label, 'Full Stack Developer');
+    assert.deepEqual(presets.fullstack.weights, {
+      depth: 0.85,
+      impact: 1.30,
+      quality: 1.25,
+      breadth: 1.40,
+      uniqueness: 0.80,
+      readiness: 1.20,
+      storytelling: 1.00
+    });
+
+    // 4. Session state defaults to fullstack
+    const session = createSession({ catalog: mockCatalog });
+    assert.equal(session.targetRole, 'fullstack');
+    assert.equal(session.getFinalResumeModel().metadata.targetRoleTitle, 'Full Stack Developer');
+
+    // 5. Custom role titles do not alter underlying scoring profile
+    session.setTargetRole('custom', 'Staff Distributed Systems Engineer');
+    assert.equal(session.targetRole, 'custom');
+    assert.equal(session.customRoleTitle, 'Staff Distributed Systems Engineer');
+    assert.equal(session.getFinalResumeModel().metadata.targetRoleTitle, 'Staff Distributed Systems Engineer');
+
+    // Scoring profile for custom uses the fallback fullstack weights without mutation
+    const customRank = rankProjects(mockCatalog, { role: 'custom' });
+    const fullstackRank = rankProjects(mockCatalog, { role: 'fullstack' });
+    assert.deepEqual(
+      customRank.rankedProjects.map(p => p.qualityScore),
+      fullstackRank.rankedProjects.map(p => p.qualityScore),
+      'Custom role must use standard baseline weights without altering scoring profile'
+    );
+
+    // 6. Explicit project selection and ordering are preserved across role and JD changes
+    session.selectProjects(['lidar-core', 'court-booking']);
+    assert.deepEqual(session.selectedProjectIds, ['lidar-core', 'court-booking']);
+
+    // Change role: selection and order remain intact
+    session.setTargetRole('backend');
+    assert.deepEqual(session.selectedProjectIds, ['lidar-core', 'court-booking']);
+
+    // Change JD: selection and order remain intact
+    session.setJobDescription('Looking for high performance cloud engineering');
+    assert.deepEqual(session.selectedProjectIds, ['lidar-core', 'court-booking']);
+  });
+
 });
+

@@ -73,7 +73,7 @@ describe('Phase 3 Scoring & Role-Weighting Engine Test Suite', () => {
   test('Case 2: Quality score normalization strictly bounds output to [0, 100] across all presets', () => {
     const roleProfiles = loadRoleProfiles();
     const presets = Object.keys(roleProfiles.rolePresets);
-    assert.ok(presets.includes('general'));
+    assert.ok(!presets.includes('general'), 'general must be excluded from presets');
     assert.ok(presets.includes('fullstack'));
     assert.ok(presets.includes('backend'));
     assert.ok(presets.includes('ai_ml_data'));
@@ -513,12 +513,12 @@ describe('Phase 3 Scoring & Role-Weighting Engine Test Suite', () => {
 
     // High depth weight preset (depth: 2.0, breadth: 0.2)
     const customDepthWeights = { depth: 2.0, impact: 1.0, quality: 1.0, breadth: 0.2, uniqueness: 1.0, readiness: 1.0, storytelling: 1.0 };
-    const depthRank = rankProjects(catalog, { role: 'general', customWeights: customDepthWeights });
+    const depthRank = rankProjects(catalog, { role: 'systems_3d', customWeights: customDepthWeights });
     assert.equal(depthRank.rankedProjects[0].id, 'high-depth');
 
     // High breadth weight preset (depth: 0.2, breadth: 2.0)
     const customBreadthWeights = { depth: 0.2, impact: 1.0, quality: 1.0, breadth: 2.0, uniqueness: 1.0, readiness: 1.0, storytelling: 1.0 };
-    const breadthRank = rankProjects(catalog, { role: 'general', customWeights: customBreadthWeights });
+    const breadthRank = rankProjects(catalog, { role: 'systems_3d', customWeights: customBreadthWeights });
     assert.equal(breadthRank.rankedProjects[0].id, 'high-breadth');
   });
 

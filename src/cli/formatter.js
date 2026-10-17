@@ -148,7 +148,7 @@ function formatResumePreview(resumeModel) {
   const meta = resumeModel.metadata || {};
 
   lines.push(pc.dim('┌──────────────────────────────────────────────────────────────────────────────┐'));
-  lines.push(pc.dim('│') + pc.bold(pc.cyan(` RESUME PREVIEW — ${meta.targetRoleTitle?.toUpperCase() || 'GENERAL'} (${meta.resumeLength?.toUpperCase() || '2PAGE'})`)).padEnd(85) + pc.dim('│'));
+  lines.push(pc.dim('│') + pc.bold(pc.cyan(` RESUME PREVIEW — ${meta.targetRoleTitle?.toUpperCase() || 'FULL STACK DEVELOPER'} (${meta.resumeLength?.toUpperCase() || '2PAGE'})`)).padEnd(85) + pc.dim('│'));
   lines.push(pc.dim('└──────────────────────────────────────────────────────────────────────────────┘\n'));
 
   // 1. Header & Contact Info

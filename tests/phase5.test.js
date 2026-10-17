@@ -723,7 +723,7 @@ describe('Phase 5 Document Exporters and Output Validation Test Suite', () => {
   test('Case 21: Exporters defensively handle raw string certifications without producing undefined tokens or empty bullets', async () => {
     const rawStringModel = {
       personal: { name: 'Raw Test Candidate', email: 'raw@example.com' },
-      metadata: { resumeLength: '1page', targetRole: 'general' },
+      metadata: { resumeLength: '1page', targetRole: 'fullstack' },
       certifications: [
         'Direct String Certification — Direct Issuer · 2025',
         'Solo Credential Without Issuer (2024)'

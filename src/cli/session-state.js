@@ -51,7 +51,7 @@ function loadProfile(customPath = null, options = {}) {
  * @param {string} role - Role preset key
  * @returns {Array<{ category: string, label: string, items: string[] }>}
  */
-function prioritizeSkillsByRole(skills = {}, role = 'general') {
+function prioritizeSkillsByRole(skills = {}, role = 'fullstack') {
   const categoryLabels = {
     languages: 'Languages',
     frontend: 'Frontend Development',
@@ -68,11 +68,10 @@ function prioritizeSkillsByRole(skills = {}, role = 'general') {
     fullstack: ['frontend', 'backend', 'databases', 'languages', 'devops', 'cloud', 'core_cs', 'desktop_3d', 'ai_ml'],
     backend: ['backend', 'databases', 'languages', 'devops', 'core_cs', 'cloud', 'frontend', 'ai_ml', 'desktop_3d'],
     ai_ml_data: ['ai_ml', 'languages', 'databases', 'desktop_3d', 'core_cs', 'backend', 'cloud', 'devops', 'frontend'],
-    systems_3d: ['desktop_3d', 'languages', 'core_cs', 'ai_ml', 'devops', 'backend', 'frontend', 'databases', 'cloud'],
-    general: ['languages', 'frontend', 'backend', 'databases', 'core_cs', 'devops', 'cloud', 'ai_ml', 'desktop_3d']
+    systems_3d: ['desktop_3d', 'languages', 'core_cs', 'ai_ml', 'devops', 'backend', 'frontend', 'databases', 'cloud']
   };
 
-  const order = priorityOrder[role] || priorityOrder.general;
+  const order = priorityOrder[role] || priorityOrder.fullstack;
   const result = [];
 
   for (const cat of order) {
@@ -99,76 +98,20 @@ function prioritizeSkillsByRole(skills = {}, role = 'general') {
   return result;
 }
 
-/**
- * Normalizes certification entries from diverse schemas (raw strings or objects)
- * into canonical objects: { name, issuer, year, raw }.
- *
- * @param {string|object} cert - Raw certification entry
- * @returns {{ name: string, issuer: string, year: string, raw: string } | null}
- */
-function normalizeCertification(cert) {
-  if (!cert) return null;
+const {
+  normalizeCertification,
+  normalizeEducation,
+  normalizeExperience,
+  normalizeProject,
+  validateCanonicalModel
+} = require('../model/normalize');
 
-  if (typeof cert === 'string') {
-    const raw = cert.trim();
-    if (!raw) return null;
-
-    let text = raw;
-    let year = '';
-    let issuer = '';
-    let name = '';
-
-    // 1. Extract 4-digit year at the end, optionally preceded by bullet/middle dot/dash/comma or wrapped in parens
-    const yearMatch = text.match(/(?:[·•\-|,]|\s+)\s*\(?(\b(?:19|20)\d{2}\b)\)?\s*$/);
-    if (yearMatch) {
-      year = yearMatch[1];
-      text = text.slice(0, yearMatch.index).trim();
-    } else {
-      const parenMatch = text.match(/\((\b(?:19|20)\d{2}\b)\)\s*$/);
-      if (parenMatch) {
-        year = parenMatch[1];
-        text = text.slice(0, parenMatch.index).trim();
-      }
-    }
-
-    // 2. Extract issuer if separated by em-dash (—), en-dash (–), or surrounded hyphen ( - )
-    const dashMatch = text.match(/\s*(?:—|–|\s-\s)\s*/);
-    if (dashMatch) {
-      const splitIdx = dashMatch.index;
-      name = text.slice(0, splitIdx).trim();
-      issuer = text.slice(splitIdx + dashMatch[0].length).trim();
-    } else {
-      name = text.trim();
-    }
-
-    return {
-      name: name || raw,
-      issuer: issuer || '',
-      year: year || '',
-      raw
-    };
-  }
-
-  if (typeof cert === 'object') {
-    const name = (cert.name || cert.title || cert.credentialName || '').trim();
-    const issuer = (cert.issuer || cert.organization || cert.issuingOrganization || cert.institution || '').trim();
-    const year = cert.year ? String(cert.year).trim() : (cert.date ? String(cert.date).trim() : '');
-    const raw = cert.raw || (name ? `${name}${issuer ? ' — ' + issuer : ''}${year ? ' · ' + year : ''}` : '');
-
-    if (!name && !issuer && !year) {
-      return null;
-    }
-
-    return {
-      name: name || issuer || 'Certification',
-      issuer,
-      year,
-      raw
-    };
-  }
-
-  return null;
-}
+const ROLE_TITLE_DEFAULTS = {
+  fullstack: 'Full Stack Developer',
+  backend: 'Backend / Systems Engineer',
+  ai_ml_data: 'AI / Machine Learning & Data Engineer',
+  systems_3d: 'Systems / 3D Graphics Developer'
+};
 
 /**
  * Creates and initializes a session state for the Resume Builder CLI.
@@ -182,7 +125,7 @@ function createSession(options = {}) {
   const profileData = loadProfile(options.profilePath, { allowMissing: Boolean(options.allowMissingProfile) });
 
   const state = {
-    targetRole: 'general',
+    targetRole: 'fullstack',
     customRoleTitle: null,
     jobDescription: null,
     jdAnalysis: null,
@@ -219,9 +162,10 @@ function createSession(options = {}) {
 
     // Methods
     setTargetRole(roleKey, customTitle = null) {
-      const validRoles = ['general', 'fullstack', 'backend', 'ai_ml_data', 'systems_3d', 'custom'];
-      this.targetRole = validRoles.includes(roleKey) ? roleKey : 'general';
-      this.customRoleTitle = roleKey === 'custom' ? (customTitle || 'Custom Role') : null;
+      const validRoles = ['fullstack', 'backend', 'ai_ml_data', 'systems_3d', 'custom'];
+      const resolvedKey = roleKey === 'general' ? 'fullstack' : roleKey;
+      this.targetRole = validRoles.includes(resolvedKey) ? resolvedKey : 'fullstack';
+      this.customRoleTitle = resolvedKey === 'custom' ? (customTitle || 'Custom Role') : null;
       this.refreshRankings();
     },
 
@@ -257,7 +201,7 @@ function createSession(options = {}) {
         return;
       }
 
-      const roleForScorer = this.targetRole === 'custom' ? 'general' : this.targetRole;
+      const roleForScorer = this.targetRole === 'custom' ? 'fullstack' : this.targetRole;
       const rankResult = rankProjects(this.rawCatalog, {
         role: roleForScorer,
         jdText: this.jobDescription
@@ -287,9 +231,9 @@ function createSession(options = {}) {
         }
       }
 
-      // Retain previously selected projects if they remain eligible in catalog; never silently auto-select
+      // Retain previously selected projects in their exact explicit user order if they remain in catalog
       if (this.selectedProjectIds.length > 0) {
-        this.selectedProjectIds = this.selectedProjectIds.filter(id => this.rankedProjects.some(p => p.id === id)).slice(0, this.maxProjects);
+        this.selectedProjectIds = this.selectedProjectIds.filter(id => this.rawCatalog.some(p => p.id === id)).slice(0, this.maxProjects);
       }
     },
 
@@ -388,72 +332,83 @@ function createSession(options = {}) {
      * @returns {object} Final compiled resume document model
      */
     getFinalResumeModel() {
+      const maxBullets = this.resumeLength === '1page' ? 2 : 4;
       const selectedProjectsData = [];
 
       for (const id of this.selectedProjectIds) {
         const details = this.getProjectDetails(id);
         if (details) {
-          const maxBullets = this.resumeLength === '1page' ? 2 : 4;
-          selectedProjectsData.push({
+          const normProj = normalizeProject({
             id: details.id,
             name: details.name,
             title: details.customTitle || details.title || details.name,
             technologies: details.primaryTechnologies || [],
-            techSummary: (details.primaryTechnologies || []).slice(0, 6).join(', '),
+            techSummary: (details.primaryTechnologies || []).slice(0, 8).join(', '),
             liveUrl: details.liveUrl || null,
             year: details.lastCommit ? details.lastCommit.slice(0, 4) : '2026',
-            bullets: (details.resumeBullets || []).slice(0, maxBullets),
+            bullets: details.resumeBullets || [],
             scores: {
               final: details.finalScore,
               quality: details.qualityScore,
               relevance: details.relevanceScore
             }
-          });
+          }, maxBullets);
+          if (normProj) {
+            selectedProjectsData.push(normProj);
+          }
         }
       }
 
       // Prioritize skills by role
       const prioritizedSkills = prioritizeSkillsByRole(
         this.profile.skills,
-        this.targetRole === 'custom' ? 'general' : this.targetRole
+        this.targetRole === 'custom' ? 'fullstack' : this.targetRole
       );
 
-      // Trim experience per page budget
+      // Trim and normalize experience per page budget
       const maxExpRoles = this.resumeLength === '1page' ? 2 : 3;
-      const maxExpBullets = this.resumeLength === '1page' ? 2 : 4;
-      const trimmedExperience = (this.profile.experience || [])
+      const maxExpBullets = this.resumeLength === '1page' ? 2 : 5;
+      const normalizedExperience = (this.profile.experience || [])
         .slice(0, maxExpRoles)
-        .map(exp => ({
-          ...exp,
-          bullets: (exp.bullets || []).slice(0, maxExpBullets)
-        }));
+        .map(exp => normalizeExperience(exp, maxExpBullets))
+        .filter(Boolean);
+
+      // Normalize education
+      const normalizedEducation = (this.profile.education || [])
+        .map(normalizeEducation)
+        .filter(Boolean);
 
       // Normalize certifications
       const normalizedCertifications = (this.profile.certifications || [])
         .map(normalizeCertification)
         .filter(Boolean);
 
-      return {
+      const targetRoleTitle = this.customRoleTitle || ROLE_TITLE_DEFAULTS[this.targetRole] || 'Full Stack Developer';
+
+      const model = {
         metadata: {
           targetRole: this.targetRole,
-          targetRoleTitle: this.customRoleTitle || this.targetRole,
+          targetRoleTitle,
           resumeLength: this.resumeLength,
           generatedAt: new Date().toISOString(),
           totalSelectedProjects: selectedProjectsData.length,
           pageBudgetRules: {
             maxProjects: this.maxProjects,
-            maxBulletsPerProject: this.resumeLength === '1page' ? 2 : 4
+            maxBulletsPerProject: maxBullets
           }
         },
         personal: { ...this.profile.personal },
         summary: this.enabledSections.summary ? this.profile.summary : null,
         skills: this.enabledSections.skills ? prioritizedSkills : [],
-        experience: this.enabledSections.experience ? trimmedExperience : [],
+        experience: this.enabledSections.experience ? normalizedExperience : [],
         projects: this.enabledSections.projects ? selectedProjectsData : [],
-        education: this.enabledSections.education ? (this.profile.education || []) : [],
+        education: this.enabledSections.education ? normalizedEducation : [],
         certifications: this.enabledSections.certifications ? normalizedCertifications : [],
         leadership: this.enabledSections.leadership ? (this.profile.leadership || []) : []
       };
+
+      validateCanonicalModel(model);
+      return model;
     }
   };
 
@@ -468,6 +423,8 @@ module.exports = {
   loadProfile,
   prioritizeSkillsByRole,
   normalizeCertification,
-  createSession
+  validateCanonicalModel,
+  createSession,
+  ROLE_TITLE_DEFAULTS
 };
 

@@ -49,23 +49,9 @@ const DIMENSIONS = {
 
 // Built-in role presets applying criterion weights (never hardcoded project multipliers)
 const DEFAULT_ROLE_PRESETS = {
-  general: {
-    key: 'general',
-    label: 'General-Purpose Software Developer',
-    description: 'Balanced general-purpose engineering evaluation across all 7 dimensions equally.',
-    weights: {
-      depth: 1.00,
-      impact: 1.00,
-      quality: 1.00,
-      breadth: 1.00,
-      uniqueness: 1.00,
-      readiness: 1.00,
-      storytelling: 1.00
-    }
-  },
   fullstack: {
     key: 'fullstack',
-    label: 'Full-Stack Developer',
+    label: 'Full Stack Developer',
     description: 'Prioritizes multi-tier integration breadth, deployment impact, testing, and production readiness.',
     weights: {
       depth: 0.85,
@@ -195,10 +181,36 @@ function normalizeQualityScore(rawScores, weights, dimensions = DIMENSIONS) {
   return Math.max(0, Math.min(100, Math.round(score * 100) / 100));
 }
 
+/**
+ * Resolves role profile and weights for a given role key.
+ * Defaults predictably to 'fullstack' (Full Stack Developer) if roleKey is missing,
+ * unrecognized, or legacy 'general'.
+ *
+ * @param {string} roleKey - Role identifier
+ * @param {object} [roleProfiles] - Loaded role profiles
+ * @returns {{ roleKey: string, weights: object, label: string }}
+ */
+function resolveRoleProfile(roleKey, roleProfiles = null) {
+  const profiles = roleProfiles || loadRoleProfiles();
+  const presets = profiles.rolePresets || DEFAULT_ROLE_PRESETS;
+
+  // Predictable default: if 'general', null, undefined, or unrecognized, resolve to 'fullstack'
+  const normalizedKey = (roleKey === 'general' || !presets[roleKey]) ? 'fullstack' : roleKey;
+  const targetPreset = presets[normalizedKey] || presets.fullstack || DEFAULT_ROLE_PRESETS.fullstack;
+
+  return {
+    roleKey: normalizedKey,
+    weights: targetPreset.weights,
+    label: targetPreset.label
+  };
+}
+
 module.exports = {
   DIMENSIONS,
   DEFAULT_ROLE_PRESETS,
   loadRoleProfiles,
   calculateMaxWeightedScore,
-  normalizeQualityScore
+  normalizeQualityScore,
+  resolveRoleProfile
 };
+

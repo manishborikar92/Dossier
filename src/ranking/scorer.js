@@ -135,10 +135,10 @@ function evaluateProjectEvidence(project) {
  * Evaluates concrete observable evidence (manifests, source files, git history, architecture).
  *
  * @param {object} project - Project catalog entry
- * @param {string} [role='general'] - Target role preset key ('general', 'fullstack', 'backend', 'ai_ml_data', 'systems_3d')
+ * @param {string} [role='fullstack'] - Target role preset key ('fullstack', 'backend', 'ai_ml_data', 'systems_3d')
  * @returns {object} { rawScores, totalRawScore, breakdown, reasons }
  */
-function scoreProjectDimensions(project, role = 'general') {
+function scoreProjectDimensions(project, role = 'fullstack') {
   const techList = Array.isArray(project.primary_technologies) ? project.primary_technologies : [];
   const techSet = new Set(techList.map(t => t.toLowerCase()));
   const fileRefs = Array.isArray(project.important_file_references) ? project.important_file_references : [];
@@ -791,7 +791,7 @@ function scoreProjectDimensions(project, role = 'general') {
  *
  * @param {object[]} catalog - Master catalog entries
  * @param {object} [options] - Ranking options
- * @param {string} [options.role='general'] - Target role preset key
+ * @param {string} [options.role='fullstack'] - Target role preset key
  * @param {object} [options.customWeights] - Optional custom criterion weights
  * @param {string} [options.jdText] - Optional Job Description text
  * @param {number} [options.alpha] - Relevance blending weight α ∈ [0, 1]
@@ -800,8 +800,9 @@ function scoreProjectDimensions(project, role = 'general') {
  */
 function rankProjects(catalog, options = {}) {
   const roleProfiles = loadRoleProfiles(options.configPath);
-  const roleKey = options.role && roleProfiles.rolePresets[options.role] ? options.role : 'general';
-  const rolePreset = roleProfiles.rolePresets[roleKey];
+  const requestedRole = options.role === 'general' ? 'fullstack' : options.role;
+  const roleKey = requestedRole && roleProfiles.rolePresets[requestedRole] ? requestedRole : 'fullstack';
+  const rolePreset = roleProfiles.rolePresets[roleKey] || roleProfiles.rolePresets.fullstack;
   const weights = options.customWeights || rolePreset.weights;
 
   // 1. Filter candidate projects: Must have resume_eligibility === true

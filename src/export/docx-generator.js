@@ -20,119 +20,62 @@ const {
   TabStopPosition
 } = require('docx');
 
-// ── Color Palette & Sizing Constants ──────────────────────────────────────────
-const COLORS = {
-  ACCENT: '1F3864',  // Deep Navy
-  BLACK: '000000',   // Primary Text
-  GRAY: '444444'     // Metadata, dates, sublines
-};
+const {
+  COLORS,
+  TYPOGRAPHY,
+  PAGE,
+  SPACING,
+  BORDERS,
+  BULLETS,
+  SECTIONS
+} = require('./design-spec');
+const {
+  normalizeCertification,
+  validateCanonicalModel
+} = require('../model/normalize');
 
+// Legacy backwards-compatible sizing constants for existing test assertions
 const SIZES = {
-  NAME: 36,            // 18 pt (half-points: 36 / 2 = 18pt)
-  SECTION_HEADER: 22,  // 11 pt
-  ITEM_TITLE: 21,      // 10.5 pt
-  BODY: 20,            // 10 pt
-  META: 19,            // 9.5 pt
-  CONTACT: 18          // 9 pt
+  NAME: TYPOGRAPHY.twoPage.name.halfPoints,
+  SECTION_HEADER: TYPOGRAPHY.twoPage.sectionHeader.halfPoints,
+  ITEM_TITLE: TYPOGRAPHY.twoPage.itemTitle.halfPoints,
+  BODY: TYPOGRAPHY.twoPage.body.halfPoints,
+  META: TYPOGRAPHY.twoPage.meta.halfPoints,
+  CONTACT: TYPOGRAPHY.twoPage.contact.halfPoints
 };
 
 // ── Helper Constructors ───────────────────────────────────────────────────────
 
 function createHr(is1Page) {
+  const sp = is1Page ? SPACING.onePage.hr : SPACING.twoPage.hr;
   return new Paragraph({
-    border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: COLORS.ACCENT, space: 1 } },
-    spacing: { before: is1Page ? 40 : 60, after: is1Page ? 40 : 60 },
+    border: { bottom: { style: BorderStyle.SINGLE, size: BORDERS.divider.wordSize, color: BORDERS.divider.color, space: BORDERS.divider.space } },
+    spacing: { before: sp.before, after: sp.after },
     children: []
   });
 }
 
-function createSectionHeader(title, is1Page) {
+function createSectionHeader(title, is1Page, pageBreakBefore = false) {
+  const sp = is1Page ? SPACING.onePage.sectionHeader : SPACING.twoPage.sectionHeader;
+  const typo = is1Page ? TYPOGRAPHY.onePage.sectionHeader : TYPOGRAPHY.twoPage.sectionHeader;
   return new Paragraph({
-    spacing: { before: is1Page ? 100 : 160, after: is1Page ? 30 : 50 },
-    border: { bottom: { style: BorderStyle.SINGLE, size: 6, color: COLORS.ACCENT, space: 2 } },
+    pageBreakBefore: Boolean(pageBreakBefore),
+    spacing: { before: sp.before, after: sp.after },
+    border: { bottom: { style: BorderStyle.SINGLE, size: BORDERS.sectionUnderline.wordSize, color: BORDERS.sectionUnderline.color, space: BORDERS.sectionUnderline.space } },
+    keepNext: true,
     children: [
       new TextRun({
         text: title.toUpperCase(),
         bold: true,
-        size: is1Page ? 20 : SIZES.SECTION_HEADER,
-        color: COLORS.ACCENT,
-        font: 'Arial'
+        size: typo.halfPoints,
+        color: typo.color,
+        font: TYPOGRAPHY.fontFamily
       })
     ]
   });
 }
 
-/**
- * Normalizes certification entries from diverse schemas (raw strings or objects)
- * into canonical objects: { name, issuer, year, raw }.
- *
- * @param {string|object} cert - Raw certification entry
- * @returns {{ name: string, issuer: string, year: string, raw: string } | null}
- */
-function normalizeCertification(cert) {
-  if (!cert) return null;
-
-  if (typeof cert === 'string') {
-    const raw = cert.trim();
-    if (!raw) return null;
-
-    let text = raw;
-    let year = '';
-    let issuer = '';
-    let name = '';
-
-    const yearMatch = text.match(/(?:[·•\-|,]|\s+)\s*\(?(\b(?:19|20)\d{2}\b)\)?\s*$/);
-    if (yearMatch) {
-      year = yearMatch[1];
-      text = text.slice(0, yearMatch.index).trim();
-    } else {
-      const parenMatch = text.match(/\((\b(?:19|20)\d{2}\b)\)\s*$/);
-      if (parenMatch) {
-        year = parenMatch[1];
-        text = text.slice(0, parenMatch.index).trim();
-      }
-    }
-
-    const dashMatch = text.match(/\s*(?:—|–|\s-\s)\s*/);
-    if (dashMatch) {
-      const splitIdx = dashMatch.index;
-      name = text.slice(0, splitIdx).trim();
-      issuer = text.slice(splitIdx + dashMatch[0].length).trim();
-    } else {
-      name = text.trim();
-    }
-
-    return {
-      name: name || raw,
-      issuer: issuer || '',
-      year: year || '',
-      raw
-    };
-  }
-
-  if (typeof cert === 'object') {
-    const name = (cert.name || cert.title || cert.credentialName || '').trim();
-    const issuer = (cert.issuer || cert.organization || cert.issuingOrganization || cert.institution || '').trim();
-    const year = cert.year ? String(cert.year).trim() : (cert.date ? String(cert.date).trim() : '');
-    const raw = cert.raw || (name ? `${name}${issuer ? ' — ' + issuer : ''}${year ? ' · ' + year : ''}` : '');
-
-    if (!name && !issuer && !year) {
-      return null;
-    }
-
-    return {
-      name: name || issuer || 'Certification',
-      issuer,
-      year,
-      raw
-    };
-  }
-
-  return null;
-}
-
 function createBullet(text, boldPrefix = null, is1Page = false) {
-  const children = [];
   const cleanPrefix = boldPrefix ? boldPrefix.trim() : '';
   const cleanText = typeof text === 'string' ? text.trim() : '';
 
@@ -140,13 +83,17 @@ function createBullet(text, boldPrefix = null, is1Page = false) {
     return null;
   }
 
+  const sp = is1Page ? SPACING.onePage.bullet : SPACING.twoPage.bullet;
+  const typo = is1Page ? TYPOGRAPHY.onePage.body : TYPOGRAPHY.twoPage.body;
+
+  const children = [];
   if (cleanPrefix) {
     children.push(
       new TextRun({
         text: cleanPrefix + (cleanText ? ' ' : ''),
         bold: true,
-        size: is1Page ? 18 : SIZES.BODY,
-        font: 'Arial',
+        size: typo.halfPoints,
+        font: TYPOGRAPHY.fontFamily,
         color: COLORS.BLACK
       })
     );
@@ -155,8 +102,8 @@ function createBullet(text, boldPrefix = null, is1Page = false) {
     children.push(
       new TextRun({
         text: cleanText,
-        size: is1Page ? 18 : SIZES.BODY,
-        font: 'Arial',
+        size: typo.halfPoints,
+        font: TYPOGRAPHY.fontFamily,
         color: COLORS.BLACK
       })
     );
@@ -164,18 +111,37 @@ function createBullet(text, boldPrefix = null, is1Page = false) {
 
   return new Paragraph({
     numbering: { reference: 'bullets', level: 0 },
-    spacing: { before: is1Page ? 20 : 30, after: is1Page ? 20 : 30 },
+    spacing: { before: sp.before, after: sp.after },
     children
   });
 }
 
 function createTwoColLine(left, right, leftBold = false, rightGray = false, is1Page = false) {
+  const sp = is1Page ? SPACING.onePage.twoColLine : SPACING.twoPage.twoColLine;
+  const leftTypo = is1Page ? TYPOGRAPHY.onePage.body : TYPOGRAPHY.twoPage.body;
+  const rightTypo = is1Page ? TYPOGRAPHY.onePage.meta : TYPOGRAPHY.twoPage.meta;
   return new Paragraph({
     tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-    spacing: { before: is1Page ? 10 : 20, after: is1Page ? 10 : 20 },
+    spacing: { before: sp.before, after: sp.after },
     children: [
-      new TextRun({ text: left, bold: leftBold, size: is1Page ? 18 : SIZES.BODY, font: 'Arial', color: COLORS.BLACK }),
-      new TextRun({ text: '\t' + right, size: is1Page ? 17 : SIZES.META, font: 'Arial', color: rightGray ? COLORS.GRAY : COLORS.BLACK, italics: rightGray })
+      new TextRun({ text: left, bold: leftBold, size: leftTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.BLACK }),
+      new TextRun({ text: '\t' + right, size: rightTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: rightGray ? COLORS.GRAY : COLORS.BLACK, italics: rightGray })
+    ]
+  });
+}
+
+function createGrayLine(text, afterTwips = 40, is1Page = false) {
+  const typo = is1Page ? TYPOGRAPHY.onePage.meta : TYPOGRAPHY.twoPage.meta;
+  const beforeTwips = is1Page ? SPACING.onePage.grayLine.before : SPACING.twoPage.grayLine.before;
+  return new Paragraph({
+    spacing: { before: beforeTwips, after: afterTwips },
+    children: [
+      new TextRun({
+        text,
+        size: typo.halfPoints,
+        font: TYPOGRAPHY.fontFamily,
+        color: COLORS.GRAY
+      })
     ]
   });
 }
@@ -205,8 +171,11 @@ async function generateResumeDocx(resumeModel, options = {}) {
     throw new Error('Invalid resumeModel provided to generateResumeDocx.');
   }
 
+  // Validate canonical schema invariants
+  validateCanonicalModel(resumeModel);
+
   const is1Page = resumeModel.metadata?.resumeLength === '1page';
-  const marginTwips = is1Page ? 720 : 1080; // 0.50 in vs 0.75 in
+  const marginTwips = is1Page ? PAGE.margins.onePage.twips : PAGE.margins.twoPage.twips;
   const personal = resumeModel.personal || {};
 
   const outputDir = options.outputPath
@@ -218,7 +187,7 @@ async function generateResumeDocx(resumeModel, options = {}) {
   }
 
   const candidateSlug = (personal.name || 'Candidate').trim().replace(/[^a-zA-Z0-9_-]/g, '_');
-  const targetRoleSlug = (resumeModel.metadata?.targetRole || 'general').replace(/[^a-zA-Z0-9_-]/g, '_');
+  const targetRoleSlug = (resumeModel.metadata?.targetRole || 'fullstack').replace(/[^a-zA-Z0-9_-]/g, '_');
   const targetLength = resumeModel.metadata?.resumeLength || '2page';
   const timestamp = Date.now();
   const defaultFilename = `${candidateSlug}_${targetRoleSlug}_${targetLength}_${timestamp}.docx`;
@@ -231,17 +200,19 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
   // ── 1. Name ────────────────────────────────────────────────────────────────
   if (personal.name && personal.name.trim().length > 0) {
+    const typo = is1Page ? TYPOGRAPHY.onePage.name : TYPOGRAPHY.twoPage.name;
+    const sp = is1Page ? SPACING.onePage.name : SPACING.twoPage.name;
     children.push(
       new Paragraph({
         alignment: AlignmentType.CENTER,
-        spacing: { before: 0, after: is1Page ? 30 : 60 },
+        spacing: { before: sp.before, after: sp.after },
         children: [
           new TextRun({
             text: personal.name.trim(),
             bold: true,
-            size: is1Page ? 32 : SIZES.NAME,
-            font: 'Arial',
-            color: COLORS.ACCENT
+            size: typo.halfPoints,
+            font: TYPOGRAPHY.fontFamily,
+            color: typo.color
           })
         ]
       })
@@ -250,17 +221,21 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
   // ── 2. Contact Information ─────────────────────────────────────────────────
   const contactChildren = [];
+  const contactTypo = is1Page ? TYPOGRAPHY.onePage.contact : TYPOGRAPHY.twoPage.contact;
+  const contactSp = is1Page ? SPACING.onePage.contact : SPACING.twoPage.contact;
+  const dotSep = '  \u00B7  ';
+
   if (personal.location) {
-    contactChildren.push(new TextRun({ text: personal.location, size: SIZES.CONTACT, font: 'Arial', color: COLORS.GRAY }));
+    contactChildren.push(new TextRun({ text: personal.location, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY }));
   }
   if (personal.email) {
     if (contactChildren.length > 0) {
-      contactChildren.push(new TextRun({ text: '  •  ', size: SIZES.CONTACT, font: 'Arial', color: COLORS.GRAY }));
+      contactChildren.push(new TextRun({ text: dotSep, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY }));
     }
     contactChildren.push(
       new ExternalHyperlink({
         children: [
-          new TextRun({ text: personal.email, size: SIZES.CONTACT, font: 'Arial', color: COLORS.ACCENT, underline: {} })
+          new TextRun({ text: personal.email, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY })
         ],
         link: sanitizeUrl(`mailto:${personal.email}`)
       })
@@ -268,21 +243,24 @@ async function generateResumeDocx(resumeModel, options = {}) {
   }
   if (personal.phone) {
     if (contactChildren.length > 0) {
-      contactChildren.push(new TextRun({ text: '  •  ', size: SIZES.CONTACT, font: 'Arial', color: COLORS.GRAY }));
+      contactChildren.push(new TextRun({ text: dotSep, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY }));
     }
     contactChildren.push(
-      new TextRun({ text: personal.phone, size: SIZES.CONTACT, font: 'Arial', color: COLORS.GRAY })
+      new TextRun({ text: personal.phone, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY })
     );
   }
   if (personal.linkedin) {
     if (contactChildren.length > 0) {
-      contactChildren.push(new TextRun({ text: '  •  ', size: SIZES.CONTACT, font: 'Arial', color: COLORS.GRAY }));
+      contactChildren.push(new TextRun({ text: dotSep, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY }));
     }
-    const cleanLink = personal.linkedin.replace(/^https?:\/\/(www\.)?/i, '');
+    let cleanLink = personal.linkedin.replace(/^https?:\/\/(www\.)?/i, '').replace(/^linkedin\.com\//i, '');
+    if (!cleanLink.startsWith('in/')) {
+      cleanLink = 'in/' + cleanLink;
+    }
     contactChildren.push(
       new ExternalHyperlink({
         children: [
-          new TextRun({ text: cleanLink, size: SIZES.CONTACT, font: 'Arial', color: COLORS.ACCENT, underline: {} })
+          new TextRun({ text: cleanLink, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY })
         ],
         link: sanitizeUrl(personal.linkedin)
       })
@@ -290,13 +268,16 @@ async function generateResumeDocx(resumeModel, options = {}) {
   }
   if (personal.github) {
     if (contactChildren.length > 0) {
-      contactChildren.push(new TextRun({ text: '  •  ', size: SIZES.CONTACT, font: 'Arial', color: COLORS.GRAY }));
+      contactChildren.push(new TextRun({ text: dotSep, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY }));
     }
-    const cleanGit = personal.github.replace(/^https?:\/\/(www\.)?/i, '');
+    let cleanGit = personal.github.replace(/^https?:\/\/(www\.)?/i, '').replace(/^github\.com\//i, '');
+    if (!cleanGit.startsWith('github/')) {
+      cleanGit = 'github/' + cleanGit;
+    }
     contactChildren.push(
       new ExternalHyperlink({
         children: [
-          new TextRun({ text: cleanGit, size: SIZES.CONTACT, font: 'Arial', color: COLORS.ACCENT, underline: {} })
+          new TextRun({ text: cleanGit, size: contactTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY })
         ],
         link: sanitizeUrl(personal.github)
       })
@@ -306,7 +287,7 @@ async function generateResumeDocx(resumeModel, options = {}) {
   children.push(
     new Paragraph({
       alignment: AlignmentType.CENTER,
-      spacing: { before: 0, after: is1Page ? 20 : 40 },
+      spacing: { before: contactSp.before, after: contactSp.after },
       children: contactChildren
     })
   );
@@ -315,16 +296,18 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
   // ── 3. Professional Summary (if populated) ─────────────────────────────────
   if (resumeModel.summary && resumeModel.summary.trim().length > 0) {
-    children.push(createSectionHeader('Professional Summary', is1Page));
+    const sp = is1Page ? SPACING.onePage.summary : SPACING.twoPage.summary;
+    const typo = is1Page ? TYPOGRAPHY.onePage.body : TYPOGRAPHY.twoPage.body;
+    children.push(createSectionHeader(SECTIONS.titles.summary, is1Page));
     children.push(
       new Paragraph({
-        spacing: { before: is1Page ? 30 : 60, after: is1Page ? 40 : 80 },
+        spacing: { before: sp.before, after: sp.after },
         children: [
           new TextRun({
             text: resumeModel.summary.trim(),
-            size: is1Page ? 18 : SIZES.BODY,
-            font: 'Arial',
-            color: COLORS.BLACK
+            size: typo.halfPoints,
+            font: TYPOGRAPHY.fontFamily,
+            color: typo.color
           })
         ]
       })
@@ -333,25 +316,27 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
   // ── 4. Technical Skills (if populated) ─────────────────────────────────────
   if (Array.isArray(resumeModel.skills) && resumeModel.skills.length > 0) {
-    children.push(createSectionHeader('Technical Skills', is1Page));
+    const sp = is1Page ? SPACING.onePage.skillRow : SPACING.twoPage.skillRow;
+    const typo = is1Page ? TYPOGRAPHY.onePage.body : TYPOGRAPHY.twoPage.body;
+    children.push(createSectionHeader(SECTIONS.titles.skills, is1Page));
     for (const cat of resumeModel.skills) {
       const itemsText = Array.isArray(cat.items) ? cat.items.join(', ') : '';
       if (itemsText.length > 0) {
         children.push(
           new Paragraph({
-            spacing: { before: is1Page ? 15 : 25, after: is1Page ? 15 : 25 },
+            spacing: { before: sp.before, after: sp.after },
             children: [
               new TextRun({
                 text: `${cat.label || cat.category}: `,
                 bold: true,
-                size: is1Page ? 18 : SIZES.BODY,
-                font: 'Arial',
+                size: typo.halfPoints,
+                font: TYPOGRAPHY.fontFamily,
                 color: COLORS.BLACK
               }),
               new TextRun({
                 text: itemsText,
-                size: is1Page ? 18 : SIZES.BODY,
-                font: 'Arial',
+                size: typo.halfPoints,
+                font: TYPOGRAPHY.fontFamily,
                 color: COLORS.BLACK
               })
             ]
@@ -363,31 +348,35 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
   // ── 5. Professional Experience (if populated) ──────────────────────────────
   if (Array.isArray(resumeModel.experience) && resumeModel.experience.length > 0) {
-    children.push(createSectionHeader('Professional Experience', is1Page));
+    const sp = is1Page ? SPACING.onePage.itemHeader : SPACING.twoPage.itemHeader;
+    const titleTypo = is1Page ? TYPOGRAPHY.onePage.itemTitle : TYPOGRAPHY.twoPage.itemTitle;
+    const bodyTypo = is1Page ? TYPOGRAPHY.onePage.body : TYPOGRAPHY.twoPage.body;
+    const metaTypo = is1Page ? TYPOGRAPHY.onePage.meta : TYPOGRAPHY.twoPage.meta;
+    children.push(createSectionHeader(SECTIONS.titles.experience, is1Page));
     for (const exp of resumeModel.experience) {
       const locText = exp.location ? ` (${exp.location})` : '';
       children.push(
         new Paragraph({
           tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-          spacing: { before: is1Page ? 60 : 100, after: is1Page ? 20 : 30 },
+          spacing: { before: sp.before, after: sp.after },
           children: [
             new TextRun({
               text: exp.role,
               bold: true,
-              size: is1Page ? 19 : SIZES.ITEM_TITLE,
-              font: 'Arial',
-              color: COLORS.BLACK
+              size: titleTypo.halfPoints,
+              font: TYPOGRAPHY.fontFamily,
+              color: titleTypo.color
             }),
             new TextRun({
               text: ` — ${exp.company}${locText}`,
-              size: is1Page ? 18 : SIZES.BODY,
-              font: 'Arial',
+              size: bodyTypo.halfPoints,
+              font: TYPOGRAPHY.fontFamily,
               color: COLORS.GRAY
             }),
             new TextRun({
               text: `\t${exp.dates || ''}`,
-              size: is1Page ? 17 : SIZES.META,
-              font: 'Arial',
+              size: metaTypo.halfPoints,
+              font: TYPOGRAPHY.fontFamily,
               color: COLORS.GRAY,
               italics: true
             })
@@ -405,27 +394,33 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
   // ── 6. Projects & Deliverables (if populated) ──────────────────────────────
   if (Array.isArray(resumeModel.projects) && resumeModel.projects.length > 0) {
-    children.push(createSectionHeader('Projects & Technical Deliverables', is1Page));
+    const sp = is1Page ? SPACING.onePage.itemHeader : SPACING.twoPage.itemHeader;
+    const sublineSp = is1Page ? SPACING.onePage.projectSubline : SPACING.twoPage.projectSubline;
+    const titleTypo = is1Page ? TYPOGRAPHY.onePage.itemTitle : TYPOGRAPHY.twoPage.itemTitle;
+    const metaTypo = is1Page ? TYPOGRAPHY.onePage.meta : TYPOGRAPHY.twoPage.meta;
+
+    children.push(createSectionHeader(SECTIONS.titles.projects, is1Page, !is1Page));
+
     for (const proj of resumeModel.projects) {
       const projHeaderChildren = [
         new TextRun({
           text: proj.title || proj.name,
           bold: true,
-          size: is1Page ? 19 : SIZES.ITEM_TITLE,
-          font: 'Arial',
-          color: COLORS.BLACK
+          size: titleTypo.halfPoints,
+          font: TYPOGRAPHY.fontFamily,
+          color: titleTypo.color
         })
       ];
 
       if (proj.liveUrl) {
         projHeaderChildren.push(
-          new TextRun({ text: '  |  ', size: is1Page ? 17 : SIZES.META, font: 'Arial', color: COLORS.GRAY }),
+          new TextRun({ text: '  |  ', size: metaTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY }),
           new ExternalHyperlink({
             children: [
               new TextRun({
                 text: proj.liveUrl,
-                size: is1Page ? 17 : SIZES.META,
-                font: 'Arial',
+                size: metaTypo.halfPoints,
+                font: TYPOGRAPHY.fontFamily,
                 color: COLORS.ACCENT,
                 underline: {}
               })
@@ -438,8 +433,8 @@ async function generateResumeDocx(resumeModel, options = {}) {
       projHeaderChildren.push(
         new TextRun({
           text: `\t${proj.year || '2026'}`,
-          size: is1Page ? 17 : SIZES.META,
-          font: 'Arial',
+          size: metaTypo.halfPoints,
+          font: TYPOGRAPHY.fontFamily,
           color: COLORS.GRAY,
           italics: true
         })
@@ -448,7 +443,7 @@ async function generateResumeDocx(resumeModel, options = {}) {
       children.push(
         new Paragraph({
           tabStops: [{ type: TabStopType.RIGHT, position: TabStopPosition.MAX }],
-          spacing: { before: is1Page ? 60 : 100, after: is1Page ? 15 : 25 },
+          spacing: { before: sp.before, after: sp.after },
           children: projHeaderChildren
         })
       );
@@ -457,10 +452,10 @@ async function generateResumeDocx(resumeModel, options = {}) {
       if (techStackText) {
         children.push(
           new Paragraph({
-            spacing: { before: 0, after: is1Page ? 20 : 30 },
+            spacing: { before: sublineSp.before, after: sublineSp.after },
             children: [
-              new TextRun({ text: 'Tech Stack: ', bold: true, size: is1Page ? 17 : SIZES.META, font: 'Arial', color: COLORS.GRAY }),
-              new TextRun({ text: techStackText, size: is1Page ? 17 : SIZES.META, font: 'Arial', color: COLORS.GRAY, italics: true })
+              new TextRun({ text: 'Tech Stack: ', bold: true, size: metaTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY }),
+              new TextRun({ text: techStackText, size: metaTypo.halfPoints, font: TYPOGRAPHY.fontFamily, color: COLORS.GRAY, italics: true })
             ]
           })
         );
@@ -476,19 +471,22 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
   // ── 7. Education (if populated) ───────────────────────────────────────────
   if (Array.isArray(resumeModel.education) && resumeModel.education.length > 0) {
-    children.push(createSectionHeader('Education', is1Page));
+    children.push(createSectionHeader(SECTIONS.titles.education, is1Page));
     for (const edu of resumeModel.education) {
-      const locText = edu.location ? ` — ${edu.location}` : '';
-      const scoreText = edu.score ? ` • ${edu.score}` : '';
       children.push(
         createTwoColLine(
-          `${edu.degree} — ${edu.institution}${locText}`,
-          `${edu.dates || ''}${scoreText}`,
-          false,
+          edu.degree,
+          edu.dates || '',
           true,
+          false,
           is1Page
         )
       );
+
+      const sublineParts = [edu.institution, edu.location, edu.details || edu.score].filter(Boolean);
+      if (sublineParts.length > 0) {
+        children.push(createGrayLine(sublineParts.join('  |  '), is1Page ? 20 : 35, is1Page));
+      }
     }
   }
 
@@ -498,30 +496,41 @@ async function generateResumeDocx(resumeModel, options = {}) {
     for (const rawCert of resumeModel.certifications) {
       const cert = normalizeCertification(rawCert);
       if (!cert || (!cert.name && !cert.raw)) continue;
-      const certName = cert.name || cert.raw;
-      const issuerText = cert.issuer ? `— ${cert.issuer}` : '';
-      const yearText = cert.year ? `(${cert.year})` : '';
-      const suffix = [issuerText, yearText].filter(Boolean).join(' ');
-      const bullet = createBullet(suffix, certName, is1Page);
+      const fullText = cert.raw || [cert.name, cert.issuer, cert.year].filter(Boolean).join(' — ');
+      const bullet = createBullet(fullText, null, is1Page);
       if (bullet) {
         certBullets.push(bullet);
       }
     }
     if (certBullets.length > 0) {
-      children.push(createSectionHeader('Certifications & Credentials', is1Page));
+      children.push(createSectionHeader(SECTIONS.titles.certifications, is1Page));
       children.push(...certBullets);
     }
   }
 
   // ── 9. Leadership (if populated) ──────────────────────────────────────────
   if (Array.isArray(resumeModel.leadership) && resumeModel.leadership.length > 0) {
-    children.push(createSectionHeader('Leadership & Activities', is1Page));
+    children.push(createSectionHeader(SECTIONS.titles.leadership, is1Page));
     for (const lead of resumeModel.leadership) {
-      const text = typeof lead === 'string' ? lead : (lead.title || lead.description || '');
-      if (text) {
-        const bullet = createBullet(text, null, is1Page);
-        if (bullet) {
-          children.push(bullet);
+      if (typeof lead === 'string') {
+        const bullet = createBullet(lead, null, is1Page);
+        if (bullet) children.push(bullet);
+      } else if (lead && typeof lead === 'object') {
+        if (lead.title) {
+          children.push(createTwoColLine(lead.title, lead.dates || '', true, false, is1Page));
+        }
+        let desc = '';
+        if (lead.institution && Array.isArray(lead.bullets) && lead.bullets[0]) {
+          desc = `${lead.institution} — ${lead.bullets[0]}`;
+        } else if (lead.institution) {
+          desc = lead.institution;
+        } else if (Array.isArray(lead.bullets) && lead.bullets[0]) {
+          desc = lead.bullets[0];
+        } else if (lead.description) {
+          desc = lead.description;
+        }
+        if (desc) {
+          children.push(createGrayLine(desc, is1Page ? 20 : 40, is1Page));
         }
       }
     }
@@ -537,9 +546,9 @@ async function generateResumeDocx(resumeModel, options = {}) {
             {
               level: 0,
               format: LevelFormat.BULLET,
-              text: '\u2022',
+              text: BULLETS.character,
               alignment: AlignmentType.LEFT,
-              style: { paragraph: { indent: { left: 540, hanging: 270 } } }
+              style: { paragraph: { indent: { left: BULLETS.leftIndentTwips, hanging: BULLETS.hangingTwips } } }
             }
           ]
         }
@@ -549,7 +558,7 @@ async function generateResumeDocx(resumeModel, options = {}) {
       {
         properties: {
           page: {
-            size: { width: 12240, height: 15840 }, // Letter: 8.5 x 11 inches
+            size: { width: PAGE.dimensions.widthTwips, height: PAGE.dimensions.heightTwips },
             margin: { top: marginTwips, right: marginTwips, bottom: marginTwips, left: marginTwips }
           }
         },
