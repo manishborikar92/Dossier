@@ -76,7 +76,6 @@ npm run scan
 
 # Launch the interactive terminal CLI wizard (requires an interactive terminal / TTY)
 npm start
-# or: npm run cli
 # Force rescan with: npm start -- --refresh
 ```
 
