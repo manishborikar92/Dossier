@@ -117,6 +117,7 @@ async function validatePdfResume(pdfPath, resumeModel) {
   }
 
   const extractedText = (textObj.text || '').trim();
+  const normalizedPdfText = extractedText.replace(/\s+/g, ' ').toLowerCase();
   if (extractedText.length === 0) {
     errors.push('Extracted PDF text is empty; document is not text-selectable or contains only raster graphics.');
   }
@@ -125,20 +126,19 @@ async function validatePdfResume(pdfPath, resumeModel) {
   const personal = resumeModel.personal || {};
 
   // Check Name
-  if (personal.name && !extractedText.toLowerCase().includes(personal.name.toLowerCase())) {
+  if (personal.name && !normalizedPdfText.includes(personal.name.replace(/\s+/g, ' ').toLowerCase())) {
     errors.push(`Candidate name "${personal.name}" was not found in extracted PDF text.`);
   }
 
   // Check Email
-  if (personal.email && !extractedText.toLowerCase().includes(personal.email.toLowerCase())) {
+  if (personal.email && !normalizedPdfText.includes(personal.email.replace(/\s+/g, ' ').toLowerCase())) {
     errors.push(`Contact email "${personal.email}" was not found in extracted PDF text.`);
   }
 
   // Check Summary
   if (resumeModel.summary && resumeModel.summary.trim().length > 0) {
-    // Check first 40 chars of summary
-    const sampleSummary = resumeModel.summary.trim().slice(0, 40).toLowerCase();
-    if (!extractedText.toLowerCase().includes(sampleSummary)) {
+    const sampleSummary = resumeModel.summary.trim().slice(0, 40).replace(/\s+/g, ' ').toLowerCase();
+    if (!normalizedPdfText.includes(sampleSummary)) {
       warnings.push(`Professional Summary snippet was not detected in extracted PDF text.`);
     }
   }
@@ -147,8 +147,8 @@ async function validatePdfResume(pdfPath, resumeModel) {
   const projectPositions = [];
   if (Array.isArray(resumeModel.projects)) {
     for (const proj of resumeModel.projects) {
-      const projTitle = (proj.title || proj.name || '').toLowerCase();
-      const pos = extractedText.toLowerCase().indexOf(projTitle);
+      const projTitle = (proj.title || proj.name || '').replace(/\s+/g, ' ').toLowerCase();
+      const pos = normalizedPdfText.indexOf(projTitle);
       if (pos === -1) {
         errors.push(`Approved project "${proj.title || proj.name}" was not found in extracted PDF text.`);
       } else {
@@ -157,8 +157,8 @@ async function validatePdfResume(pdfPath, resumeModel) {
 
       // Check at least one bullet point
       if (Array.isArray(proj.bullets) && proj.bullets.length > 0) {
-        const firstBulletSnippet = proj.bullets[0].slice(0, 30).toLowerCase();
-        if (!extractedText.toLowerCase().includes(firstBulletSnippet)) {
+        const firstBulletSnippet = proj.bullets[0].slice(0, 30).replace(/\s+/g, ' ').toLowerCase();
+        if (!normalizedPdfText.includes(firstBulletSnippet)) {
           warnings.push(`Project bullet for "${proj.name}" was not found in extracted text.`);
         }
       }
@@ -177,7 +177,7 @@ async function validatePdfResume(pdfPath, resumeModel) {
   // Check Professional Experience
   if (Array.isArray(resumeModel.experience)) {
     for (const exp of resumeModel.experience) {
-      if (exp.company && !extractedText.toLowerCase().includes(exp.company.toLowerCase())) {
+      if (exp.company && !normalizedPdfText.includes(exp.company.replace(/\s+/g, ' ').toLowerCase())) {
         errors.push(`Experience employer "${exp.company}" was not found in extracted PDF text.`);
       }
     }
@@ -186,7 +186,7 @@ async function validatePdfResume(pdfPath, resumeModel) {
   // Check Education
   if (Array.isArray(resumeModel.education)) {
     for (const edu of resumeModel.education) {
-      if (edu.institution && !extractedText.toLowerCase().includes(edu.institution.toLowerCase())) {
+      if (edu.institution && !normalizedPdfText.includes(edu.institution.replace(/\s+/g, ' ').toLowerCase())) {
         errors.push(`Education institution "${edu.institution}" was not found in extracted PDF text.`);
       }
     }
@@ -398,6 +398,15 @@ async function validateDocxResume(docxPath, resumeModel) {
     );
   }
 
+  function unescapeXml(str) {
+    return str
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'");
+  }
+
   // ── 2. Sequential Text Extraction & Paragraph Reconstruction ─────────────────
   const pRegex = /<w:p(?:\s[^>]*)?>([\s\S]*?)<\/w:p>/g;
   const tRegex = /<w:t(?:\s[^>]*)?>([\s\S]*?)<\/w:t>/g;
@@ -409,7 +418,7 @@ async function validateDocxResume(docxPath, resumeModel) {
     let tMatch;
     const cleanContent = pContent.replace(/<w:tab\/>/g, ' \t ');
     while ((tMatch = tRegex.exec(cleanContent)) !== null) {
-      pText += tMatch[1];
+      pText += unescapeXml(tMatch[1]);
     }
     if (pText.trim().length > 0) {
       paragraphs.push(pText.trim());
@@ -417,6 +426,7 @@ async function validateDocxResume(docxPath, resumeModel) {
   }
 
   const extractedText = paragraphs.join('\n');
+  const normalizedDocxText = extractedText.replace(/\s+/g, ' ').toLowerCase();
   if (extractedText.length === 0) {
     errors.push('Extracted DOCX text is empty; document does not contain readable paragraph content.');
   }
@@ -426,17 +436,17 @@ async function validateDocxResume(docxPath, resumeModel) {
   if (resumeModel && typeof resumeModel === 'object') {
     const personal = resumeModel.personal || {};
 
-    if (personal.name && !extractedText.toLowerCase().includes(personal.name.toLowerCase())) {
+    if (personal.name && !normalizedDocxText.includes(personal.name.replace(/\s+/g, ' ').toLowerCase())) {
       errors.push(`Candidate name "${personal.name}" was not found in extracted DOCX text.`);
     }
 
-    if (personal.email && !extractedText.toLowerCase().includes(personal.email.toLowerCase())) {
+    if (personal.email && !normalizedDocxText.includes(personal.email.replace(/\s+/g, ' ').toLowerCase())) {
       errors.push(`Contact email "${personal.email}" was not found in extracted DOCX text.`);
     }
 
     if (resumeModel.summary && resumeModel.summary.trim().length > 0) {
-      const sampleSummary = resumeModel.summary.trim().slice(0, 40).toLowerCase();
-      if (!extractedText.toLowerCase().includes(sampleSummary)) {
+      const sampleSummary = resumeModel.summary.trim().slice(0, 40).replace(/\s+/g, ' ').toLowerCase();
+      if (!normalizedDocxText.includes(sampleSummary)) {
         warnings.push('Professional Summary snippet was not detected in extracted DOCX text.');
       }
     }
@@ -445,8 +455,8 @@ async function validateDocxResume(docxPath, resumeModel) {
     const projectPositions = [];
     if (Array.isArray(resumeModel.projects)) {
       for (const proj of resumeModel.projects) {
-        const projTitle = (proj.title || proj.name || '').toLowerCase();
-        const pos = extractedText.toLowerCase().indexOf(projTitle);
+        const projTitle = unescapeXml(proj.title || proj.name || '').replace(/\s+/g, ' ').toLowerCase();
+        const pos = normalizedDocxText.indexOf(projTitle);
         if (pos === -1) {
           errors.push(`Approved project "${proj.title || proj.name}" was not found in extracted DOCX text.`);
         } else {
@@ -466,7 +476,7 @@ async function validateDocxResume(docxPath, resumeModel) {
     // Check Professional Experience
     if (Array.isArray(resumeModel.experience)) {
       for (const exp of resumeModel.experience) {
-        if (exp.company && !extractedText.toLowerCase().includes(exp.company.toLowerCase())) {
+        if (exp.company && !normalizedDocxText.includes(exp.company.replace(/\s+/g, ' ').toLowerCase())) {
           errors.push(`Experience employer "${exp.company}" was not found in extracted DOCX text.`);
         }
       }
@@ -475,7 +485,7 @@ async function validateDocxResume(docxPath, resumeModel) {
     // Check Education
     if (Array.isArray(resumeModel.education)) {
       for (const edu of resumeModel.education) {
-        if (edu.institution && !extractedText.toLowerCase().includes(edu.institution.toLowerCase())) {
+        if (edu.institution && !normalizedDocxText.includes(edu.institution.replace(/\s+/g, ' ').toLowerCase())) {
           errors.push(`Education institution "${edu.institution}" was not found in extracted DOCX text.`);
         }
       }
