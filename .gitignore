@@ -1,0 +1,25 @@
+# Personal Configuration & Identity
+config/profile.json
+config/custom-weights.json
+
+# Local Scan Caches & Fingerprints
+data/catalog.json
+data/*.cache
+
+# Generated Resume Deliverables (Confidential)
+output/*.docx
+output/*.pdf
+temp/
+
+# Node runtime dependencies & logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# OS / Editor metadata
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

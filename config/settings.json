@@ -1,0 +1,76 @@
+{
+  "scanner": {
+    "projects_root": "C:\\Users\\manis\\Projects",
+    "internal_docs_root": "C:\\Users\\manis\\Projects\\InternalDocs",
+    "ignore_directories": [
+      ".git",
+      "node_modules",
+      "venv",
+      ".venv",
+      "__pycache__",
+      "dist",
+      "build",
+      ".next",
+      "out",
+      "coverage",
+      ".idea",
+      ".vscode"
+    ],
+    "non_project_directories": [
+      "InternalDocs",
+      "Notes",
+      "manishborikar92",
+      "Git-and-Github-Commands",
+      "Resume-Builder"
+    ],
+    "sensitive_file_patterns": [
+      ".env*",
+      "*.pem",
+      "*.key",
+      "id_rsa*",
+      "credentials.json",
+      "serviceAccountKey.json"
+    ],
+    "heavy_extensions": [
+      "*.pcd",
+      "*.ply",
+      "*.las",
+      "*.h5",
+      "*.onnx",
+      "*.mp4",
+      "*.zip",
+      "*.tar.gz"
+    ]
+  },
+  "export": {
+    "output_dir": "output",
+    "edge_path": "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+    "default_font": "Arial",
+    "accent_color": "1F3864",
+    "body_color": "000000",
+    "gray_color": "444444",
+    "units": {
+      "twips_per_inch": 1440,
+      "twips_per_point": 20,
+      "half_points_per_point": 2
+    },
+    "budget_1page": {
+      "margin_twips": 720,
+      "max_projects": 2,
+      "max_bullets_per_project": 2,
+      "max_experience_roles": 2,
+      "max_bullets_per_experience": 2
+    },
+    "budget_2page": {
+      "margin_twips": 1080,
+      "max_projects": 4,
+      "max_bullets_per_project": 4,
+      "max_experience_roles": 3,
+      "max_bullets_per_experience": 3
+    }
+  },
+  "cache": {
+    "catalog_file": "data/catalog.json",
+    "use_cache": true
+  }
+}

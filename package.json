@@ -1,0 +1,26 @@
+{
+  "name": "resume-builder",
+  "version": "1.0.0",
+  "description": "Intelligent, interactive resume builder with automated project discovery and transparent heuristic ranking",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test tests/**/*.test.js",
+    "lint": "node -e \"console.log('Validating JSON configs...'); JSON.parse(require('fs').readFileSync('config/profile.example.json')); JSON.parse(require('fs').readFileSync('config/ranking-weights.json')); JSON.parse(require('fs').readFileSync('config/settings.json')); console.log('Configs valid.');\""
+  },
+  "keywords": [
+    "resume",
+    "resume-builder",
+    "ats",
+    "docx",
+    "pdf",
+    "cli"
+  ],
+  "author": "Manish Borikar",
+  "license": "ISC",
+  "dependencies": {
+    "@clack/prompts": "^0.9.0",
+    "docx": "^9.1.0",
+    "picocolors": "^1.1.1"
+  }
+}

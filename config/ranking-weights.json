@@ -1,0 +1,107 @@
+{
+  "dimensions": {
+    "depth": {
+      "name": "Technical Depth",
+      "max_raw_points": 25,
+      "description": "Algorithmic complexity, spatial math, WASM execution, binary protocols, concurrency."
+    },
+    "impact": {
+      "name": "Real-World Impact & Deployment",
+      "max_raw_points": 20,
+      "description": "Verified production URL, active payment/telemetry gateways, real user transaction models."
+    },
+    "quality": {
+      "name": "Engineering Quality & Testing",
+      "max_raw_points": 15,
+      "description": "Automated test suites (Pytest, Jest, Playwright), ORM/migrations, Dockerization, error handling."
+    },
+    "breadth": {
+      "name": "Breadth of Skills",
+      "max_raw_points": 15,
+      "description": "Full-stack integration spanning Frontend, Backend, Database, Cloud/CDN, and Security/Auth."
+    },
+    "uniqueness": {
+      "name": "Architectural Uniqueness",
+      "max_raw_points": 10,
+      "description": "Distinctive domains: 3D point cloud LiDAR, in-browser WASM IDE, vector search, companion robotics."
+    },
+    "readiness": {
+      "name": "Production Readiness",
+      "max_raw_points": 10,
+      "description": "Authentication/RBAC, rate limiting, request validation, environment isolation, logging."
+    },
+    "storytelling": {
+      "name": "Storytelling Potential",
+      "max_raw_points": 5,
+      "description": "Clarity of problem-solution arc, measurable business/user value, interview demo appeal."
+    }
+  },
+  "role_presets": {
+    "general": {
+      "label": "General-Purpose Software Developer",
+      "weights": {
+        "depth": 1.00,
+        "impact": 1.00,
+        "quality": 1.00,
+        "breadth": 1.00,
+        "uniqueness": 1.00,
+        "readiness": 1.00,
+        "storytelling": 1.00
+      }
+    },
+    "fullstack": {
+      "label": "Full-Stack Developer",
+      "weights": {
+        "depth": 0.90,
+        "impact": 1.25,
+        "quality": 1.20,
+        "breadth": 1.20,
+        "uniqueness": 0.85,
+        "readiness": 1.15,
+        "storytelling": 1.00
+      }
+    },
+    "backend": {
+      "label": "Backend / Systems Engineer",
+      "weights": {
+        "depth": 1.15,
+        "impact": 1.10,
+        "quality": 1.25,
+        "breadth": 0.95,
+        "uniqueness": 0.95,
+        "readiness": 1.20,
+        "storytelling": 1.00
+      }
+    },
+    "ai_ml_data": {
+      "label": "AI / Machine Learning / Data Engineer",
+      "weights": {
+        "depth": 1.30,
+        "impact": 0.95,
+        "quality": 1.10,
+        "breadth": 0.95,
+        "uniqueness": 1.25,
+        "readiness": 0.85,
+        "storytelling": 1.00
+      }
+    },
+    "systems_3d": {
+      "label": "Systems / 3D Graphics / Computer Vision Developer",
+      "weights": {
+        "depth": 1.35,
+        "impact": 0.85,
+        "quality": 1.15,
+        "breadth": 0.80,
+        "uniqueness": 1.30,
+        "readiness": 0.90,
+        "storytelling": 1.00
+      }
+    }
+  },
+  "jd_matching": {
+    "default_alpha": 0.35,
+    "tech_weight": 0.70,
+    "context_weight": 0.30,
+    "epsilon": 0.000001
+  }
+}
