@@ -57,7 +57,7 @@ In the `docx` library:
 
 ---
 
-## 🚀 Setup & Installation
+## 🚀 Setup & Usage
 
 Ensure Node.js (>= 20) and npm are installed:
 
@@ -68,16 +68,39 @@ cd C:\Users\manis\Projects\Resume-Builder
 # Install required dependencies
 npm install
 
-# Validate configuration files
-npm run lint
+# Run automated test suites (56 tests across 4 phases)
+npm test
+
+# Run project discovery and catalog refresh standalone
+npm run scan
+
+# Launch the interactive terminal CLI wizard
+npm start
+# or: npm run cli
+# Force rescan with: npm start -- --refresh
 ```
+
+---
+
+## 🧭 Interactive Terminal CLI Workflow (Phase 4)
+
+The application provides an interactive wizard powered by `@clack/prompts`:
+
+1. **Target Role Selection**: Select from pre-configured engineering presets (`Full-Stack Engineer`, `Backend & Distributed Systems`, `AI / ML & Data Engineering`, `Systems & 3D Graphics`, `General-Purpose Software Developer`) or define a custom target title.
+2. **Optional Job Description (JD)**: Paste an active job posting for semantic token matching ($S_{tech}$, $S_{context}$, $S_{relevance}$), or skip. Uninformative prose gracefully defaults without penalizing scores.
+3. **Resume Format Budget**: Choose between **1-Page Compact** (max 2 projects, concise bullets) and **2-Page Extended** (max 4 projects, expanded bullets and sections).
+4. **Project Ranking & Inspection**: View the ASCII project table with selection markers, composite scores, deployment status badges (`Live Deployed`, `Desktop Pkg`, `Protocol SDK`, `Container Infrastructure`), technology tags, and scan coverage %. Inspect detailed 7-factor cards.
+5. **Selection & Reordering**: Select, deselect, and customize project display order to curate the strongest portfolio narrative.
+6. **Bullet Point Review & Claim Confirmation**: Tailor bullet descriptions and confirm or exclude unverified metrics.
+7. **Profile & Contact Review**: Inspect and optionally adjust headline, contact channels, or section visibility in memory. Edits only persist to `config/profile.json` upon explicit confirmation.
+8. **In-Terminal ASCII Preview & Approval**: Review full resume layout in the terminal before export approval.
 
 ---
 
 ## 🗺️ Phased Development Roadmap
 
-- **Phase 1: Scaffolding & Configuration** *(Current)*: Project structure, dependency manifests, `.gitignore`, profile templates, ranking configurations, styling helpers, and Phase 1 checks.
-- **Phase 2: Discovery & Change Detection**: Filesystem scanner, monorepo/sub-module boundary detection, and two-tier fingerprint caching (`git rev-parse HEAD` + manifest hashing).
-- **Phase 3: Scoring & Role Weighting Engine**: 7-factor scoring engine, normalized role weights, and deterministic JD keyword overlap matcher.
-- **Phase 4: Interactive CLI Experience**: Step-by-step terminal UI using `@clack/prompts`, metric confirmation, and in-terminal layout preview.
-- **Phase 5: Dual Export Pipeline & Verification**: DOCX generation, zero-dependency headless Microsoft Edge PDF generation, and ATS text extraction testing.
+- **Phase 1: Scaffolding & Configuration** *(Completed & Verified)*: Project structure, dependency manifests, `.gitignore`, profile templates, ranking configurations, styling helpers, and 8 passing tests.
+- **Phase 2: Discovery & Change Detection** *(Completed & Verified)*: Filesystem scanner, monorepo/sub-module boundary detection, two-tier content-based fingerprint caching (Git + non-Git), 4-way orthogonal status classification, catalog reconciliation, and 20 passing tests.
+- **Phase 3: Scoring & Role Weighting Engine** *(Completed & Validated)*: 7-factor scoring engine (100 raw pts), normalized role weights, grounded evidence scoring, safe JD keyword matcher with prose fallback ($\alpha_{eff} = 0$), and 16 passing tests.
+- **Phase 4: Interactive CLI Experience** *(Completed & Validated)*: Terminal UI using `@clack/prompts`, session state machine, budget enforcement, claim confirmation, ASCII resume preview, and 12 passing tests (56 total tests).
+- **Phase 5: Dual Export Pipeline & Verification** *(Pending Authorization)*: DOCX generation, zero-dependency headless Microsoft Edge PDF generation, and ATS text extraction testing.

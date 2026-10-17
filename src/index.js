@@ -90,5 +90,8 @@ module.exports = {
   scanProjects,
   ...require('./ranking/scorer'),
   ...require('./ranking/role-profiles'),
-  ...require('./ranking/jd-matcher')
+  ...require('./ranking/jd-matcher'),
+  ...require('./cli/session-state'),
+  ...require('./cli/formatter'),
+  ...require('./cli/wizard')
 };
