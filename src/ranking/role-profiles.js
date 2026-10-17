@@ -68,12 +68,12 @@ const DEFAULT_ROLE_PRESETS = {
     label: 'Full-Stack Developer',
     description: 'Prioritizes multi-tier integration breadth, deployment impact, testing, and production readiness.',
     weights: {
-      depth: 0.90,
-      impact: 1.25,
-      quality: 1.20,
-      breadth: 1.20,
-      uniqueness: 0.85,
-      readiness: 1.15,
+      depth: 0.85,
+      impact: 1.30,
+      quality: 1.25,
+      breadth: 1.40,
+      uniqueness: 0.80,
+      readiness: 1.20,
       storytelling: 1.00
     }
   },
@@ -82,12 +82,12 @@ const DEFAULT_ROLE_PRESETS = {
     label: 'Backend / Systems Engineer',
     description: 'Emphasizes data modeling, testing quality, production readiness, and algorithmic depth.',
     weights: {
-      depth: 1.15,
-      impact: 1.10,
-      quality: 1.25,
-      breadth: 0.95,
-      uniqueness: 0.95,
-      readiness: 1.20,
+      depth: 1.30,
+      impact: 1.15,
+      quality: 1.35,
+      breadth: 0.85,
+      uniqueness: 0.85,
+      readiness: 1.30,
       storytelling: 1.00
     }
   },
@@ -96,12 +96,12 @@ const DEFAULT_ROLE_PRESETS = {
     label: 'AI / Machine Learning / Data Engineer',
     description: 'Accentuates algorithmic depth, spatial/matrix math, domain uniqueness, and data pipelines.',
     weights: {
-      depth: 1.30,
-      impact: 0.95,
-      quality: 1.10,
-      breadth: 0.95,
-      uniqueness: 1.25,
-      readiness: 0.85,
+      depth: 1.50,
+      impact: 0.70,
+      quality: 1.15,
+      breadth: 0.60,
+      uniqueness: 1.40,
+      readiness: 0.75,
       storytelling: 1.00
     }
   },
@@ -110,12 +110,12 @@ const DEFAULT_ROLE_PRESETS = {
     label: 'Systems / 3D Graphics / Computer Vision Developer',
     description: 'Focuses heavily on spatial algorithms, graphics/computational depth, and architectural novelty.',
     weights: {
-      depth: 1.35,
-      impact: 0.85,
+      depth: 1.55,
+      impact: 0.65,
       quality: 1.15,
-      breadth: 0.80,
-      uniqueness: 1.30,
-      readiness: 0.90,
+      breadth: 0.55,
+      uniqueness: 1.45,
+      readiness: 0.75,
       storytelling: 1.00
     }
   }

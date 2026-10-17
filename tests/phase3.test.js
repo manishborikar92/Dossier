@@ -408,4 +408,161 @@ describe('Phase 3 Scoring & Role-Weighting Engine Test Suite', () => {
     assert.equal(res.rankedProjects[1].id, 'proj-y');
   });
 
+  // 13. Role presets produce sensible relative rankings across clearly differentiated archetypes
+  test('Case 13: Role presets produce sensible relative rankings across differentiated archetypes', () => {
+    // Archetype 1: Full-Stack Web SaaS (Next.js, Express, Postgres, Prisma, PhonePe, Live domain, Supertest)
+    const webSaaS = {
+      id: 'web-saas',
+      name: 'Court Booking Platform',
+      title: 'Full-Stack Venue Reservation SaaS',
+      purpose: 'End-to-end court booking, slot concurrency control, PhonePe payment processing, and customer retention platform.',
+      resume_eligibility: true,
+      primary_technologies: ['Next.js', 'React.js', 'Express.js', 'PostgreSQL', 'Prisma ORM', 'PhonePe Payment Gateway', 'Supertest', 'TypeScript', 'Zod'],
+      live_url: 'https://www.venuebooking.example.com',
+      is_monorepo: true,
+      subcomponents: [{ name: 'web' }, { name: 'server' }],
+      commit_count: 150,
+      important_file_references: ['package.json', 'README.md', 'server/prisma/schema.prisma', 'tests/booking.test.js']
+    };
+
+    // Archetype 2: 3D Point Cloud Desktop Visualizer (Open3D, PyVista, VTK, PyQt6, Inno Setup)
+    const tool3D = {
+      id: 'tool-3d',
+      name: 'PointViz 3D',
+      title: '3D LiDAR Point Cloud Visualizer Desktop App',
+      purpose: 'Interactive 3D LiDAR point cloud visualization, RANSAC ground plane segmentation, and voxel downsampling.',
+      technical_analysis: 'Employs RANSAC plane segmentation, KD-Tree spatial queries, and VTK OpenGL rendering.',
+      resume_eligibility: true,
+      primary_technologies: ['Open3D', 'PyVista', 'VTK', 'PyQt6', 'Python', 'NumPy', 'Inno Setup', 'PyInstaller'],
+      commit_count: 85,
+      important_file_references: ['setup.py', 'README.md', 'inno_setup.iss', 'tests/test_geometry.py']
+    };
+
+    // Archetype 3: AI / Semantic Vector Search Microservice (FastAPI, pgvector, sentence-transformers)
+    const aiPlatform = {
+      id: 'ai-platform',
+      name: 'TrueSemantic',
+      title: 'AI Semantic Search & Vector Embeddings Engine',
+      purpose: 'Algorithmic feed ranking engine and natural language semantic vector search using high-dimensional embeddings.',
+      technical_analysis: 'In-database vector calculations using pgvector HNSW indexing, 384-dimensional dense embeddings with sentence-transformers.',
+      resume_eligibility: true,
+      primary_technologies: ['FastAPI', 'Python', 'PostgreSQL', 'pgvector', 'sentence-transformers', 'Docker Compose', 'NumPy'],
+      commit_count: 90,
+      important_file_references: ['requirements.txt', 'README.md', 'Dockerfile', 'docker-compose.yml', 'migrations/001_hnsw.sql']
+    };
+
+    // Archetype 4: Low-Level Binary UDP Driver (UDP Sockets, binary packet deserialization, CRC16/32)
+    const binaryDriver = {
+      id: 'binary-driver',
+      name: 'LiDAR Driver',
+      title: 'Binary Protocol UDP Sensor Driver',
+      purpose: 'Low-level UDP socket deserialization, binary unpack, and CRC32 hardware sensor telemetry parser.',
+      technical_analysis: 'Binary unpack with 0xAA preamble verification, little-endian struct unpack, and dual CRC16/CRC32 checksum checking.',
+      resume_eligibility: true,
+      primary_technologies: ['Binary Protocols', 'UDP Sockets', 'Python', 'NumPy', 'Setuptools'],
+      commit_count: 60,
+      important_file_references: ['setup.py', 'README.md', 'tests/test_crc.py']
+    };
+
+    const archetypes = [webSaaS, tool3D, aiPlatform, binaryDriver];
+
+    // Under Full-Stack preset: Web SaaS MUST rank #1
+    const fsRank = rankProjects(archetypes, { role: 'fullstack' });
+    assert.equal(fsRank.rankedProjects[0].id, 'web-saas', 'Full-Stack role must rank full-stack web SaaS #1');
+
+    // Under Systems / 3D preset: 3D Visualizer and Binary Driver MUST rank in the top 2
+    const sysRank = rankProjects(archetypes, { role: 'systems_3d' });
+    const top2SysIds = [sysRank.rankedProjects[0].id, sysRank.rankedProjects[1].id];
+    assert.ok(top2SysIds.includes('tool-3d'), 'Systems / 3D role must rank 3D tool in top 2');
+    assert.ok(top2SysIds.includes('binary-driver') || top2SysIds.includes('tool-3d'), 'Systems / 3D role must prioritize systems archetypes');
+    assert.ok(
+      sysRank.rankedProjects.find(p => p.id === 'tool-3d').qualityScore > sysRank.rankedProjects.find(p => p.id === 'web-saas').qualityScore,
+      '3D tool must have higher quality score than web SaaS in systems_3d'
+    );
+
+    // Under AI/ML preset: AI Semantic Platform MUST rank #1
+    const aiRank = rankProjects(archetypes, { role: 'ai_ml_data' });
+    assert.equal(aiRank.rankedProjects[0].id, 'ai-platform', 'AI/ML role must rank semantic vector search #1');
+    assert.ok(
+      aiRank.rankedProjects.find(p => p.id === 'ai-platform').qualityScore > aiRank.rankedProjects.find(p => p.id === 'web-saas').qualityScore,
+      'AI platform must score higher than web SaaS in ai_ml_data role'
+    );
+  });
+
+  // 14. Weight sensitivity test: Increasing a criterion weight mathematically increases relative advantage
+  test('Case 14: Weight sensitivity dynamically shifts ranking according to mathematical expectations', () => {
+    // Project High Depth / Low Breadth
+    const projDepth = {
+      id: 'high-depth',
+      name: 'Deep Algorithms',
+      resume_eligibility: true,
+      primary_technologies: ['Open3D', 'PyVista', 'NumPy'],
+      commit_count: 50
+    };
+
+    // Project Low Depth / High Breadth
+    const projBreadth = {
+      id: 'high-breadth',
+      name: 'Broad Portal',
+      resume_eligibility: true,
+      primary_technologies: ['React.js', 'Express.js', 'PostgreSQL', 'Cloudinary', 'JWT Auth'],
+      commit_count: 50
+    };
+
+    const catalog = [projDepth, projBreadth];
+
+    // High depth weight preset (depth: 2.0, breadth: 0.2)
+    const customDepthWeights = { depth: 2.0, impact: 1.0, quality: 1.0, breadth: 0.2, uniqueness: 1.0, readiness: 1.0, storytelling: 1.0 };
+    const depthRank = rankProjects(catalog, { role: 'general', customWeights: customDepthWeights });
+    assert.equal(depthRank.rankedProjects[0].id, 'high-depth');
+
+    // High breadth weight preset (depth: 0.2, breadth: 2.0)
+    const customBreadthWeights = { depth: 0.2, impact: 1.0, quality: 1.0, breadth: 2.0, uniqueness: 1.0, readiness: 1.0, storytelling: 1.0 };
+    const breadthRank = rankProjects(catalog, { role: 'general', customWeights: customBreadthWeights });
+    assert.equal(breadthRank.rankedProjects[0].id, 'high-breadth');
+  });
+
+  // 15. Non-web impact regression: Packaged desktop installers and distributed libraries receive impact credit
+  test('Case 15: Non-web software releases receive concrete real-world impact credit', () => {
+    const desktopApp = {
+      id: 'desktop-installer',
+      name: 'Desktop App with Installer',
+      resume_eligibility: true,
+      primary_technologies: ['Inno Setup', 'PyInstaller', 'PyQt6', 'Python'],
+      important_file_references: ['setup.iss', 'build.bat']
+    };
+
+    const libraryPkg = {
+      id: 'python-lib',
+      name: 'Distributed Python Driver',
+      resume_eligibility: true,
+      primary_technologies: ['Binary Protocols', 'UDP Sockets', 'Setuptools', 'Python']
+    };
+
+    const scoredDesktop = scoreProjectDimensions(desktopApp, 'general');
+    const scoredLib = scoreProjectDimensions(libraryPkg, 'general');
+
+    assert.ok(scoredDesktop.rawScores.impact >= 7, 'Desktop app with Inno Setup must receive >= 7 impact points');
+    assert.ok(scoredLib.rawScores.impact >= 6, 'Reusable driver library with setuptools must receive >= 6 impact points');
+  });
+
+  // 16. Vector search and algorithmic depth regression
+  test('Case 16: pgvector and sentence-transformers receive algorithmic depth and uniqueness credit', () => {
+    const vectorProj = {
+      id: 'vec-proj',
+      name: 'Semantic Feed',
+      resume_eligibility: true,
+      primary_technologies: ['FastAPI', 'PostgreSQL', 'pgvector', 'sentence-transformers (all-MiniLM-L6-v2)'],
+      technical_analysis: 'pgvector HNSW cosine similarity search over 384-dimensional dense vectors.'
+    };
+
+    const scoredGeneral = scoreProjectDimensions(vectorProj, 'general');
+    const scoredAi = scoreProjectDimensions(vectorProj, 'ai_ml_data');
+
+    assert.ok(scoredGeneral.rawScores.depth >= 13, 'General role must credit vector search depth (>= 13 pts)');
+    assert.ok(scoredAi.rawScores.depth >= 17, 'AI/ML role must credit vector search depth heavily (>= 17 pts)');
+    assert.equal(scoredAi.rawScores.uniqueness, 10, 'AI/ML role must award maximum uniqueness (10/10) to HNSW vector search');
+  });
+
 });
+
