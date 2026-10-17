@@ -219,7 +219,13 @@ function formatResumePreview(resumeModel) {
   if (Array.isArray(resumeModel.certifications) && resumeModel.certifications.length > 0) {
     lines.push(pc.bold(pc.underline('CERTIFICATIONS')));
     for (const cert of resumeModel.certifications) {
-      lines.push(`  • ${cert}`);
+      if (typeof cert === 'string') {
+        lines.push(`  • ${cert}`);
+      } else if (cert && typeof cert === 'object') {
+        const issuer = cert.issuer ? ` — ${cert.issuer}` : '';
+        const year = cert.year ? ` (${cert.year})` : '';
+        lines.push(`  • ${pc.bold(cert.name || cert.title || '')}${issuer} ${pc.dim(year)}`.trim());
+      }
     }
     lines.push('');
   }

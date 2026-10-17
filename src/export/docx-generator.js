@@ -62,16 +62,105 @@ function createSectionHeader(title, is1Page) {
   });
 }
 
+/**
+ * Normalizes certification entries from diverse schemas (raw strings or objects)
+ * into canonical objects: { name, issuer, year, raw }.
+ *
+ * @param {string|object} cert - Raw certification entry
+ * @returns {{ name: string, issuer: string, year: string, raw: string } | null}
+ */
+function normalizeCertification(cert) {
+  if (!cert) return null;
+
+  if (typeof cert === 'string') {
+    const raw = cert.trim();
+    if (!raw) return null;
+
+    let text = raw;
+    let year = '';
+    let issuer = '';
+    let name = '';
+
+    const yearMatch = text.match(/(?:[·•\-|,]|\s+)\s*\(?(\b(?:19|20)\d{2}\b)\)?\s*$/);
+    if (yearMatch) {
+      year = yearMatch[1];
+      text = text.slice(0, yearMatch.index).trim();
+    } else {
+      const parenMatch = text.match(/\((\b(?:19|20)\d{2}\b)\)\s*$/);
+      if (parenMatch) {
+        year = parenMatch[1];
+        text = text.slice(0, parenMatch.index).trim();
+      }
+    }
+
+    const dashMatch = text.match(/\s*(?:—|–|\s-\s)\s*/);
+    if (dashMatch) {
+      const splitIdx = dashMatch.index;
+      name = text.slice(0, splitIdx).trim();
+      issuer = text.slice(splitIdx + dashMatch[0].length).trim();
+    } else {
+      name = text.trim();
+    }
+
+    return {
+      name: name || raw,
+      issuer: issuer || '',
+      year: year || '',
+      raw
+    };
+  }
+
+  if (typeof cert === 'object') {
+    const name = (cert.name || cert.title || cert.credentialName || '').trim();
+    const issuer = (cert.issuer || cert.organization || cert.issuingOrganization || cert.institution || '').trim();
+    const year = cert.year ? String(cert.year).trim() : (cert.date ? String(cert.date).trim() : '');
+    const raw = cert.raw || (name ? `${name}${issuer ? ' — ' + issuer : ''}${year ? ' · ' + year : ''}` : '');
+
+    if (!name && !issuer && !year) {
+      return null;
+    }
+
+    return {
+      name: name || issuer || 'Certification',
+      issuer,
+      year,
+      raw
+    };
+  }
+
+  return null;
+}
+
 function createBullet(text, boldPrefix = null, is1Page = false) {
   const children = [];
-  if (boldPrefix) {
+  const cleanPrefix = boldPrefix ? boldPrefix.trim() : '';
+  const cleanText = typeof text === 'string' ? text.trim() : '';
+
+  if (!cleanPrefix && !cleanText) {
+    return null;
+  }
+
+  if (cleanPrefix) {
     children.push(
-      new TextRun({ text: boldPrefix + ' ', bold: true, size: is1Page ? 18 : SIZES.BODY, font: 'Arial', color: COLORS.BLACK })
+      new TextRun({
+        text: cleanPrefix + (cleanText ? ' ' : ''),
+        bold: true,
+        size: is1Page ? 18 : SIZES.BODY,
+        font: 'Arial',
+        color: COLORS.BLACK
+      })
     );
   }
-  children.push(
-    new TextRun({ text, size: is1Page ? 18 : SIZES.BODY, font: 'Arial', color: COLORS.BLACK })
-  );
+  if (cleanText) {
+    children.push(
+      new TextRun({
+        text: cleanText,
+        size: is1Page ? 18 : SIZES.BODY,
+        font: 'Arial',
+        color: COLORS.BLACK
+      })
+    );
+  }
 
   return new Paragraph({
     numbering: { reference: 'bullets', level: 0 },
@@ -405,13 +494,22 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
   // ── 8. Certifications (if populated) ──────────────────────────────────────
   if (Array.isArray(resumeModel.certifications) && resumeModel.certifications.length > 0) {
-    children.push(createSectionHeader('Certifications & Credentials', is1Page));
-    for (const cert of resumeModel.certifications) {
-      const issuerText = cert.issuer ? ` — ${cert.issuer}` : '';
-      const yearText = cert.year ? ` (${cert.year})` : '';
-      children.push(
-        createBullet(`${issuerText}${yearText}`, cert.name, is1Page)
-      );
+    const certBullets = [];
+    for (const rawCert of resumeModel.certifications) {
+      const cert = normalizeCertification(rawCert);
+      if (!cert || (!cert.name && !cert.raw)) continue;
+      const certName = cert.name || cert.raw;
+      const issuerText = cert.issuer ? `— ${cert.issuer}` : '';
+      const yearText = cert.year ? `(${cert.year})` : '';
+      const suffix = [issuerText, yearText].filter(Boolean).join(' ');
+      const bullet = createBullet(suffix, certName, is1Page);
+      if (bullet) {
+        certBullets.push(bullet);
+      }
+    }
+    if (certBullets.length > 0) {
+      children.push(createSectionHeader('Certifications & Credentials', is1Page));
+      children.push(...certBullets);
     }
   }
 
@@ -421,7 +519,10 @@ async function generateResumeDocx(resumeModel, options = {}) {
     for (const lead of resumeModel.leadership) {
       const text = typeof lead === 'string' ? lead : (lead.title || lead.description || '');
       if (text) {
-        children.push(createBullet(text, null, is1Page));
+        const bullet = createBullet(text, null, is1Page);
+        if (bullet) {
+          children.push(bullet);
+        }
       }
     }
   }
@@ -470,6 +571,7 @@ async function generateResumeDocx(resumeModel, options = {}) {
 
 module.exports = {
   generateResumeDocx,
+  normalizeCertification,
   COLORS,
   SIZES
 };

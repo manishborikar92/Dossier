@@ -5,7 +5,7 @@ const path = require('path');
 const { PDFParse } = require('pdf-parse');
 const JSZip = require('jszip');
 
-const { createSession, loadProfile } = require('../src/cli/session-state');
+const { createSession, loadProfile, normalizeCertification } = require('../src/cli/session-state');
 const { generateResumeHtml, escapeHtml, sanitizeUrl } = require('../src/export/html-template');
 const { generateResumeDocx } = require('../src/export/docx-generator');
 const { generateResumePdf, resolveEdgePath } = require('../src/export/pdf-generator');
@@ -601,5 +601,182 @@ describe('Phase 5 Document Exporters and Output Validation Test Suite', () => {
     const model = session.getFinalResumeModel();
     assert.ok(model);
     assert.equal(model.metadata.targetRole, 'backend');
+  });
+
+  // Case 19: normalizeCertification handles diverse string and object schemas
+  test('Case 19: normalizeCertification normalizes diverse string and object schemas into canonical objects', () => {
+    // String with em-dash and middle dot
+    const c1 = normalizeCertification('Machine Learning with Python — freeCodeCamp · 2025');
+    assert.deepEqual(c1, {
+      name: 'Machine Learning with Python',
+      issuer: 'freeCodeCamp',
+      year: '2025',
+      raw: 'Machine Learning with Python — freeCodeCamp · 2025'
+    });
+
+    // String without em-dash but with middle dot
+    const c2 = normalizeCertification('OpenEDG Python Institute: Programming with Python Professional Certificate · 2025');
+    assert.deepEqual(c2, {
+      name: 'OpenEDG Python Institute: Programming with Python Professional Certificate',
+      issuer: '',
+      year: '2025',
+      raw: 'OpenEDG Python Institute: Programming with Python Professional Certificate · 2025'
+    });
+
+    // String with parentheses year
+    const c3 = normalizeCertification('AWS Certified Solutions Architect (2024)');
+    assert.deepEqual(c3, {
+      name: 'AWS Certified Solutions Architect',
+      issuer: '',
+      year: '2024',
+      raw: 'AWS Certified Solutions Architect (2024)'
+    });
+
+    // String with hyphen separator
+    const c4 = normalizeCertification('React Native Developer - Meta - 2023');
+    assert.deepEqual(c4, {
+      name: 'React Native Developer',
+      issuer: 'Meta',
+      year: '2023',
+      raw: 'React Native Developer - Meta - 2023'
+    });
+
+    // Solo string with no year
+    const c5 = normalizeCertification('Certified Kubernetes Administrator');
+    assert.deepEqual(c5, {
+      name: 'Certified Kubernetes Administrator',
+      issuer: '',
+      year: '',
+      raw: 'Certified Kubernetes Administrator'
+    });
+
+    // Object with canonical properties
+    const c6 = normalizeCertification({ name: 'Docker Foundations', issuer: 'Docker, Inc.', year: '2025' });
+    assert.deepEqual(c6, {
+      name: 'Docker Foundations',
+      issuer: 'Docker, Inc.',
+      year: '2025',
+      raw: 'Docker Foundations — Docker, Inc. · 2025'
+    });
+
+    // Object with property aliases (title, organization, date)
+    const c7 = normalizeCertification({ title: 'Cloud Architect', organization: 'Google Cloud', date: 2024 });
+    assert.deepEqual(c7, {
+      name: 'Cloud Architect',
+      issuer: 'Google Cloud',
+      year: '2024',
+      raw: 'Cloud Architect — Google Cloud · 2024'
+    });
+
+    // Null, empty, and falsy inputs
+    assert.equal(normalizeCertification(null), null);
+    assert.equal(normalizeCertification(''), null);
+    assert.equal(normalizeCertification({}), null);
+  });
+
+  // Case 20: Full CLI/session pipeline normalizes profile string certifications and renders all 7 without empty bullets
+  test('Case 20: CLI session model normalizes profile string certifications and renders fully in DOCX and PDF', async () => {
+    const session = createSession({ catalog: testCatalog });
+    session.setTargetRole('fullstack');
+    session.setResumeLength('2page');
+    session.selectProjects(['court-booking', 'enterprise-workflow', 'lidar-core']);
+
+    const model = session.getFinalResumeModel();
+    assert.ok(Array.isArray(model.certifications));
+    assert.equal(model.certifications.length, 7);
+    assert.ok(model.certifications.every(c => typeof c === 'object' && c.name && c.year));
+
+    const targetDocx = path.join(testOutputDir, 'test_certs_2page.docx');
+    const targetPdf = path.join(testOutputDir, 'test_certs_2page.pdf');
+
+    await generateResumeDocx(model, { outputPath: targetDocx });
+    await generateResumePdf(model, { outputPath: targetPdf });
+
+    // Validate deliverables with comprehensive validator
+    const val = await validateDeliverables({ docxPath: targetDocx, pdfPath: targetPdf }, model);
+    assert.equal(val.allValid, true);
+    assert.equal(val.docx.valid, true);
+    assert.equal(val.pdf.valid, true);
+
+    // Verify DOCX contains zero empty bullet paragraphs
+    const docxBuf = fs.readFileSync(targetDocx);
+    const zip = await JSZip.loadAsync(docxBuf);
+    const xml = await zip.file('word/document.xml').async('text');
+    const bulletParagraphs = [...xml.matchAll(/<w:p\b[^>]*>(?:(?!<\/w:p>).)*?<w:numPr>(?:(?!<\/w:p>).)*?<\/w:p>/gs)];
+    for (const bp of bulletParagraphs) {
+      const textContent = [...bp[0].matchAll(/<w:t[^>]*>(.*?)<\/w:t>/g)].map(m => m[1]).join('').trim();
+      assert.ok(textContent.length > 0, 'Found empty bullet paragraph in DOCX');
+    }
+
+    // Verify all 7 certification names exist in DOCX XML
+    for (const cert of model.certifications) {
+      assert.ok(xml.includes(cert.name.slice(0, 20)), `DOCX missing cert: ${cert.name}`);
+    }
+
+    // Verify HTML has zero empty bullets
+    const html = generateResumeHtml(model);
+    assert.ok(!html.includes('<li><strong></strong></li>'), 'HTML contains empty bullet');
+    assert.ok(!html.includes('<li></li>'), 'HTML contains empty li');
+  });
+
+  // Case 21: Exporter defense when raw strings are passed directly to generateResumeDocx and generateResumeHtml
+  test('Case 21: Exporters defensively handle raw string certifications without producing undefined tokens or empty bullets', async () => {
+    const rawStringModel = {
+      personal: { name: 'Raw Test Candidate', email: 'raw@example.com' },
+      metadata: { resumeLength: '1page', targetRole: 'general' },
+      certifications: [
+        'Direct String Certification — Direct Issuer · 2025',
+        'Solo Credential Without Issuer (2024)'
+      ],
+      education: [{ degree: 'B.S. CS', institution: 'University', dates: '2024' }],
+      skills: [{ category: 'languages', label: 'Languages', items: ['JavaScript'] }],
+      experience: [],
+      projects: []
+    };
+
+    // Test HTML template
+    const html = generateResumeHtml(rawStringModel);
+    assert.ok(html.includes('Direct String Certification'));
+    assert.ok(html.includes('Direct Issuer'));
+    assert.ok(html.includes('Solo Credential Without Issuer'));
+    assert.ok(!html.includes('undefined'));
+    assert.ok(!html.includes('<li><strong></strong></li>'));
+
+    // Test DOCX generator
+    const rawDocxPath = path.join(testOutputDir, 'test_raw_strings.docx');
+    await generateResumeDocx(rawStringModel, { outputPath: rawDocxPath });
+
+    const docxBuf = fs.readFileSync(rawDocxPath);
+    const zip = await JSZip.loadAsync(docxBuf);
+    const xml = await zip.file('word/document.xml').async('text');
+    assert.ok(xml.includes('Direct String Certification'));
+    assert.ok(xml.includes('Direct Issuer'));
+    assert.ok(xml.includes('Solo Credential Without Issuer'));
+    assert.ok(!xml.includes('undefined'));
+  });
+
+  // Case 22: Validator detects empty bullets in DOCX
+  test('Case 22: Validator detects and reports empty bullet paragraphs in DOCX', async () => {
+    const session = createSession({ catalog: testCatalog });
+    session.setTargetRole('fullstack');
+    session.setResumeLength('1page');
+    session.selectProjects(['court-booking']);
+    const model = session.getFinalResumeModel();
+
+    const targetDocx = path.join(testOutputDir, 'test_empty_bullet_detection.docx');
+    await generateResumeDocx(model, { outputPath: targetDocx });
+
+    // Intentionally inject an empty bullet paragraph into DOCX
+    const docxBuf = fs.readFileSync(targetDocx);
+    const zip = await JSZip.loadAsync(docxBuf);
+    let docXml = await zip.file('word/document.xml').async('text');
+    docXml = docXml.replace('</w:body>', '<w:p><w:pPr><w:numPr><w:numId w:val="1"/><w:ilvl w:val="0"/></w:numPr></w:pPr><w:r><w:t></w:t></w:r></w:p></w:body>');
+    zip.file('word/document.xml', docXml);
+    const tamperedBuf = await zip.generateAsync({ type: 'nodebuffer' });
+    fs.writeFileSync(targetDocx, tamperedBuf);
+
+    const val = await validateDocxResume(targetDocx, model);
+    assert.equal(val.valid, false);
+    assert.ok(val.errors.some(e => e.includes('Found empty bullet paragraph')));
   });
 });

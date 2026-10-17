@@ -41,6 +41,75 @@ function sanitizeUrl(url) {
 }
 
 /**
+ * Normalizes certification entries from diverse schemas (raw strings or objects)
+ * into canonical objects: { name, issuer, year, raw }.
+ *
+ * @param {string|object} cert - Raw certification entry
+ * @returns {{ name: string, issuer: string, year: string, raw: string } | null}
+ */
+function normalizeCertification(cert) {
+  if (!cert) return null;
+
+  if (typeof cert === 'string') {
+    const raw = cert.trim();
+    if (!raw) return null;
+
+    let text = raw;
+    let year = '';
+    let issuer = '';
+    let name = '';
+
+    const yearMatch = text.match(/(?:[·•\-|,]|\s+)\s*\(?(\b(?:19|20)\d{2}\b)\)?\s*$/);
+    if (yearMatch) {
+      year = yearMatch[1];
+      text = text.slice(0, yearMatch.index).trim();
+    } else {
+      const parenMatch = text.match(/\((\b(?:19|20)\d{2}\b)\)\s*$/);
+      if (parenMatch) {
+        year = parenMatch[1];
+        text = text.slice(0, parenMatch.index).trim();
+      }
+    }
+
+    const dashMatch = text.match(/\s*(?:—|–|\s-\s)\s*/);
+    if (dashMatch) {
+      const splitIdx = dashMatch.index;
+      name = text.slice(0, splitIdx).trim();
+      issuer = text.slice(splitIdx + dashMatch[0].length).trim();
+    } else {
+      name = text.trim();
+    }
+
+    return {
+      name: name || raw,
+      issuer: issuer || '',
+      year: year || '',
+      raw
+    };
+  }
+
+  if (typeof cert === 'object') {
+    const name = (cert.name || cert.title || cert.credentialName || '').trim();
+    const issuer = (cert.issuer || cert.organization || cert.issuingOrganization || cert.institution || '').trim();
+    const year = cert.year ? String(cert.year).trim() : (cert.date ? String(cert.date).trim() : '');
+    const raw = cert.raw || (name ? `${name}${issuer ? ' — ' + issuer : ''}${year ? ' · ' + year : ''}` : '');
+
+    if (!name && !issuer && !year) {
+      return null;
+    }
+
+    return {
+      name: name || issuer || 'Certification',
+      issuer,
+      year,
+      raw
+    };
+  }
+
+  return null;
+}
+
+/**
  * Generates an HTML document tailored for printing via Headless Edge.
  *
  * @param {object} model - Canonical finalResumeModel
@@ -392,19 +461,24 @@ function generateResumeHtml(model) {
 
   // 6. Certifications (if populated)
   if (Array.isArray(model.certifications) && model.certifications.length > 0) {
-    html += `
-  <div class="section avoid-break">
-    <div class="section-title">Certifications & Credentials</div>
-    <ul class="bullets">`;
-    for (const cert of model.certifications) {
+    const certItems = [];
+    for (const rawCert of model.certifications) {
+      const cert = normalizeCertification(rawCert);
+      if (!cert || (!cert.name && !cert.raw)) continue;
+      const certName = cert.name || cert.raw;
       const issuerText = cert.issuer ? ` — ${escapeHtml(cert.issuer)}` : '';
       const yearText = cert.year ? ` (${escapeHtml(cert.year)})` : '';
-      html += `
-      <li><strong>${escapeHtml(cert.name)}</strong>${issuerText}${yearText}</li>`;
+      certItems.push(`<li><strong>${escapeHtml(certName)}</strong>${issuerText}${yearText}</li>`);
     }
-    html += `
+    if (certItems.length > 0) {
+      html += `
+  <div class="section avoid-break">
+    <div class="section-title">Certifications & Credentials</div>
+    <ul class="bullets">
+      ${certItems.join('\n      ')}
     </ul>
   </div>`;
+    }
   }
 
   // 7. Leadership & Activities (if populated)
@@ -435,5 +509,6 @@ function generateResumeHtml(model) {
 module.exports = {
   escapeHtml,
   sanitizeUrl,
+  normalizeCertification,
   generateResumeHtml
 };

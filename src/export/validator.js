@@ -192,6 +192,19 @@ async function validatePdfResume(pdfPath, resumeModel) {
     }
   }
 
+  // Check Certifications
+  if (Array.isArray(resumeModel.certifications) && resumeModel.certifications.length > 0) {
+    for (const rawCert of resumeModel.certifications) {
+      const certName = typeof rawCert === 'string' ? rawCert : (rawCert.name || rawCert.title || '');
+      if (certName) {
+        const snippet = certName.slice(0, 25).replace(/\s+/g, ' ').toLowerCase();
+        if (!normalizedPdfText.includes(snippet)) {
+          errors.push(`Certification "${certName}" was not found in extracted PDF text.`);
+        }
+      }
+    }
+  }
+
   // ── 3. Reading Order Sequencing Check ──────────────────────────────────────
   // ATS single-column expectations:
   // Name/Contact -> Summary (if present) -> Skills (if present) -> Experience (if present) -> Projects -> Education
@@ -488,6 +501,28 @@ async function validateDocxResume(docxPath, resumeModel) {
         if (edu.institution && !normalizedDocxText.includes(edu.institution.replace(/\s+/g, ' ').toLowerCase())) {
           errors.push(`Education institution "${edu.institution}" was not found in extracted DOCX text.`);
         }
+      }
+    }
+
+    // Check Certifications
+    if (Array.isArray(resumeModel.certifications) && resumeModel.certifications.length > 0) {
+      for (const rawCert of resumeModel.certifications) {
+        const certName = typeof rawCert === 'string' ? rawCert : (rawCert.name || rawCert.title || '');
+        if (certName) {
+          const snippet = unescapeXml(certName).slice(0, 25).replace(/\s+/g, ' ').toLowerCase();
+          if (!normalizedDocxText.includes(snippet)) {
+            errors.push(`Certification "${certName}" was not found in extracted DOCX text.`);
+          }
+        }
+      }
+    }
+
+    // Check for empty bullet paragraphs (<w:p> with <w:numPr> and empty text)
+    const bulletParagraphs = [...docXml.matchAll(/<w:p\b[^>]*>(?:(?!<\/w:p>).)*?<w:numPr>(?:(?!<\/w:p>).)*?<\/w:p>/gs)];
+    for (const bp of bulletParagraphs) {
+      const textContent = [...bp[0].matchAll(/<w:t[^>]*>(.*?)<\/w:t>/g)].map(m => m[1]).join('').trim();
+      if (textContent.length === 0) {
+        errors.push('Found empty bullet paragraph (<w:p> with <w:numPr> and empty text) in DOCX.');
       }
     }
 

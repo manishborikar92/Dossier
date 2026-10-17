@@ -100,6 +100,77 @@ function prioritizeSkillsByRole(skills = {}, role = 'general') {
 }
 
 /**
+ * Normalizes certification entries from diverse schemas (raw strings or objects)
+ * into canonical objects: { name, issuer, year, raw }.
+ *
+ * @param {string|object} cert - Raw certification entry
+ * @returns {{ name: string, issuer: string, year: string, raw: string } | null}
+ */
+function normalizeCertification(cert) {
+  if (!cert) return null;
+
+  if (typeof cert === 'string') {
+    const raw = cert.trim();
+    if (!raw) return null;
+
+    let text = raw;
+    let year = '';
+    let issuer = '';
+    let name = '';
+
+    // 1. Extract 4-digit year at the end, optionally preceded by bullet/middle dot/dash/comma or wrapped in parens
+    const yearMatch = text.match(/(?:[·•\-|,]|\s+)\s*\(?(\b(?:19|20)\d{2}\b)\)?\s*$/);
+    if (yearMatch) {
+      year = yearMatch[1];
+      text = text.slice(0, yearMatch.index).trim();
+    } else {
+      const parenMatch = text.match(/\((\b(?:19|20)\d{2}\b)\)\s*$/);
+      if (parenMatch) {
+        year = parenMatch[1];
+        text = text.slice(0, parenMatch.index).trim();
+      }
+    }
+
+    // 2. Extract issuer if separated by em-dash (—), en-dash (–), or surrounded hyphen ( - )
+    const dashMatch = text.match(/\s*(?:—|–|\s-\s)\s*/);
+    if (dashMatch) {
+      const splitIdx = dashMatch.index;
+      name = text.slice(0, splitIdx).trim();
+      issuer = text.slice(splitIdx + dashMatch[0].length).trim();
+    } else {
+      name = text.trim();
+    }
+
+    return {
+      name: name || raw,
+      issuer: issuer || '',
+      year: year || '',
+      raw
+    };
+  }
+
+  if (typeof cert === 'object') {
+    const name = (cert.name || cert.title || cert.credentialName || '').trim();
+    const issuer = (cert.issuer || cert.organization || cert.issuingOrganization || cert.institution || '').trim();
+    const year = cert.year ? String(cert.year).trim() : (cert.date ? String(cert.date).trim() : '');
+    const raw = cert.raw || (name ? `${name}${issuer ? ' — ' + issuer : ''}${year ? ' · ' + year : ''}` : '');
+
+    if (!name && !issuer && !year) {
+      return null;
+    }
+
+    return {
+      name: name || issuer || 'Certification',
+      issuer,
+      year,
+      raw
+    };
+  }
+
+  return null;
+}
+
+/**
  * Creates and initializes a session state for the Resume Builder CLI.
  *
  * @param {object} [options]
@@ -357,6 +428,11 @@ function createSession(options = {}) {
           bullets: (exp.bullets || []).slice(0, maxExpBullets)
         }));
 
+      // Normalize certifications
+      const normalizedCertifications = (this.profile.certifications || [])
+        .map(normalizeCertification)
+        .filter(Boolean);
+
       return {
         metadata: {
           targetRole: this.targetRole,
@@ -375,7 +451,7 @@ function createSession(options = {}) {
         experience: this.enabledSections.experience ? trimmedExperience : [],
         projects: this.enabledSections.projects ? selectedProjectsData : [],
         education: this.enabledSections.education ? (this.profile.education || []) : [],
-        certifications: this.enabledSections.certifications ? (this.profile.certifications || []) : [],
+        certifications: this.enabledSections.certifications ? normalizedCertifications : [],
         leadership: this.enabledSections.leadership ? (this.profile.leadership || []) : []
       };
     }
@@ -391,5 +467,7 @@ function createSession(options = {}) {
 module.exports = {
   loadProfile,
   prioritizeSkillsByRole,
+  normalizeCertification,
   createSession
 };
+
