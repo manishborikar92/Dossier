@@ -10,7 +10,7 @@ const fs = require('fs');
 const path = require('path');
 
 // ── Output file (saved next to this script) ────────────────────
-const OUTPUT_FILE = path.join(__dirname, '../output/Manish-Borikar-Resume.docx');
+const OUTPUT_FILE = path.join(__dirname, 'output/Manish-Borikar-Resume.docx');
 
 // ── Color palette ──────────────────────────────────────────────
 const ACCENT = "1F3864";   // dark navy
@@ -245,6 +245,7 @@ const doc = new Document({
 });
 
 Packer.toBuffer(doc).then(buffer => {
+  fs.mkdirSync(path.dirname(OUTPUT_FILE), { recursive: true });
   fs.writeFileSync(OUTPUT_FILE, buffer);
   console.log("Resume generated successfully: " + OUTPUT_FILE);
 });
