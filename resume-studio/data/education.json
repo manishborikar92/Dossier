@@ -1,0 +1,23 @@
+[
+  {
+    "id": "edu-btech",
+    "degree": "B.Tech – Information Technology",
+    "institution": "Kavi Kulguru Institute of Technology and Science, Ramtek",
+    "dates": "May 2025",
+    "detail": "CGPA: 6.85/10"
+  },
+  {
+    "id": "edu-hsc",
+    "degree": "HSC – Computer Science",
+    "institution": "Lokmanya Vidhyalaya and Junior College, Warora",
+    "dates": "April 2021",
+    "detail": "79.33%"
+  },
+  {
+    "id": "edu-ssc",
+    "degree": "SSC",
+    "institution": "Z.P. (Ex. Govt.) Jubilee High School, Chandrapur",
+    "dates": "March 2019",
+    "detail": "66.20%"
+  }
+]

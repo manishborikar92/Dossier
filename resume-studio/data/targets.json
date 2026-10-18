@@ -1,0 +1,24 @@
+[
+  {
+    "id": "target-tcs-prime",
+    "name": "TCS NQT Digital / Prime — Software Developer",
+    "kind": "job",
+    "company": "TCS",
+    "jd": "Role Overview: TCS Digital and TCS Prime roles target high-performing candidates with strong problem-solving ability, core CS fundamentals, and hands-on development skills.\nResponsibilities: Design, develop, test, and deploy scalable software solutions. Write clean, efficient, and maintainable code. Work on full-stack development (frontend + backend + APIs). Build and integrate RESTful services. Debug, troubleshoot, and optimize performance. Participate in code reviews and follow best practices. Collaborate with cross-functional teams. Contribute to system design and architecture.\nCore Requirements: Strong Data Structures and Algorithms (VERY IMPORTANT). Proficiency in Java / JavaScript / Python / C++. Strong understanding of OOP, OS, DBMS, Computer Networks. Experience with web development (frontend + backend). Knowledge of REST APIs and backend architecture. Familiarity with SQL / NoSQL databases. Strong problem-solving and analytical skills.\nPreferred: Experience with React.js, Node.js, Express.js. Exposure to microservices architecture. Basic cloud knowledge (AWS / GCP / Azure). Familiarity with Git, Docker, CI/CD. Strong real-world project experience.\nSkills: Frontend React.js, JavaScript, HTML, CSS. Backend Node.js, Express.js, REST API development. Database SQL (MySQL / PostgreSQL), NoSQL (MongoDB). Tools Git, Docker, CI/CD, Cloud.",
+    "keywords": [],
+    "focusProjectIds": [
+      "iwlars"
+    ],
+    "notes": "IWLARS is pinned so it always leads on this resume."
+  },
+  {
+    "id": "target-fullstack-generic",
+    "name": "Full Stack Developer (generic example)",
+    "kind": "job",
+    "company": "",
+    "jd": "Full Stack Developer. Build and maintain web applications using Next.js or React with Node.js and Express. Design REST APIs, work with MongoDB or SQL databases, implement authentication (JWT, OAuth), use Git, write clean maintainable code, debug and optimize performance, and collaborate with cross-functional teams. Nice to have: AWS, Docker, CI/CD, TypeScript.",
+    "keywords": [],
+    "focusProjectIds": [],
+    "notes": "Example only - replace the text with a real job description."
+  }
+]

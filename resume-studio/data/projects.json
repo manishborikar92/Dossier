@@ -1,0 +1,2217 @@
+[
+  {
+    "id": "iwlars",
+    "title": "IWLARS – Intelligent Wagon Load Analysis & Reporting System",
+    "ownership": "company",
+    "link": "",
+    "year": "2025",
+    "techStack": [
+      "Python",
+      "Open3D",
+      "NumPy",
+      "Next.js 16",
+      "Firebase",
+      "Matplotlib",
+      "WeasyPrint"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 1,
+      "score": 97,
+      "isTop5": true,
+      "purpose": "Automated 3D LiDAR point-cloud processing, volume calculation, center-of-gravity balance assessment, and derailment prevention for railway freight wagons.",
+      "architecture": "Dual-component industrial telemetry system: (1) Desktop Core (iwlars-core) with Livox sensor ingestion, multi-stage 3D spatial preprocessing pipeline, Digital Elevation Model volume estimator, and CoG balance analysis; (2) Next.js Cloud Dashboard (iwlars-web) interfacing with Firebase Firestore for remote station monitoring, multi-station telemetry selectors, and Cloudinary PDF report access.",
+      "technicalAnalysis": "Employs RANSAC plane segmentation for ground extraction, point-density sidewall detection for 3-axis rotation normalization, longitudinal track gap segmentation for discrete wagon isolation, 2.5D Digital Elevation Model rasterization for volume measurement, and 3-axis center-of-gravity imbalance computation.",
+      "keyImplementation": "Voxel grid downsampling, wall-based spatial normalization (roll/pitch/yaw correction), volume estimation against calibrated empty-wagon baselines, multi-quadrant load balance classification, machine-fingerprint AES-256 license security, and automated ReportLab PDF export.",
+      "technologies": [
+        "Python",
+        "Open3D",
+        "NumPy",
+        "SciPy",
+        "PyQt6",
+        "Next.js",
+        "Firebase Firestore",
+        "Cloudinary",
+        "ReportLab",
+        "Livox LiDAR SDK"
+      ],
+      "techNotListed": [
+        "SciPy",
+        "PyQt6",
+        "ReportLab"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 655,
+      "firstCommit": "2025-06-19",
+      "lastCommit": "2026-06-21",
+      "localPath": "C:\\Users\\manis\\Projects\\iwlars"
+    },
+    "bullets": [
+      {
+        "id": "b-iw-uncj5q",
+        "text": "Engineered a dual-component platform combining a Python desktop application for 3D point cloud processing with a Next.js web dashboard for viewing analytics and generated reports.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-iw-g6106n",
+        "text": "Developed an end-to-end preprocessing pipeline using Open3D for point cloud downsampling, ground filtering, wagon segmentation, and alignment — processing large LiDAR datasets efficiently.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-iw-3fdfcl",
+        "text": "Designed classification algorithms to detect wagon load status (Underloaded, Overloaded, Unbalanced) with volume estimation via Digital Elevation Models (DEM), enabling automated quality control.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-iw-2zhq32",
+        "text": "Built a secure Firebase dashboard with RBAC and automated PDF/HTML report generation via WeasyPrint, eliminating manual reporting overhead.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-iwlars-1p581a0",
+        "text": "Architected an industrial dual-platform system combining a Python 3D point-cloud processing core with a Next.js web dashboard for automated freight train load auditing and derailment prevention.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-iwlars-pxmtda",
+        "text": "Engineered a geometric preprocessing pipeline in Open3D and NumPy performing RANSAC ground-plane removal, density-based sidewall detection for spatial tilt normalization, and train wagon segmentation.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-iwlars-arr71",
+        "text": "Implemented cargo volume estimation algorithms using 2.5D Digital Elevation Models (DEM) and discrete voxel grids, comparing scans against empty-wagon baselines to detect overloading.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-iwlars-1ia9h0x",
+        "text": "Developed center-of-gravity (CoG) load distribution models calculating lateral, longitudinal, and diagonal imbalances to classify structural safety hazards.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-iwlars-v7xbud",
+        "text": "Built automated PDF inspection report generation and cloud synchronization pipelines using Firebase Admin SDK and Cloudinary, streaming live telemetry to multi-station operations teams.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "ca-workflow",
+    "title": "CA-Workflow – Workflow Management Platform",
+    "ownership": "company",
+    "link": "caworkflow.com",
+    "year": "2025",
+    "techStack": [
+      "Next.js 16",
+      "Node.js 18+",
+      "Express.js 5",
+      "MongoDB/Mongoose 8",
+      "Cloudinary",
+      "Razorpay",
+      "Resend",
+      "JWT",
+      "RBAC"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 7,
+      "score": 80,
+      "isTop5": false,
+      "purpose": "Practice management, client document vault, communication, and billing portal for Chartered Accountant firms.",
+      "architecture": "Full-stack client/server: Express REST API with multi-tenancy for CA firms, document lifecycle manager, Razorpay subscriptions, and React frontend.",
+      "technicalAnalysis": "Multi-tenant firm isolation, Cloudinary document categorization, automated invoice generation, and Jest integration tests.",
+      "keyImplementation": "Secure document vaults, subscription tiers, message threads, client onboarding workflows.",
+      "technologies": [
+        "React",
+        "Express.js",
+        "MongoDB",
+        "Cloudinary",
+        "Razorpay",
+        "JWT",
+        "Jest"
+      ],
+      "techNotListed": [
+        "React",
+        "Jest"
+      ],
+      "liveUrl": "https://www.caworkflow.com/",
+      "urlType": "Production SaaS Platform",
+      "commitCount": 118,
+      "firstCommit": "2026-02-07",
+      "lastCommit": "2026-06-23",
+      "localPath": "C:\\Users\\manis\\Projects\\CA-Workflow"
+    },
+    "bullets": [
+      {
+        "id": "b-ca-1ebzjzb",
+        "text": "Architected a secure, cloud-based workflow management system for Chartered Accountants, streamlining document exchange and client communication for professional CA firms.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-ca-m37kn2",
+        "text": "Implemented dual authentication (Google OAuth for CA admins, ID-based for clients) with JWT session management and RBAC across all API routes.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-ca-1gc9i4n",
+        "text": "Developed and maintained the API backend using Node.js and Express.js, with optimized MongoDB queries handling data operations across multiple users.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-ca-ykkra8",
+        "text": "Integrated thread-based client communication with read receipts, automated Resend email notifications, and Razorpay payment gateway for three billing models (pay-per-document, invoice, subscriptions).",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-ca-workflow-ft8ybv",
+        "text": "Engineered a multi-tenant practice management platform for Chartered Accountants to streamline client communication, document vaults, and billing.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-ca-workflow-1c261sm",
+        "text": "Implemented secure document storage and categorized folders integrated with Cloudinary and role-based access control.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-ca-workflow-1vqnabc",
+        "text": "Integrated Razorpay payment processing for automated invoice generation, client payment tracking, and subscription tiers.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "smart-healthcare",
+    "title": "Smart Healthcare – AI Skin Disease Detection",
+    "ownership": "college",
+    "link": "git.new/smart-healthcare",
+    "year": "2024",
+    "techStack": [
+      "Python",
+      "ResNet50V2",
+      "Deep Learning",
+      "Hugging Face",
+      "JavaScript"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 12,
+      "score": 70.5,
+      "isTop5": false,
+      "purpose": "Dermatological lesion classification web application powered by fine-tuned ResNet-50 v2 deep learning model.",
+      "architecture": "Serverless ML web tool: Next.js frontend querying a custom ResNet-50 v2 model hosted on Hugging Face Spaces via Gradio API.",
+      "technicalAnalysis": "Transfer learning with custom classification head (GlobalAveragePooling2D, Dense, Dropout, BatchNormalization) and image data generators.",
+      "keyImplementation": "Early stopping, learning rate plateau reduction, browser-side Gradio client integration.",
+      "technologies": [
+        "Python",
+        "TensorFlow/Keras",
+        "ResNet-50 v2",
+        "Next.js",
+        "Hugging Face Gradio Client"
+      ],
+      "techNotListed": [],
+      "liveUrl": "https://smart-healthcare-ai.vercel.app/",
+      "urlType": "Production Web Tool",
+      "commitCount": 119,
+      "firstCommit": "2024-06-30",
+      "lastCommit": "2026-03-23",
+      "localPath": "C:\\Users\\manis\\Projects\\Smart-Healthcare"
+    },
+    "bullets": [
+      {
+        "id": "b-sh-1kl5mjd",
+        "text": "Built an AI diagnostic web application classifying skin conditions (malignant, benign, burns, healthy) by fine-tuning a ResNet50V2 model on a custom dataset and hosting it on Hugging Face.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-sh-1c4z6fi",
+        "text": "Integrated the Hugging Face-hosted model API into the frontend, enabling users to upload skin images and receive classification results directly in the browser.",
+        "tags": [],
+        "status": "confident",
+        "source": "resume"
+      },
+      {
+        "id": "b-smart-healthcare-11njinx",
+        "text": "Trained a deep learning image classification model using ResNet-50 v2 and transfer learning in TensorFlow/Keras for dermatological screening.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-smart-healthcare-h2j19b",
+        "text": "Implemented image preprocessing and augmentation pipelines (rotation, shear, zoom) to enhance model generalization across varied lighting conditions.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-smart-healthcare-11a7ooe",
+        "text": "Built a responsive Next.js frontend querying the hosted inference model via Gradio Client without dedicated backend server dependencies.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "second-opinion",
+    "title": "Second Opinion – Online Healthcare Platform",
+    "ownership": "company",
+    "link": "",
+    "year": "2025",
+    "techStack": [
+      "Next.js",
+      "Node.js",
+      "Express.js",
+      "MongoDB",
+      "Firebase"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "The original resume also said \"real-time communication\" - you confirmed that was inaccurate, so it was left out.",
+    "kb": {
+      "rank": 8,
+      "score": 79,
+      "isTop5": false,
+      "purpose": "Healthcare teleconsultation and medical record review platform connecting patients with specialist doctors.",
+      "architecture": "Decoupled medical consultation portal with role-based access for Admins, Doctors, and Patients, document review, and ECharts analytics.",
+      "technicalAnalysis": "Role-gated routes, appointment slot management, medical history document attachments via Cloudinary, and Excel export reports.",
+      "keyImplementation": "Firebase Auth token verification, medical record uploads, doctor availability schedules.",
+      "technologies": [
+        "Next.js 15",
+        "React",
+        "Express.js",
+        "MongoDB",
+        "Cloudinary",
+        "Firebase Auth",
+        "ECharts"
+      ],
+      "techNotListed": [
+        "React",
+        "ECharts"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 349,
+      "firstCommit": "2025-04-09",
+      "lastCommit": "2026-07-02",
+      "localPath": "C:\\Users\\manis\\Projects\\Second-Opinion"
+    },
+    "bullets": [
+      {
+        "id": "b-so-w9fo6d",
+        "text": "Designed and developed a full-stack online healthcare platform facilitating remote consultations and patient access to specialised medical opinions.",
+        "tags": [],
+        "status": "prep",
+        "source": "original-resume"
+      },
+      {
+        "id": "b-second-opinion-cw80uw",
+        "text": "Developed a telemedicine consultation portal enabling patients to upload diagnostic records and receive secondary clinical evaluations.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-second-opinion-11tbftm",
+        "text": "Implemented tri-role access controls (Patient, Doctor, Admin) with secure session handling via Firebase Authentication.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-second-opinion-fvp0dm",
+        "text": "Integrated Cloudinary media pipelines for medical report archiving and ExcelJS for clinical consultation summaries.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "enroutear",
+    "title": "EnRouteAR – Augmented Reality Navigation Web App",
+    "ownership": "college",
+    "link": "enroutear.vercel.app",
+    "year": "Jan – Apr 2023",
+    "techStack": [
+      "JavaScript",
+      "WebAR",
+      "HTML/CSS",
+      "Mapbox",
+      "AR.js",
+      "A-Frame"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 17,
+      "score": 62,
+      "isTop5": false,
+      "purpose": "Mobile Augmented Reality wayfinding application overlaying GPS waypoints onto a live camera feed for campus navigation.",
+      "architecture": "Client-side WebAR application: HTML5 camera stream, A-Frame 3D entity projection, AR.js GPS-camera orientation tracking, Mapbox 2D fallback map.",
+      "technicalAnalysis": "Coordinates transformation from WGS84 GPS latitude/longitude to 3D world space, distance attenuation, and bearing calculation.",
+      "keyImplementation": "Campus waypoint catalogue (places.js), camera orientation tracking, responsive destination selector.",
+      "technologies": [
+        "JavaScript",
+        "A-Frame",
+        "AR.js",
+        "Mapbox",
+        "Next.js"
+      ],
+      "techNotListed": [
+        "Next.js"
+      ],
+      "liveUrl": "https://enroutear.vercel.app/",
+      "urlType": "Live WebAR Application",
+      "commitCount": 287,
+      "firstCommit": "2024-01-12",
+      "lastCommit": "2026-03-23",
+      "localPath": "C:\\Users\\manis\\Projects\\EnRouteAR"
+    },
+    "bullets": [
+      {
+        "id": "b-en-16ksi4p",
+        "text": "Developed an AR navigation system for guiding new visitors around the KITS campus using WebAR and real-time geolocation.",
+        "tags": [],
+        "status": "prep",
+        "source": "original-resume"
+      },
+      {
+        "id": "b-en-40o679",
+        "text": "Enabled interactive campus navigation using AR elements from user location to selected destination.",
+        "tags": [],
+        "status": "prep",
+        "source": "original-resume"
+      },
+      {
+        "id": "b-enroutear-qimjcy",
+        "text": "Built a browser-based augmented reality navigation application overlaying 3D waypoints onto live smartphone camera feeds.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-enroutear-rvkmf9",
+        "text": "Integrated device GPS geolocation and compass sensors via AR.js to calculate real-time distance and bearing to destination points.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-enroutear-yhdi81",
+        "text": "Configured Progressive Web App (PWA) manifest and responsive map controls using Mapbox for campus navigation.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "song-recognition-bot",
+    "title": "Song Recognition Bot",
+    "ownership": "personal",
+    "link": "t.me/TuneDetectBot",
+    "year": "Dec 2024 – Feb 2025",
+    "techStack": [
+      "Python",
+      "ACRCloud API",
+      "Telegram Bot API"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 10,
+      "score": 74,
+      "isTop5": false,
+      "purpose": "Automated audio recognition and media downloader bot for Telegram utilizing acoustic fingerprinting.",
+      "architecture": "Event-driven asynchronous bot: python-telegram-bot handlers, Pydub/FFmpeg audio extraction, ACRCloud acoustic identification, and Dockerized deployment.",
+      "technicalAnalysis": "Audio trimming and conversion to MP3 format, acoustic fingerprint matching, video extraction via yt-dlp, and user quota tracking.",
+      "keyImplementation": "Rate-limiting decorators, audio format normalizer, Docker Compose multi-container setup.",
+      "technologies": [
+        "Python",
+        "python-telegram-bot",
+        "ACRCloud API",
+        "yt-dlp",
+        "Pydub",
+        "Docker Compose",
+        "SQLite"
+      ],
+      "techNotListed": [
+        "yt-dlp",
+        "SQLite"
+      ],
+      "liveUrl": "https://t.me/TuneDetectBot",
+      "urlType": "Active Telegram Bot",
+      "commitCount": 122,
+      "firstCommit": "2024-12-11",
+      "lastCommit": "2026-02-23",
+      "localPath": "C:\\Users\\manis\\Projects\\Song-Recognition-Bot"
+    },
+    "bullets": [
+      {
+        "id": "b-sb-1dz30xj",
+        "text": "Telegram-based bot that identifies songs from links, videos, or voice notes using ACRCloud, providing detailed metadata and streaming links.",
+        "tags": [],
+        "status": "prep",
+        "source": "original-resume"
+      },
+      {
+        "id": "b-sb-g7qynw",
+        "text": "Supports track download functionality alongside recognition from multiple media input formats.",
+        "tags": [],
+        "status": "prep",
+        "source": "original-resume"
+      },
+      {
+        "id": "b-song-recognition-bot-1suzdql",
+        "text": "Developed an asynchronous Telegram bot for automated audio recognition and media retrieval from Instagram, YouTube, and direct audio files.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-song-recognition-bot-e8ytpj",
+        "text": "Integrated ACRCloud audio fingerprinting APIs to extract acoustic features and return detailed track metadata and streaming links.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-song-recognition-bot-mnr0v0",
+        "text": "Engineered an audio processing pipeline using Pydub and FFmpeg for automatic format conversion and duration trimming, deployed via Docker Compose.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "pickleball",
+    "title": "Pickleball — Sports Venue Booking Engine & Venue Management Platform",
+    "ownership": "personal",
+    "link": "baselinearena.in",
+    "year": "2026",
+    "techStack": [
+      "Next.js 16",
+      "Express.js",
+      "PostgreSQL",
+      "Prisma ORM",
+      "PhonePe API",
+      "WhatsApp API",
+      "MapLibre GL"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 2,
+      "score": 92,
+      "isTop5": true,
+      "purpose": "Production end-to-end court booking, slot concurrency control, PhonePe payment processing, and customer retention platform for sports venues.",
+      "architecture": "Layered modular monolith: (1) Express.js REST API with Prisma ORM and PostgreSQL enforcing domain constraints and state machines; (2) Payment provider factory abstracting PhonePe and sandbox gateways with SHA-256 signatures; (3) In-flight task draining background scheduler; (4) Next.js 16 / React 19 customer booking interface and administrative management dashboard.",
+      "technicalAnalysis": "Relational schema modeling with 15+ models and 15 custom PostgreSQL enums, transactional slot booking with conflict detection and temporary hold timeouts, SHA-256 checksum and X-VERIFY webhook validation, and automated lifecycle cron jobs for reminders and review requests.",
+      "keyImplementation": "Transactional slot reservation holds, provider factory pattern for payments, idempotent webhook handling, lifecycle-aware scheduler with graceful shutdown, WhatsApp OTP auth flow, gamified scratch-card rewards with ledger tracking, and MapLibre GL venue locator.",
+      "technologies": [
+        "Next.js 16",
+        "React 19",
+        "Express.js",
+        "PostgreSQL",
+        "Prisma ORM",
+        "PhonePe Payment Gateway",
+        "WhatsApp OTP API",
+        "MapLibre GL",
+        "Tailwind CSS"
+      ],
+      "techNotListed": [
+        "React 19",
+        "Tailwind CSS"
+      ],
+      "liveUrl": "https://www.baselinearena.in/",
+      "urlType": "Production Venue & SaaS Platform",
+      "commitCount": 162,
+      "firstCommit": "2026-05-10",
+      "lastCommit": "2026-08-20",
+      "localPath": "C:\\Users\\manis\\Projects\\Pickleball"
+    },
+    "bullets": [
+      {
+        "id": "b-pickleball-1xvrdf6",
+        "text": "Architected an end-to-end court reservation and venue management SaaS with relational schema modeling, slot concurrency controls, and integrated payments.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pickleball-1neceyy",
+        "text": "Designed a PostgreSQL database schema using Prisma ORM with 15+ relational models, enum state machines, and migrations enforcing strict slot booking constraints.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pickleball-4pr3to",
+        "text": "Engineered a transactional booking engine preventing double-booking through temporary slot reservation holds, conflict detection, and automated timeout releases.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pickleball-13fxhj6",
+        "text": "Integrated PhonePe payment infrastructure using a provider factory pattern, implementing SHA-256 checksum verification, idempotent webhook processing, and payment reconciliation.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pickleball-1vflkon",
+        "text": "Developed an asynchronous background scheduler managing in-flight task draining, automated court slot expiry, and scheduled WhatsApp notifications for match reminders.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pickleball-1ku0qw3",
+        "text": "Built a responsive Next.js frontend featuring interactive court selection grids, MapLibre GL venue discovery, and an administrative portal for dynamic pricing and court scheduling.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "trueconnect",
+    "title": "TrueConnect — Authenticity-Driven Social Feed & Semantic Search Engine",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Laravel 11",
+      "FastAPI",
+      "Python",
+      "PostgreSQL",
+      "pgvector",
+      "sentence-transformers",
+      "Docker"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 3,
+      "score": 90,
+      "isTop5": true,
+      "purpose": "Algorithmic feed ranking engine and natural language semantic vector search replacing traditional vanity engagement metrics with authenticity and relationship depth.",
+      "architecture": "Distributed multi-service architecture: Laravel 11 REST API managing users, posts, and social relationships; decoupled Python FastAPI microservice generating 384-dimensional dense embeddings; PostgreSQL with pgvector executing HNSW cosine similarity search; React Native mobile app.",
+      "technicalAnalysis": "In-database vector calculations using pgvector HNSW indexing, dynamic user centroid vector synthesis over 30-day interaction history using L2 Euclidean normalization, and multi-objective ranking formulation balancing authenticity (0.4), relationship depth (0.3), and semantic match (0.3) scaled by power-law time decay.",
+      "keyImplementation": "HNSW cosine vector index (vector_cosine_ops), mathematical SQL query combining logarithmic relationship weight and polynomial time decay, deterministic PHP fallback unit vector generator for microservice fault-tolerance.",
+      "technologies": [
+        "Laravel 11 (PHP 8.2)",
+        "FastAPI (Python)",
+        "PostgreSQL 16",
+        "pgvector",
+        "sentence-transformers (all-MiniLM-L6-v2)",
+        "React Native (Expo)",
+        "Docker Compose"
+      ],
+      "techNotListed": [
+        "sentence-transformers (all-MiniLM-L6-v2)",
+        "React Native (Expo)"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 12,
+      "firstCommit": "2026-07-14",
+      "lastCommit": "2026-07-14",
+      "localPath": "C:\\Users\\manis\\Projects\\TrueConnect"
+    },
+    "bullets": [
+      {
+        "id": "b-trueconnect-w2r2l1",
+        "text": "Architected a distributed social platform decoupling content management in Laravel from a Python FastAPI embedding microservice for semantic vector search and feed ranking.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-trueconnect-347ezd",
+        "text": "Configured PostgreSQL with pgvector, creating Hierarchical Navigable Small World (HNSW) indices over 384-dimensional embeddings generated by all-MiniLM-L6-v2 for cosine similarity queries.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-trueconnect-1prhm7m",
+        "text": "Implemented a mathematical feed ranking engine in SQL computing dynamic centroid user interest vectors from 30-day interaction history using L2 normalization.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-trueconnect-1ragl2",
+        "text": "Engineered a multi-objective scoring formula balancing post authenticity (40%), logarithmic relationship interaction depth (30%), and semantic cosine similarity (30%) modulated by a power-law time-decay function.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-trueconnect-1rjobba",
+        "text": "Developed natural language post search executing sub-linear approximate nearest neighbor (ANN) vector queries with deterministic fallback mechanisms for microservice resilience.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "pointviz",
+    "title": "pointviz — High-Performance 3D Point Cloud Visualizer & Measurement Suite",
+    "ownership": "personal",
+    "link": "",
+    "year": "2025 – 2026",
+    "techStack": [
+      "Python",
+      "PyQt6",
+      "PyVista",
+      "Open3D",
+      "VTK",
+      "NumPy",
+      "PyInstaller",
+      "Inno Setup"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 4,
+      "score": 87.5,
+      "isTop5": true,
+      "purpose": "Native desktop 3D point cloud visualizer for loading, inspecting, measuring, and segmenting massive .pcd and .ply datasets with spatial indexing.",
+      "architecture": "Decoupled desktop software architecture: pure Python/NumPy/Open3D computational core independent of GUI frameworks; PyQt6/PyVista GPU-accelerated interactive 3D viewport; QThread asynchronous file ingestion pipeline; PyInstaller and Inno Setup native Windows installer pipeline.",
+      "technicalAnalysis": "Open3D KDTreeFlann spatial index enabling sub-millisecond nearest-point snapping, formal 3-phase measurement state machine, 6-axis orthogonal bounding box clipping via vectorized NumPy coordinate masking, and arbitrary plane slicing.",
+      "keyImplementation": "KD-Tree snap queries, delta coordinate calculations (dX, dY, dZ), interactive VTK measurement lines, QThread cooperative interruption handling, automated voxel downsampling dialog for files >100MB, PyInstaller build spec, Inno Setup script.",
+      "technologies": [
+        "Python 3.10+",
+        "PyQt6",
+        "PyVista",
+        "Open3D",
+        "VTK",
+        "NumPy",
+        "Matplotlib",
+        "PyInstaller",
+        "Inno Setup"
+      ],
+      "techNotListed": [
+        "Matplotlib"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 41,
+      "firstCommit": "2025-08-27",
+      "lastCommit": "2026-07-23",
+      "localPath": "C:\\Users\\manis\\Projects\\pointviz"
+    },
+    "bullets": [
+      {
+        "id": "b-pointviz-1mtrf9r",
+        "text": "Engineered a native desktop 3D point cloud analysis tool in PyQt6 and PyVista capable of rendering and inspecting multi-million point .pcd and .ply datasets.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pointviz-oja9h2",
+        "text": "Implemented a spatial measurement engine utilizing Open3D KDTreeFlann spatial indices, enabling sub-millisecond snap-to-point queries and delta-coordinate calculations (dX, dY, dZ).",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pointviz-1mu5mp1",
+        "text": "Architected a multithreaded processing pipeline using PyQt6 QThread with cooperative interruption and progress event broadcasting for non-blocking file loading, voxel downsampling, and export.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pointviz-1ojt98l",
+        "text": "Built dynamic 6-axis orthogonal bounding box and arbitrary plane clipping filters in NumPy, accelerating point slicing via vectorized coordinate masks.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pointviz-8q4nqe",
+        "text": "Configured automated Windows binary compilation and installer creation using PyInstaller and Inno Setup, verified through 40KB+ of automated Pytest unit tests and performance benchmarks.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "codeassess",
+    "title": "CodeAssess — Online Technical Assessment & In-Browser Python IDE Platform",
+    "ownership": "personal",
+    "link": "codeassess.vercel.app",
+    "year": "2026",
+    "techStack": [
+      "Next.js 16.2",
+      "React 19.2",
+      "WebAssembly (Pyodide)",
+      "CodeMirror",
+      "Zustand",
+      "Tailwind CSS v4"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 5,
+      "score": 86,
+      "isTop5": true,
+      "purpose": "Serverless online technical coding assessment platform running a client-side Python judge engine in WebAssembly with anti-cheating browser integrity guards.",
+      "architecture": "Client-centric WebAssembly architecture: Next.js 16 App Router interface; Pyodide WebAssembly runtime running candidate Python code with virtualized I/O streams; browser security DOM integrity guards; Zustand persistent session store; token-gated invitation routing.",
+      "technicalAnalysis": "In-browser WebAssembly compilation harness intercepting sys.stdin/stdout/stderr via io.StringIO to execute unit tests without remote servers; DOM Visibility API, Fullscreen API, and clipboard traps preventing unauthorized window navigation; debounced local storage scheduler.",
+      "keyImplementation": "Execution timeout handling, traceback sanitization, violation counter terminating sessions upon 3 infractions, token resolution (/join/[token]), repository-backed session normalization, 13 automated test suites.",
+      "technologies": [
+        "Next.js 16.2",
+        "React 19.2",
+        "WebAssembly (Pyodide v0.27.3)",
+        "CodeMirror",
+        "Zustand 5",
+        "Tailwind CSS v4"
+      ],
+      "techNotListed": [
+        "WebAssembly (Pyodide v0.27.3)"
+      ],
+      "liveUrl": "https://codeassess.vercel.app/",
+      "urlType": "Production Web Application",
+      "commitCount": 49,
+      "firstCommit": "2026-03-26",
+      "lastCommit": "2026-09-07",
+      "localPath": "C:\\Users\\manis\\Projects\\CodeAssess"
+    },
+    "bullets": [
+      {
+        "id": "b-codeassess-1fvkael",
+        "text": "Architected a serverless technical assessment platform featuring an in-browser Python code execution sandbox powered by WebAssembly (WASM) and Pyodide.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-codeassess-1vp8t90",
+        "text": "Developed a client-side execution harness virtualizing sys.stdin, sys.stdout, and sys.stderr streams to run test cases and catch runtime tracebacks without backend infrastructure costs.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-codeassess-1c7frsl",
+        "text": "Engineered anti-cheating browser integrity guards leveraging the Visibility API, Fullscreen API, and clipboard traps to prevent tab-switching, copy-pasting, and unauthorized window navigation.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-codeassess-1at4ywa",
+        "text": "Implemented a state machine using Zustand with debounced local storage persistence, tracking timed exam sessions, auto-saving drafts, and enforcing violation limits.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-codeassess-1wuo8do",
+        "text": "Built token-gated invitation routing and an interactive code editor using CodeMirror with Python syntax highlighting, verified through 13 automated test suites.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "evercut",
+    "title": "EverCut — Salon Booking & Merchant Operations Ecosystem",
+    "ownership": "personal",
+    "link": "evercut.in",
+    "year": "2026",
+    "techStack": [
+      "Next.js 16",
+      "Express.js",
+      "MongoDB",
+      "Flutter",
+      "AWS S3",
+      "Cloudflare Workers"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 6,
+      "score": 84,
+      "isTop5": false,
+      "purpose": "Comprehensive salon appointment booking platform with cross-platform mobile client, admin portal, and edge media delivery.",
+      "architecture": "Multi-tier platform: Express backend with 15+ Mongoose models, AWS S3 presigned URL pipeline, Cloudflare Worker for media resizing, Flutter customer app with BLoC/Clean Architecture, Next.js admin dashboard.",
+      "technicalAnalysis": "Mongoose schemas for multi-stylist shops, split payouts, booking schedules, JWT auth, and Cloudflare media worker integration.",
+      "keyImplementation": "Presigned S3 uploads, mobile state management with BLoC, role-based controllers.",
+      "technologies": [
+        "Next.js 16",
+        "Node.js",
+        "Express.js",
+        "MongoDB",
+        "Flutter (Dart)",
+        "AWS S3",
+        "Cloudflare Workers"
+      ],
+      "techNotListed": [
+        "Node.js"
+      ],
+      "liveUrl": "https://evercut.in/",
+      "urlType": "Production Service & Web Portal",
+      "commitCount": 304,
+      "firstCommit": "2026-03-09",
+      "lastCommit": "2026-07-04",
+      "localPath": "C:\\Users\\manis\\Projects\\EverCut"
+    },
+    "bullets": [
+      {
+        "id": "b-evercut-4rpkgw",
+        "text": "Architected a multi-service salon booking ecosystem comprising an Express.js REST API, a Flutter mobile client, and a Next.js administrative portal.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-evercut-1jw726k",
+        "text": "Engineered media ingestion pipelines leveraging AWS S3 presigned URLs and Cloudflare Workers for edge image transformation and delivery.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-evercut-5y7722",
+        "text": "Designed MongoDB schemas supporting shop onboarding, stylist schedules, service catalogs, and split payout calculations.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "lead-mapper",
+    "title": "Lead-Mapper — Intelligent CSV Lead Ingestion & AI Schema Normalizer",
+    "ownership": "personal",
+    "link": "groweasy-lead-mapper.vercel.app",
+    "year": "2026",
+    "techStack": [
+      "Next.js",
+      "Express.js",
+      "TypeScript",
+      "Google Gemini API",
+      "Zod",
+      "csv-parse"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 9,
+      "score": 78.5,
+      "isTop5": false,
+      "purpose": "Streaming CSV ingestion pipeline leveraging Google Gemini to map ambiguous columns into standardized CRM lead entities.",
+      "architecture": "Stateless ingestion pipeline: Next.js upload/preview interface, Express.js TypeScript API with deterministic regex normalization, LRU request cache, and Gemini structured output extraction.",
+      "technicalAnalysis": "Chunked CSV parsing with relax_column_count, regex heuristic pre-matching, request hashing cache, and strict JSON schema generation for Gemini.",
+      "keyImplementation": "Deterministic high-confidence pre-filtering to save LLM tokens, batching in chunks of 20, Zod response validation.",
+      "technologies": [
+        "Next.js",
+        "Express.js",
+        "TypeScript",
+        "Google Gemini API",
+        "Zod",
+        "csv-parse"
+      ],
+      "techNotListed": [],
+      "liveUrl": "https://groweasy-lead-mapper.vercel.app/",
+      "urlType": "Production Web Tool",
+      "commitCount": 13,
+      "firstCommit": "2026-07-09",
+      "lastCommit": "2026-07-12",
+      "localPath": "C:\\Users\\manis\\Projects\\Lead-Mapper"
+    },
+    "bullets": [
+      {
+        "id": "b-lead-mapper-1d2tw7g",
+        "text": "Built an AI-driven CSV lead ingestion pipeline mapping unstandardized spreadsheet columns to structured CRM lead records using Google Gemini.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-lead-mapper-1ffat5b",
+        "text": "Implemented a deterministic preprocessing regex engine that resolves high-confidence fields instantly, reducing LLM token consumption.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-lead-mapper-1yv6ehq",
+        "text": "Engineered an LRU payload hashing cache and batch processor to handle irregular column layouts and empty cells gracefully.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "prompts-library",
+    "title": "PromptBase — AI Prompt Management & Engineering Platform",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Next.js 16",
+      "React 19",
+      "Drizzle ORM",
+      "PostgreSQL",
+      "Supabase",
+      "Vercel AI SDK"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 11,
+      "score": 74,
+      "isTop5": false,
+      "purpose": "Curated software development prompt engineering repository with AI prompt generation and Supabase authentication.",
+      "architecture": "Next.js 16 App Router application with Drizzle ORM migrations, Supabase SSR session handling, and Google AI SDK prompt generation.",
+      "technicalAnalysis": "Drizzle schema migrations, RBAC SQL triggers, client-side Fuzzy search via Fuse.js, and Playwright E2E testing.",
+      "keyImplementation": "Server actions with Zod, Drizzle relational queries, RBAC migration scripts.",
+      "technologies": [
+        "Next.js 16",
+        "React 19",
+        "Drizzle ORM",
+        "PostgreSQL",
+        "Supabase SSR",
+        "Vercel AI SDK",
+        "Playwright"
+      ],
+      "techNotListed": [
+        "Playwright"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 13,
+      "firstCommit": "2026-02-04",
+      "lastCommit": "2026-02-24",
+      "localPath": "C:\\Users\\manis\\Projects\\Prompts-Library"
+    },
+    "bullets": [
+      {
+        "id": "b-prompts-library-1uer5wp",
+        "text": "Built an AI prompt repository and prompt generation web platform using Next.js 16 and Vercel AI SDK.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-prompts-library-1ur33qb",
+        "text": "Designed relational database schemas and role-based permissions using Drizzle ORM and PostgreSQL migrations.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-prompts-library-4te20p",
+        "text": "Configured Supabase SSR authentication and client-side fuzzy search for sub-second prompt indexing.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "pico",
+    "title": "Project PICO — Companion Robot Emotion Engine & Simulation Platform",
+    "ownership": "personal",
+    "link": "pico.vaelix.in",
+    "year": "2025 – 2026",
+    "techStack": [
+      "Python",
+      "MicroPython",
+      "Pygame",
+      "Next.js",
+      "State Machines"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 13,
+      "score": 70.5,
+      "isTop5": false,
+      "purpose": "Emotionally responsive desktop companion robot architecture combining emotion state machines, hardware firmware, and OLED face simulations.",
+      "architecture": "Robotic simulation and firmware suite: Python state machine engine (EmotionEngine), Pygame OLED eye renderer, MicroPython hardware specs, and Next.js blueprint portal.",
+      "technicalAnalysis": "Multi-state personality transitions (15 states), sensory trigger queues, timed auto-returns to idle, and sound bank coordination.",
+      "keyImplementation": "Threaded state transitions, expressive sound triggers, OLED coordinate geometry.",
+      "technologies": [
+        "Python",
+        "MicroPython",
+        "Pygame",
+        "Next.js",
+        "Finite State Machines"
+      ],
+      "techNotListed": [
+        "Finite State Machines"
+      ],
+      "liveUrl": "https://pico.vaelix.in/",
+      "urlType": "Product Showcase & Interactive Web",
+      "commitCount": 59,
+      "firstCommit": "2025-11-03",
+      "lastCommit": "2026-03-23",
+      "localPath": "C:\\Users\\manis\\Projects\\Pico"
+    },
+    "bullets": [
+      {
+        "id": "b-pico-1b1r23l",
+        "text": "Engineered a deterministic finite state machine (EmotionEngine) managing 15 distinct emotional states based on sensory trigger inputs.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pico-8gc6du",
+        "text": "Developed a real-time Pygame simulation rendering OLED eye expressions and audio sound bank triggers for robotic hardware testing.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-pico-17ck0x2",
+        "text": "Built a product specification and interactive demonstration website in Next.js documenting robot firmware and hardware architecture.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "perceptionkit",
+    "title": "PerceptionKit — Real-Time Computer Vision Gesture Control System",
+    "ownership": "personal",
+    "link": "",
+    "year": "2025",
+    "techStack": [
+      "Python",
+      "OpenCV",
+      "MediaPipe",
+      "PyAutoGUI",
+      "NumPy"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 14,
+      "score": 64.5,
+      "isTop5": false,
+      "purpose": "Webcam-based hand tracking and virtual OS mouse controller using MediaPipe landmark coordinates.",
+      "architecture": "Real-time computer vision stream: OpenCV frame capture, MediaPipe 21-landmark 3D coordinate estimation, and PyAutoGUI event injection.",
+      "technicalAnalysis": "Exponential moving average cursor stabilization, pinch-distance calculation, fingertip multi-point detection, and debouncing.",
+      "keyImplementation": "Click/drag state transitions, smoothing factor calibration, screenshot gesture detection.",
+      "technologies": [
+        "Python",
+        "OpenCV",
+        "MediaPipe Hands",
+        "PyAutoGUI",
+        "NumPy"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 12,
+      "firstCommit": "2025-11-18",
+      "lastCommit": "2025-11-18",
+      "localPath": "C:\\Users\\manis\\Projects\\PerceptionKit"
+    },
+    "bullets": [
+      {
+        "id": "b-perceptionkit-1vz3614",
+        "text": "Developed a contactless mouse control system using MediaPipe Hands and OpenCV for real-time cursor navigation and OS gesture control.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-perceptionkit-1x98ze",
+        "text": "Implemented exponential moving average smoothing and debouncing filters to eliminate cursor jitter and accidental clicks.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-perceptionkit-t6qadc",
+        "text": "Engineered multi-finger gesture recognition routines for dragging, right-clicking, vertical scrolling, and screen capture.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "forecastapp",
+    "title": "UK Wind Power Forecast Monitor & Analytics Platform",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Next.js",
+      "TypeScript",
+      "Recharts",
+      "Python",
+      "Pandas",
+      "Jupyter"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 15,
+      "score": 64.5,
+      "isTop5": false,
+      "purpose": "Energy generation monitoring web app displaying UK wind actuals vs forecasts for January 2024 with analytical Jupyter studies.",
+      "architecture": "Full-stack dashboard: Next.js API routes serving energy time-series data, Recharts interactive graph with forecast horizon controls, and Jupyter notebooks.",
+      "technicalAnalysis": "Forecast error characterization, reliable wind capacity analysis, horizon slider filtering.",
+      "keyImplementation": "Synchronized line chart rendering, date range selection, REST API endpoint aggregation.",
+      "technologies": [
+        "Next.js",
+        "TypeScript",
+        "Recharts",
+        "Python",
+        "Jupyter",
+        "Pandas"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 20,
+      "firstCommit": "2026-03-16",
+      "lastCommit": "2026-03-18",
+      "localPath": "C:\\Users\\manis\\Projects\\ForecastApp"
+    },
+    "bullets": [
+      {
+        "id": "b-forecastapp-zjblpw",
+        "text": "Built an energy generation monitoring dashboard in Next.js comparing actual vs forecasted wind generation across dynamic horizons.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-forecastapp-1qisqtx",
+        "text": "Authored analytical Jupyter notebooks in Pandas evaluating forecast error distributions and reliable energy capacity thresholds.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-forecastapp-m6bd5i",
+        "text": "Constructed synchronized time-series visualizations using Recharts and React state hooks.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "courierbridge",
+    "title": "CourierBridge — Multi-Carrier Logistics Tracking Aggregator API",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Node.js",
+      "Express.js",
+      "Joi",
+      "RESTful APIs"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 16,
+      "score": 62.5,
+      "isTop5": false,
+      "purpose": "Logistics aggregator microservice normalizing shipment tracking responses across multiple freight carriers.",
+      "architecture": "Express.js microservice standardizing external logistics tracking endpoints into a unified response schema.",
+      "technicalAnalysis": "Joi query validation, standardized API response envelopes, error handling middleware.",
+      "keyImplementation": "Modular tracking controller, unified tracking status normalizer.",
+      "technologies": [
+        "Node.js",
+        "Express.js",
+        "Joi",
+        "REST API"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 14,
+      "firstCommit": "2026-04-08",
+      "lastCommit": "2026-04-15",
+      "localPath": "C:\\Users\\manis\\Projects\\CourierBridge"
+    },
+    "bullets": [
+      {
+        "id": "b-courierbridge-1vxa5xr",
+        "text": "Developed a logistics microservice aggregating and normalizing shipment tracking data across multiple third-party courier APIs.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-courierbridge-1vrwbhr",
+        "text": "Implemented strict request validation using Joi and structured error middleware for uniform API responses.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "regimen",
+    "title": "Regimen — Daily Habit & Routine Tracker Progressive Web App",
+    "ownership": "personal",
+    "link": "regimen-daily.vercel.app",
+    "year": "2025 – 2026",
+    "techStack": [
+      "Next.js",
+      "React",
+      "Firebase Auth",
+      "Firestore",
+      "PWA"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 18,
+      "score": 59,
+      "isTop5": false,
+      "purpose": "Installable Progressive Web App for tracking daily habits, calculating streaks, and visualizing consistency via calendar heatmaps.",
+      "architecture": "Serverless Progressive Web App: Next.js App Router, Firebase Client SDK authentication, Firestore real-time collection listeners, PWA service worker.",
+      "technicalAnalysis": "Streak counter algorithm, 30-day performance matrix calculations, offline PWA caching.",
+      "keyImplementation": "Firestore security rules, habit creation dialogs, calendar heatmap visualization.",
+      "technologies": [
+        "Next.js",
+        "React",
+        "Firebase Auth",
+        "Firestore",
+        "PWA Manifest"
+      ],
+      "techNotListed": [
+        "PWA Manifest"
+      ],
+      "liveUrl": "http://regimen-daily.vercel.app/",
+      "urlType": "Production PWA Web App",
+      "commitCount": 31,
+      "firstCommit": "2025-12-22",
+      "lastCommit": "2026-03-08",
+      "localPath": "C:\\Users\\manis\\Projects\\Regimen"
+    },
+    "bullets": [
+      {
+        "id": "b-regimen-1mk7keh",
+        "text": "Developed an installable Progressive Web Application (PWA) for habit tracking and daily routine consistency.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-regimen-1skm3c2",
+        "text": "Integrated Firebase Authentication and Firestore real-time listeners for instant synchronization across devices.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-regimen-rj20v5",
+        "text": "Built visual 30-day activity heatmaps and mathematical streak counters calculating completion percentages.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "vaelix",
+    "title": "Vaelix — Corporate Technology Agency Website & Proposal Generator",
+    "ownership": "personal",
+    "link": "vaelix.in",
+    "year": "2025 – 2026",
+    "techStack": [
+      "Next.js 16",
+      "Tailwind CSS v4",
+      "Framer Motion",
+      "docx"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 19,
+      "score": 57,
+      "isTop5": false,
+      "purpose": "Corporate software agency website featuring glassmorphism design and programmatic client proposal document generation.",
+      "architecture": "Next.js 16 App Router marketing platform with Framer Motion animations and server-side script generating standardized client quotation documents.",
+      "technicalAnalysis": "Fluid UI styling with Tailwind v4, Vercel analytics integration, programmatic document generation using docx.",
+      "keyImplementation": "Automated quotation builder script, performance optimization for 95+ Lighthouse scores.",
+      "technologies": [
+        "Next.js 16",
+        "Tailwind CSS v4",
+        "Framer Motion",
+        "docx"
+      ],
+      "techNotListed": [],
+      "liveUrl": "https://www.vaelix.in/",
+      "urlType": "Production Agency Website",
+      "commitCount": 99,
+      "firstCommit": "2025-12-29",
+      "lastCommit": "2026-08-18",
+      "localPath": "C:\\Users\\manis\\Projects\\Vaelix"
+    },
+    "bullets": [
+      {
+        "id": "b-vaelix-ctl7az",
+        "text": "Architected a high-performance agency website using Next.js 16 App Router and Tailwind CSS v4 featuring glassmorphism and 60fps animations.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-vaelix-12yja93",
+        "text": "Implemented programmatic client proposal generation in JavaScript using the docx library to output standardized quotation documents.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-vaelix-7xahw1",
+        "text": "Optimized client-side rendering and asset loading to achieve top-tier Lighthouse performance scores.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "oracle-free-server",
+    "title": "OCI Instance Hunter — Automated Cloud Compute Provisioner",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Go",
+      "Oracle Cloud Infrastructure SDK",
+      "Docker",
+      "Kubernetes"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 20,
+      "score": 56.5,
+      "isTop5": false,
+      "purpose": "Automated Go daemon monitoring and provisioning Oracle Cloud Free Tier ARM instances when capacity becomes available.",
+      "architecture": "Go background worker polling OCI compute APIs on a configurable ticker interval to claim high-demand Ampere A1 compute shapes.",
+      "technicalAnalysis": "OCI compute client authentication via API signing keys, availability zone domain traversal, error retry loop.",
+      "keyImplementation": "Ticker loop execution, configuration parsing from environment variables.",
+      "technologies": [
+        "Go",
+        "Oracle Cloud Infrastructure (OCI) Go SDK",
+        "Docker",
+        "Kubernetes"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 6,
+      "firstCommit": "2026-02-14",
+      "lastCommit": "2026-02-20",
+      "localPath": "C:\\Users\\manis\\Projects\\oracle-free-server"
+    },
+    "bullets": [
+      {
+        "id": "b-oracle-free-server-8r7djv",
+        "text": "Built an automated cloud infrastructure daemon in Go utilizing the OCI Go SDK to monitor availability zones and claim high-demand ARM compute instances.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-oracle-free-server-1mg1b7n",
+        "text": "Implemented exponential backoff polling and API signing key authentication for reliable cloud resource acquisition.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "livox-py",
+    "title": "livox-py — Python Driver Wrapper & Packet Parser for Livox LiDAR",
+    "ownership": "personal",
+    "link": "",
+    "year": "2025",
+    "techStack": [
+      "Python",
+      "Binary Struct Parsing",
+      "UDP Sockets",
+      "NumPy"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 21,
+      "score": 55.5,
+      "isTop5": false,
+      "purpose": "Python SDK wrapper and binary packet parser for Livox LiDAR sensors.",
+      "architecture": "Low-level driver library for communicating with Livox LiDAR over Ethernet and parsing raw binary data packets into NumPy coordinate arrays.",
+      "technicalAnalysis": "Binary struct unpacking of LiDAR broadcast packets, timestamp synchronization, and PCD file writer.",
+      "keyImplementation": "Livox communication protocol implementation, point-cloud coordinate conversion.",
+      "technologies": [
+        "Python",
+        "Binary Protocols",
+        "UDP Sockets",
+        "NumPy",
+        "Setuptools"
+      ],
+      "techNotListed": [
+        "Binary Protocols",
+        "Setuptools"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 10,
+      "firstCommit": "2025-10-01",
+      "lastCommit": "2025-10-01",
+      "localPath": "C:\\Users\\manis\\Projects\\livox-py"
+    },
+    "bullets": [
+      {
+        "id": "b-livox-py-1y7q23f",
+        "text": "Developed a Python driver wrapper for Livox LiDAR sensors to capture real-time UDP point data and parse proprietary binary frame packets.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-livox-py-1sij5mc",
+        "text": "Implemented low-level struct unpacking and conversion of spherical sensor coordinates into calibrated Cartesian point clouds.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "remotion",
+    "title": "Remotion Video Engine — Programmatic Motion Graphics Framework",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "React",
+      "TypeScript",
+      "Remotion",
+      "FFmpeg"
+    ],
+    "tags": [],
+    "visible": true,
+    "notes": "",
+    "kb": {
+      "rank": 22,
+      "score": 53.5,
+      "isTop5": false,
+      "purpose": "Programmatic video composition and motion graphics rendering using React and Remotion.",
+      "architecture": "Programmatic video renderer compiling React components into MP4 videos using Remotion bundler and rendering pipelines.",
+      "technicalAnalysis": "Frame-accurate animations, kinetic typography, retention graph visualizers, and automated audio waveform alignment.",
+      "keyImplementation": "Render scripts (render-video.ts), animated SVG overlays, sound asset timing.",
+      "technologies": [
+        "React",
+        "TypeScript",
+        "Remotion",
+        "FFmpeg"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 2,
+      "firstCommit": "2026-08-26",
+      "lastCommit": "2026-08-26",
+      "localPath": "C:\\Users\\manis\\Projects\\Remotion"
+    },
+    "bullets": [
+      {
+        "id": "b-remotion-ce8b3w",
+        "text": "Built a programmatic video generation pipeline using Remotion and React to render automated social media video reels.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      },
+      {
+        "id": "b-remotion-59v8vb",
+        "text": "Implemented frame-precise motion graphics, kinetic subtitles, and synchronized audio track rendering.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "merchant",
+    "title": "EverCut Merchant App — Barber & Salon Schedule Management",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Flutter",
+      "Dart",
+      "RESTful APIs"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 23,
+      "score": 49,
+      "isTop5": false,
+      "purpose": "Flutter mobile application for salon merchants, stylists, and barbers to manage appointments and earnings.",
+      "architecture": "Cross-platform mobile application interfacing with EverCut backend API for business profiles and appointment tracking.",
+      "technicalAnalysis": "Clean architecture data sources and repositories, appointment approval workflows.",
+      "keyImplementation": "Business profile management module, schedule review UI.",
+      "technologies": [
+        "Flutter",
+        "Dart",
+        "REST APIs"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 8,
+      "firstCommit": "2026-01-28",
+      "lastCommit": "2026-05-09",
+      "localPath": "C:\\Users\\manis\\Projects\\merchant"
+    },
+    "bullets": [
+      {
+        "id": "b-merchant-l07mua",
+        "text": "Developed a cross-platform mobile client in Flutter for salon merchants to review appointment bookings and manage working schedules.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "evercut-customer",
+    "title": "EverCut Customer Mobile App",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Flutter",
+      "Dart"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 24,
+      "score": 48.5,
+      "isTop5": false,
+      "purpose": "Standalone extraction clone of the Flutter customer mobile application for salon bookings.",
+      "architecture": "Extracted standalone mobile application matching the customer-app directory in EverCut.",
+      "technicalAnalysis": "Duplicate of EverCut customer module.",
+      "keyImplementation": "Customer booking flow, appointment history.",
+      "technologies": [
+        "Flutter",
+        "Dart"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 4,
+      "firstCommit": "2026-06-21",
+      "lastCommit": "2026-07-06",
+      "localPath": "C:\\Users\\manis\\Projects\\EverCut-Customer"
+    },
+    "bullets": [
+      {
+        "id": "b-evercut-customer-lxwl5l",
+        "text": "Built a customer-facing Flutter mobile application for browsing salon service catalogs and booking appointments.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "karaoke-player",
+    "title": "AI Karaoke Player — Synchronized Lyric Transcription Tool",
+    "ownership": "personal",
+    "link": "",
+    "year": "2025 – 2026",
+    "techStack": [
+      "Python",
+      "OpenAI Whisper",
+      "Pygame",
+      "yt-dlp"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 25,
+      "score": 48,
+      "isTop5": false,
+      "purpose": "Command-line tool that downloads audio from YouTube and synchronizes character-by-character lyrics using OpenAI Whisper.",
+      "architecture": "Two-script utility: yt-dlp audio downloader, Whisper AI speech-to-text inference with word-level timestamps, and Pygame playback synchronizer.",
+      "technicalAnalysis": "Whisper model inference for word-level timestamps and character typewriter playback.",
+      "keyImplementation": "Word-level timestamp synchronization, terminal color formatting.",
+      "technologies": [
+        "Python",
+        "OpenAI Whisper",
+        "Pygame",
+        "yt-dlp",
+        "PyTorch"
+      ],
+      "techNotListed": [
+        "PyTorch"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 12,
+      "firstCommit": "2025-10-24",
+      "lastCommit": "2026-02-20",
+      "localPath": "C:\\Users\\manis\\Projects\\Karaoke-Player"
+    },
+    "bullets": [
+      {
+        "id": "b-karaoke-player-i1tle",
+        "text": "Built an automated lyrics synchronizer downloading YouTube audio and extracting word timestamps using OpenAI Whisper.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "evercut-intership",
+    "title": "EverCut Prototype — Salon Booking Monolith",
+    "ownership": "personal",
+    "link": "",
+    "year": "2025 – 2026",
+    "techStack": [
+      "React",
+      "Express.js",
+      "MongoDB"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 26,
+      "score": 45.5,
+      "isTop5": false,
+      "purpose": "Early monolithic web prototype of the EverCut salon appointment platform.",
+      "architecture": "Legacy prototype consisting of client, server (v1), and server-v2, superseded by modern EverCut.",
+      "technicalAnalysis": "Basic Mongoose models and soft-delete middleware.",
+      "keyImplementation": "Initial authentication and booking API endpoints.",
+      "technologies": [
+        "React (Vite)",
+        "Express.js",
+        "MongoDB",
+        "Firebase"
+      ],
+      "techNotListed": [
+        "Firebase"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 150,
+      "firstCommit": "2025-02-25",
+      "lastCommit": "2026-03-07",
+      "localPath": "C:\\Users\\manis\\Projects\\EverCut-InterShip"
+    },
+    "bullets": [
+      {
+        "id": "b-evercut-intership-1n7i7v4",
+        "text": "Created an early prototype for salon appointments utilizing React and Express REST endpoints.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "reelsanskar",
+    "title": "ReelSanskar — Creative Agency Showcase",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Next.js",
+      "React",
+      "Tailwind CSS"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 27,
+      "score": 43.5,
+      "isTop5": false,
+      "purpose": "Marketing and client landing page for a video editing and motion graphics creative agency.",
+      "architecture": "Single-page responsive Next.js marketing website highlighting video reels and contact links.",
+      "technicalAnalysis": "Next.js App Router components and CSS animations.",
+      "keyImplementation": "About section, video reel showcase.",
+      "technologies": [
+        "Next.js",
+        "React",
+        "Tailwind CSS"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 10,
+      "firstCommit": "2026-08-07",
+      "lastCommit": "2026-08-17",
+      "localPath": "C:\\Users\\manis\\Projects\\reelsanskar"
+    },
+    "bullets": [
+      {
+        "id": "b-reelsanskar-1qsprne",
+        "text": "Built a portfolio website in Next.js showcasing video editing services and creative agency client work.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "boilerplate",
+    "title": "Backend Boilerplate — Modular Microservice Templates",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Node.js",
+      "Express.js",
+      "Nodemailer",
+      "Helmet"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 28,
+      "score": 43.5,
+      "isTop5": false,
+      "purpose": "Modular microservice scaffold templates for authentication, payments, payouts, and automated email services.",
+      "architecture": "Collection of standalone starter modules: email-module, firebase-module, payment-module, payout-module, server.",
+      "technicalAnalysis": "Express rate limiting, security headers via Helmet, Nodemailer SMTP configuration.",
+      "keyImplementation": "Reusable middleware, environment configuration patterns.",
+      "technologies": [
+        "Node.js",
+        "Express.js",
+        "Nodemailer",
+        "Helmet"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 14,
+      "firstCommit": "2026-03-08",
+      "lastCommit": "2026-06-04",
+      "localPath": "C:\\Users\\manis\\Projects\\Boilerplate"
+    },
+    "bullets": [
+      {
+        "id": "b-boilerplate-x5xw6p",
+        "text": "Engineered reusable backend microservice starter templates implementing secure Express routing, rate limiting, and email dispatch.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "pre-built-tools",
+    "title": "Internal Engineering Tools & License Manager",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Python",
+      "PyQt6",
+      "Firebase Admin",
+      "Node.js"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 29,
+      "score": 42.5,
+      "isTop5": false,
+      "purpose": "Internal developer utility suite including Firebase license management desktop GUI and starter auth templates.",
+      "architecture": "Collection of utilities: Firebase-License-Manager (PyQt6 desktop app), Email-Service, and Authentication templates.",
+      "technicalAnalysis": "PyQt6 GUI manipulating Firestore license collections, cryptographic key storage.",
+      "keyImplementation": "Desktop GUI license generation, email dispatching scripts.",
+      "technologies": [
+        "Node.js",
+        "Express.js",
+        "React",
+        "PyQt6",
+        "Firebase Admin"
+      ],
+      "techNotListed": [
+        "Express.js",
+        "React"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 0,
+      "firstCommit": null,
+      "lastCommit": null,
+      "localPath": "C:\\Users\\manis\\Projects\\Pre-Built Tools"
+    },
+    "bullets": [
+      {
+        "id": "b-pre-built-tools-ynv5bw",
+        "text": "Created internal developer tools including a PyQt6 desktop utility for managing Firestore-backed software license keys.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "proximity-lock",
+    "title": "Bluetooth Proximity Workstation Auto-Lock",
+    "ownership": "personal",
+    "link": "",
+    "year": "2025",
+    "techStack": [
+      "Python",
+      "Bleak (BLE)",
+      "Windows API"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 30,
+      "score": 40,
+      "isTop5": false,
+      "purpose": "Security utility locking Windows workstations when a paired phone's Bluetooth Low Energy (BLE) beacon drops out of range.",
+      "architecture": "Single-daemon script monitoring BLE advertisements for a specific Service UUID and invoking user32.dll LockWorkStation upon timeout.",
+      "technicalAnalysis": "Uses BLE Service UUID tracking to circumvent mobile MAC address randomization.",
+      "keyImplementation": "BleakScanner event listener, ctypes Windows lock call.",
+      "technologies": [
+        "Python",
+        "Bleak (BLE)",
+        "ctypes (Windows API)"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 1,
+      "firstCommit": "2025-10-10",
+      "lastCommit": "2025-10-10",
+      "localPath": "C:\\Users\\manis\\Projects\\Proximity-Lock"
+    },
+    "bullets": [
+      {
+        "id": "b-proximity-lock-18iapre",
+        "text": "Built a Python background security script locking Windows workstations upon loss of Bluetooth Low Energy (BLE) phone proximity.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "manishborikar92",
+    "title": "GitHub Profile Metrics Automation",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Python",
+      "GitHub Actions"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 31,
+      "score": 32,
+      "isTop5": false,
+      "purpose": "Automated workflow fetching GitHub profile metrics and updating dynamic SVG badges on user profile README.",
+      "architecture": "Scheduled GitHub Actions workflow executing Python scripts to cache GitHub commit statistics and render SVG cards.",
+      "technicalAnalysis": "GitHub REST API querying, SVG template injection, git automated commit action.",
+      "keyImplementation": "Cached statistics, automated workflow cron.",
+      "technologies": [
+        "Python",
+        "GitHub Actions",
+        "SVG"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 29,
+      "firstCommit": "2026-03-19",
+      "lastCommit": "2026-07-09",
+      "localPath": "C:\\Users\\manis\\Projects\\manishborikar92"
+    },
+    "bullets": [
+      {
+        "id": "b-manishborikar92-12c6o3g",
+        "text": "Automated personal GitHub profile metrics caching and SVG generation using GitHub Actions.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "internaldocs",
+    "title": "Enterprise Technical Documentation Suite",
+    "ownership": "personal",
+    "link": "",
+    "year": "2026",
+    "techStack": [
+      "Markdown",
+      "Technical Architecture Specifications"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 32,
+      "score": 23.5,
+      "isTop5": false,
+      "purpose": "Comprehensive engineering knowledge base, architectural specifications, and operational blueprints.",
+      "architecture": "Structured documentation hub encompassing architecture, deployment, infrastructure, guides, operations, platform, and security.",
+      "technicalAnalysis": "Enterprise-wide technical standards, modular monolith architectural blueprints, database guidelines.",
+      "keyImplementation": "Categorized documentation hierarchy, cross-linked INDEX.md maps.",
+      "technologies": [
+        "Markdown"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 2,
+      "firstCommit": "2026-05-16",
+      "lastCommit": "2026-05-16",
+      "localPath": "C:\\Users\\manis\\Projects\\InternalDocs"
+    },
+    "bullets": [
+      {
+        "id": "b-internaldocs-g18wnj",
+        "text": "Authored 40+ engineering specifications detailing backend architectures, database schemas, and DevOps workflows.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "frontend-projects",
+    "title": "Frontend Component Sandbox",
+    "ownership": "personal",
+    "link": "",
+    "year": "N/A",
+    "techStack": [
+      "HTML",
+      "CSS",
+      "JavaScript",
+      "React"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 33,
+      "score": 20.5,
+      "isTop5": false,
+      "purpose": "Collection of foundational UI practice exercises covering basic navigation bars, login forms, and CSS animations.",
+      "architecture": "Directory of 8 independent exploratory web projects (Login Page, Footer Nav, Wall Task, valentines-website).",
+      "technicalAnalysis": "Standard DOM manipulation, responsive CSS layouts, React components.",
+      "keyImplementation": "Beginner frontend templates.",
+      "technologies": [
+        "HTML",
+        "CSS",
+        "JavaScript",
+        "React"
+      ],
+      "techNotListed": [],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 0,
+      "firstCommit": null,
+      "lastCommit": null,
+      "localPath": "C:\\Users\\manis\\Projects\\Frontend Projects"
+    },
+    "bullets": [
+      {
+        "id": "b-frontend-projects-11e3tzp",
+        "text": "Created responsive UI exercises and web components focusing on modern CSS layouts and interactivity.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "notes",
+    "title": "Computer Science Study Archive",
+    "ownership": "personal",
+    "link": "",
+    "year": "N/A",
+    "techStack": [
+      "Markdown",
+      "Python",
+      "Web Standards"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 34,
+      "score": 15.5,
+      "isTop5": false,
+      "purpose": "Personal study archive, course notes, and exploratory scripts spanning cloud computing, full-stack development, and algorithms.",
+      "architecture": "Informal folders: AI Operations, Full Stack Development, Google Compute Engine, Python Notes, Scroll Animation.",
+      "technicalAnalysis": "Informal tutorials, practice syntax snippets, and concept summaries.",
+      "keyImplementation": "Exploratory Python virtual environment, CSS trick demos.",
+      "technologies": [
+        "Markdown",
+        "Python",
+        "HTML",
+        "CSS"
+      ],
+      "techNotListed": [
+        "HTML",
+        "CSS"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 0,
+      "firstCommit": null,
+      "lastCommit": null,
+      "localPath": "C:\\Users\\manis\\Projects\\Notes"
+    },
+    "bullets": [
+      {
+        "id": "b-notes-my33yp",
+        "text": "Maintained an ongoing technical knowledge base of software engineering concepts, cloud platforms, and algorithms.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  },
+  {
+    "id": "git-and-github-commands",
+    "title": "Git & GitHub Workflow Guide",
+    "ownership": "personal",
+    "link": "",
+    "year": "2024 – 2025",
+    "techStack": [
+      "Git",
+      "Bash",
+      "Markdown"
+    ],
+    "tags": [],
+    "visible": false,
+    "notes": "",
+    "kb": {
+      "rank": 35,
+      "score": 13.5,
+      "isTop5": false,
+      "purpose": "Personal cheat sheet for git version control commands, remote repository workflows, and branching strategies.",
+      "architecture": "Single reference guide and shell script documenting git configuration and everyday commands.",
+      "technicalAnalysis": "Git branch management, merge conflict resolution, rebase syntax.",
+      "keyImplementation": "Bash helper commands.",
+      "technologies": [
+        "Bash",
+        "Shell",
+        "Markdown"
+      ],
+      "techNotListed": [
+        "Shell"
+      ],
+      "liveUrl": null,
+      "urlType": null,
+      "commitCount": 12,
+      "firstCommit": "2024-06-07",
+      "lastCommit": "2025-03-18",
+      "localPath": "C:\\Users\\manis\\Projects\\Git-and-Github-Commands"
+    },
+    "bullets": [
+      {
+        "id": "b-git-and-github-commands-1gpwg93",
+        "text": "Compiled a reference guide documenting branch hygiene, conventional commits, and remote repository commands.",
+        "tags": [],
+        "status": "prep",
+        "source": "kb"
+      }
+    ]
+  }
+]

@@ -1,0 +1,350 @@
+[
+  {
+    "id": "sk-languages",
+    "label": "Languages",
+    "items": [
+      {
+        "id": "sk-1kemhpj",
+        "name": "Python",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-1xxw2ti",
+        "name": "JavaScript (ES6+)",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-376qid",
+        "name": "SQL",
+        "status": "confident",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "id": "sk-frontend",
+    "label": "Frontend",
+    "items": [
+      {
+        "id": "sk-1uktl8p",
+        "name": "Next.js 16 (App Router)",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-brqhyi",
+        "name": "Tailwind CSS",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-3ok0y7",
+        "name": "HTML5",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-yjpz35",
+        "name": "CSS3",
+        "status": "confident",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "id": "sk-backend",
+    "label": "Backend & APIs",
+    "items": [
+      {
+        "id": "sk-1oa22ju",
+        "name": "Node.js 18+",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-12sxcxb",
+        "name": "Express.js 5",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-1bi13w0",
+        "name": "REST APIs",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-s3taai",
+        "name": "JWT Authentication",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-yk14al",
+        "name": "RBAC",
+        "status": "confident",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "id": "sk-databases",
+    "label": "Databases",
+    "items": [
+      {
+        "id": "sk-aqsvvl",
+        "name": "MongoDB/Mongoose",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-3svrff",
+        "name": "MySQL",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-t6mty1",
+        "name": "Firebase Firestore",
+        "status": "confident",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "id": "sk-corecs",
+    "label": "Core CS",
+    "items": [
+      {
+        "id": "sk-376n3n",
+        "name": "OOP",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-yjqcej",
+        "name": "DBMS",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-7vud5y",
+        "name": "Operating Systems",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-193xclf",
+        "name": "Data Structures & Algorithms",
+        "status": "confident",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "id": "sk-devops",
+    "label": "DevOps & Tools",
+    "items": [
+      {
+        "id": "sk-1x0cqkb",
+        "name": "Git/GitHub",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-377e0g",
+        "name": "npm",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-19gi9nt",
+        "name": "VS Code",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-848i6f",
+        "name": "Postman",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-1s5udjw",
+        "name": "PyInstaller",
+        "status": "confident",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "id": "sk-cloud",
+    "label": "Cloud & Integrations",
+    "items": [
+      {
+        "id": "sk-1fi28na",
+        "name": "Firebase",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-1x10y8v",
+        "name": "Cloudinary",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-xdhoql",
+        "name": "Razorpay",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-1lb2wau",
+        "name": "Resend",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-1fagidf",
+        "name": "Google OAuth",
+        "status": "confident",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "id": "sk-desktop",
+    "label": "Desktop & 3D",
+    "items": [
+      {
+        "id": "sk-3uzzt5",
+        "name": "PyQt6",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-1jkngmm",
+        "name": "Open3D",
+        "status": "confident",
+        "tags": []
+      },
+      {
+        "id": "sk-3tipfi",
+        "name": "NumPy",
+        "status": "confident",
+        "tags": []
+      }
+    ]
+  },
+  {
+    "id": "sk-excluded",
+    "label": "Not claimed (excluded)",
+    "items": [
+      {
+        "id": "sk-1cfll7h",
+        "name": "Docker",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-7v70fw",
+        "name": "TypeScript",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-1wdngt5",
+        "name": "PostgreSQL",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-3no65y",
+        "name": "Flask",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-1xldz59",
+        "name": "FastAPI",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-1n0j7ib",
+        "name": "Microservices",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-18yz5y0",
+        "name": "TensorFlow",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-pii64r",
+        "name": "Scikit-learn",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-1jknh1s",
+        "name": "OpenCV",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-3wnu99",
+        "name": "SciPy",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-e0j4hh",
+        "name": "PyVista",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-yjvt6j",
+        "name": "Jest",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-mqfaxg",
+        "name": "Supertest",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-ohf208",
+        "name": "Three.js",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-vd0zxb",
+        "name": "React.js",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-10ge8gh",
+        "name": "Computer Networks",
+        "status": "exclude",
+        "tags": []
+      },
+      {
+        "id": "sk-hfqefi",
+        "name": "MVC architecture",
+        "status": "exclude",
+        "tags": []
+      }
+    ]
+  }
+]

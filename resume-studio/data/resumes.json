@@ -1,0 +1,382 @@
+[
+  {
+    "id": "resume-current",
+    "name": "Current resume",
+    "targetId": null,
+    "template": "classic",
+    "options": {
+      "paper": "letter",
+      "contactSeparator": "·",
+      "shortLinks": true,
+      "showProjectLinks": true,
+      "projectsOnNewPage": true,
+      "projectTypeLabels": [
+        "college"
+      ],
+      "nameUpper": true,
+      "targetPages": 2,
+      "fileName": "",
+      "fontFamily": "sans",
+      "fontSize": 10,
+      "accent": "#1F3864",
+      "nameAlign": "center",
+      "sectionStyle": "rule",
+      "spacing": "tight",
+      "margin": 0.75
+    },
+    "sectionOrder": [
+      "summary",
+      "skills",
+      "experience",
+      "projects",
+      "education",
+      "certifications",
+      "involvement"
+    ],
+    "sections": {},
+    "titles": {},
+    "selection": {
+      "summaryId": "sum-fullstack",
+      "contactIds": [
+        "c-loc",
+        "c-email",
+        "c-phone",
+        "c-linkedin",
+        "c-github"
+      ],
+      "skills": [
+        {
+          "groupId": "sk-languages",
+          "items": [
+            "sk-1kemhpj",
+            "sk-1xxw2ti",
+            "sk-376qid"
+          ]
+        },
+        {
+          "groupId": "sk-frontend",
+          "items": [
+            "sk-1uktl8p",
+            "sk-brqhyi",
+            "sk-3ok0y7",
+            "sk-yjpz35"
+          ]
+        },
+        {
+          "groupId": "sk-backend",
+          "items": [
+            "sk-1oa22ju",
+            "sk-12sxcxb",
+            "sk-1bi13w0",
+            "sk-s3taai",
+            "sk-yk14al"
+          ]
+        },
+        {
+          "groupId": "sk-databases",
+          "items": [
+            "sk-aqsvvl",
+            "sk-3svrff",
+            "sk-t6mty1"
+          ]
+        },
+        {
+          "groupId": "sk-corecs",
+          "items": [
+            "sk-376n3n",
+            "sk-yjqcej",
+            "sk-7vud5y",
+            "sk-193xclf"
+          ]
+        },
+        {
+          "groupId": "sk-devops",
+          "items": [
+            "sk-1x0cqkb",
+            "sk-377e0g",
+            "sk-19gi9nt",
+            "sk-848i6f",
+            "sk-1s5udjw"
+          ]
+        },
+        {
+          "groupId": "sk-cloud",
+          "items": [
+            "sk-1fi28na",
+            "sk-1x10y8v",
+            "sk-xdhoql",
+            "sk-1lb2wau",
+            "sk-1fagidf"
+          ]
+        },
+        {
+          "groupId": "sk-desktop",
+          "items": [
+            "sk-3uzzt5",
+            "sk-1jkngmm",
+            "sk-3tipfi"
+          ]
+        }
+      ],
+      "experience": [
+        {
+          "id": "exp-quantneural-dev",
+          "bullets": [
+            "b-qd-peltrw",
+            "b-qd-1a12c4e",
+            "b-qd-11efwr3",
+            "b-qd-14s9qzn",
+            "b-qd-1y03hx1"
+          ]
+        },
+        {
+          "id": "exp-quantneural-intern",
+          "bullets": [
+            "b-qi-8vi8xu",
+            "b-qi-1sb9iil",
+            "b-qi-y8sxdj"
+          ]
+        },
+        {
+          "id": "exp-phn",
+          "bullets": [
+            "b-phn-1p2eioe"
+          ]
+        }
+      ],
+      "projects": [
+        {
+          "id": "iwlars",
+          "bullets": [
+            "b-iw-uncj5q",
+            "b-iw-g6106n",
+            "b-iw-3fdfcl",
+            "b-iw-2zhq32"
+          ]
+        },
+        {
+          "id": "ca-workflow",
+          "bullets": [
+            "b-ca-1ebzjzb",
+            "b-ca-m37kn2",
+            "b-ca-1gc9i4n",
+            "b-ca-ykkra8"
+          ]
+        },
+        {
+          "id": "smart-healthcare",
+          "bullets": [
+            "b-sh-1kl5mjd",
+            "b-sh-1c4z6fi"
+          ]
+        }
+      ],
+      "education": [
+        "edu-btech",
+        "edu-hsc",
+        "edu-ssc"
+      ],
+      "certifications": [
+        "cert-z1hsoa",
+        "cert-1nh5paz",
+        "cert-1mm3a7k"
+      ],
+      "involvement": [
+        "inv-nss"
+      ]
+    },
+    "overrides": {},
+    "createdAt": "2026-10-18T10:10:41.360Z",
+    "updatedAt": "2026-10-18T10:10:41.360Z"
+  },
+  {
+    "id": "resume-tcs-tailored",
+    "name": "TCS Prime — auto-tailored",
+    "targetId": "target-tcs-prime",
+    "template": "classic",
+    "options": {
+      "paper": "letter",
+      "contactSeparator": "·",
+      "shortLinks": true,
+      "showProjectLinks": true,
+      "projectsOnNewPage": false,
+      "projectTypeLabels": [
+        "college"
+      ],
+      "nameUpper": true,
+      "targetPages": 2,
+      "fileName": "",
+      "fontFamily": "sans",
+      "fontSize": 10,
+      "accent": "#1F3864",
+      "nameAlign": "center",
+      "sectionStyle": "rule",
+      "spacing": "tight",
+      "margin": 0.75
+    },
+    "sectionOrder": [
+      "summary",
+      "skills",
+      "experience",
+      "projects",
+      "education",
+      "certifications",
+      "involvement"
+    ],
+    "sections": {},
+    "titles": {},
+    "selection": {
+      "summaryId": "sum-fullstack",
+      "contactIds": [
+        "c-loc",
+        "c-email",
+        "c-phone",
+        "c-linkedin",
+        "c-github"
+      ],
+      "skills": [
+        {
+          "groupId": "sk-languages",
+          "items": [
+            "sk-1xxw2ti",
+            "sk-376qid",
+            "sk-1kemhpj"
+          ]
+        },
+        {
+          "groupId": "sk-frontend",
+          "items": [
+            "sk-brqhyi",
+            "sk-3ok0y7",
+            "sk-yjpz35",
+            "sk-1uktl8p"
+          ]
+        },
+        {
+          "groupId": "sk-backend",
+          "items": [
+            "sk-1bi13w0",
+            "sk-1oa22ju",
+            "sk-12sxcxb",
+            "sk-s3taai",
+            "sk-yk14al"
+          ]
+        },
+        {
+          "groupId": "sk-databases",
+          "items": [
+            "sk-aqsvvl",
+            "sk-3svrff",
+            "sk-t6mty1"
+          ]
+        },
+        {
+          "groupId": "sk-corecs",
+          "items": [
+            "sk-193xclf",
+            "sk-376n3n",
+            "sk-yjqcej",
+            "sk-7vud5y"
+          ]
+        },
+        {
+          "groupId": "sk-devops",
+          "items": [
+            "sk-1x0cqkb",
+            "sk-377e0g",
+            "sk-19gi9nt",
+            "sk-848i6f",
+            "sk-1s5udjw"
+          ]
+        },
+        {
+          "groupId": "sk-cloud",
+          "items": [
+            "sk-1fi28na",
+            "sk-1x10y8v",
+            "sk-xdhoql",
+            "sk-1lb2wau",
+            "sk-1fagidf"
+          ]
+        },
+        {
+          "groupId": "sk-desktop",
+          "items": [
+            "sk-3uzzt5",
+            "sk-1jkngmm",
+            "sk-3tipfi"
+          ]
+        }
+      ],
+      "experience": [
+        {
+          "id": "exp-quantneural-dev",
+          "bullets": [
+            "b-qd-peltrw",
+            "b-qd-1a12c4e",
+            "b-qd-11efwr3",
+            "b-qd-14s9qzn",
+            "b-qd-1y03hx1"
+          ]
+        },
+        {
+          "id": "exp-quantneural-intern",
+          "bullets": [
+            "b-qi-8vi8xu",
+            "b-qi-1sb9iil",
+            "b-qi-y8sxdj"
+          ]
+        },
+        {
+          "id": "exp-phn",
+          "bullets": [
+            "b-phn-1p2eioe"
+          ]
+        }
+      ],
+      "projects": [
+        {
+          "id": "iwlars",
+          "bullets": [
+            "b-iw-uncj5q",
+            "b-iw-g6106n",
+            "b-iw-3fdfcl",
+            "b-iw-2zhq32"
+          ]
+        },
+        {
+          "id": "ca-workflow",
+          "bullets": [
+            "b-ca-1ebzjzb",
+            "b-ca-m37kn2",
+            "b-ca-1gc9i4n",
+            "b-ca-ykkra8"
+          ]
+        },
+        {
+          "id": "smart-healthcare",
+          "bullets": [
+            "b-sh-1kl5mjd",
+            "b-sh-1c4z6fi"
+          ]
+        }
+      ],
+      "education": [
+        "edu-btech",
+        "edu-hsc",
+        "edu-ssc"
+      ],
+      "certifications": [
+        "cert-z1hsoa",
+        "cert-1nh5paz",
+        "cert-1mm3a7k"
+      ],
+      "involvement": [
+        "inv-nss"
+      ]
+    },
+    "overrides": {},
+    "createdAt": "2026-10-18T10:10:41.720Z",
+    "updatedAt": "2026-10-18T10:10:41.720Z"
+  }
+]

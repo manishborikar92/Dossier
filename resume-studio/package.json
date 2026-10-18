@@ -1,0 +1,25 @@
+{
+  "name": "resume-studio",
+  "version": "1.0.0",
+  "description": "Local resume builder: reusable career data, tailored resumes, DOCX/PDF export.",
+  "scripts": {
+    "dev": "next dev -p 3000 -H 127.0.0.1",
+    "build": "next build",
+    "start": "next start -p 3000 -H 127.0.0.1",
+    "seed": "node scripts/seed.mjs",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "docx": "^9.12.0",
+    "next": "^15.5.28",
+    "pdfkit": "^0.15.2",
+    "react": "^19.3.1",
+    "react-dom": "^19.3.1",
+    "zod": "^3.25.76"
+  },
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=18.18"
+  }
+}
