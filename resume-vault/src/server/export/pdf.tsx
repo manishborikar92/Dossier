@@ -1,7 +1,7 @@
 import React from 'react';
 import { Document, Font, Link, Page, Text, View, renderToBuffer } from '@react-pdf/renderer';
-import type { ResumeDoc, SectionDoc, EntryBlock, ContactPart } from '@/lib/resumeDoc';
-import { DENSITY_SCALE, TEMPLATES } from '@/lib/templates';
+import { isUnbreakable, type ResumeDoc, type SectionDoc, type EntryBlock, type ContactPart } from '@/lib/resumeDoc';
+import { DENSITY_SCALE, LINK_BLUE, TEMPLATES } from '@/lib/templates';
 import { toWinAnsi } from '@/lib/text';
 
 // Never insert hyphens when wrapping: it would corrupt the text that ATS parsers read.
@@ -36,11 +36,17 @@ function ResumePdf({ doc }: { doc: ResumeDoc }) {
   const contact = (parts: ContactPart[]) => (
     <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: t.headerAlign === 'center' ? 'center' : 'flex-start', marginTop: 3 }}>
       {parts.map((p, i) => (
-        <Text key={i} style={{ ...body, fontSize: t.base - 1, color: GRAY }}>
+        <Text key={i} style={{ ...body, fontSize: t.contactSize, color: GRAY }}>
           {p.url ? (
-            <Link src={p.url} style={{ color: GRAY, textDecoration: 'none' }}>
-              {s(p.text)}
-            </Link>
+            t.contactLinks === 'blue' && !p.url.startsWith('mailto:') ? (
+              <Link src={p.url} style={{ color: LINK_BLUE, textDecoration: 'underline' }}>
+                {s(p.text)}
+              </Link>
+            ) : (
+              <Link src={p.url} style={{ color: GRAY, textDecoration: 'none' }}>
+                {s(p.text)}
+              </Link>
+            )
           ) : (
             s(p.text)
           )}
@@ -67,57 +73,82 @@ function ResumePdf({ doc }: { doc: ResumeDoc }) {
         borderBottomColor: accent,
       }}
     >
-      <Text style={{ fontFamily: bold, fontSize: t.headingSize, color: accent, letterSpacing: t.headingUpper ? 0.4 : 0 }}>
+      <Text style={{ fontFamily: bold, fontSize: t.headingSize, color: accent, letterSpacing: t.headingTracking }}>
         {s(t.headingUpper ? title.toUpperCase() : title)}
       </Text>
     </View>
   );
 
   /** Title row, sub-line and technology line of an entry. */
-  const entryHeader = (e: EntryBlock) => (
-    <View style={{ marginTop: t.entryGap * scale }}>
-      <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
-        <Text style={{ ...body, flex: 1 }}>
-          <Text style={{ fontFamily: bold, fontSize: t.base + 0.5 }}>{s(e.title)}</Text>
-          {e.org ? <Text style={{ color: GRAY }}>{s(` \u2014 ${e.org}`)}</Text> : null}
-          {e.links.map((l, i) => (
-            <Text key={i} style={{ color: GRAY }}>
-              {'  |  '}
-              <Link src={l.url} style={{ color: GRAY }}>
-                {s(l.text)}
-              </Link>
-            </Text>
-          ))}
-        </Text>
-        {e.right ? (
-          <Text style={{ fontFamily: italic, fontSize: small, color: GRAY, marginLeft: 10, flexShrink: 0 }}>{s(e.right)}</Text>
+  const entryHeader = (e: EntryBlock) => {
+    const plain = e.variant === 'plain';
+    const titleSize = plain ? t.base : t.base + 0.5;
+    const inlineLinks = t.titleLinks === 'title';
+    return (
+      <View style={{ marginTop: (plain ? Math.max(2, t.entryGap - 3) : t.entryGap) * scale }}>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          <Text style={{ ...body, flex: 1 }}>
+            <Text style={{ fontFamily: bold, fontSize: titleSize }}>{s(e.title)}</Text>
+            {e.org ? <Text style={{ color: GRAY }}>{s(` \u2014 ${e.org}`)}</Text> : null}
+            {e.links.map((l, i) =>
+              inlineLinks ? (
+                <Text key={i} style={{ fontFamily: bold, fontSize: titleSize }}>
+                  {'  |  '}
+                  <Link src={l.url} style={{ color: '#000000', textDecoration: 'none' }}>
+                    {s(l.text)}
+                  </Link>
+                </Text>
+              ) : (
+                <Text key={i} style={{ color: GRAY }}>
+                  {'  |  '}
+                  <Link src={l.url} style={{ color: GRAY }}>
+                    {s(l.text)}
+                  </Link>
+                </Text>
+              ),
+            )}
+          </Text>
+          {e.right ? (
+            plain ? (
+              <Text style={{ fontFamily: t.font, fontSize: small, color: '#000000', marginLeft: 10, flexShrink: 0 }}>{s(e.right)}</Text>
+            ) : (
+              <Text style={{ fontFamily: italic, fontSize: small, color: GRAY, marginLeft: 10, flexShrink: 0 }}>{s(e.right)}</Text>
+            )
+          ) : null}
+        </View>
+        {e.sub ? <Text style={{ ...body, fontSize: small, color: GRAY, marginTop: 1 }}>{s(e.sub)}</Text> : null}
+        {e.meta ? (
+          <Text style={{ ...body, fontSize: small, color: GRAY, marginTop: 1 }}>
+            {e.meta.startsWith('Tech Stack: ') ? (
+              <>
+                <Text style={{ fontFamily: bold }}>Tech Stack: </Text>
+                <Text style={{ fontFamily: italic }}>{s(e.meta.slice('Tech Stack: '.length))}</Text>
+              </>
+            ) : (
+              s(e.meta)
+            )}
+          </Text>
         ) : null}
+        {e.description ? <Text style={{ ...body, marginTop: 2 * scale }}>{s(e.description)}</Text> : null}
       </View>
-      {e.sub ? <Text style={{ ...body, fontSize: small, color: GRAY, marginTop: 1 }}>{s(e.sub)}</Text> : null}
-      {e.meta ? (
-        <Text style={{ ...body, fontSize: small, color: GRAY, marginTop: 1 }}>
-          {e.meta.startsWith('Tech Stack: ') ? (
-            <>
-              <Text style={{ fontFamily: bold }}>Tech Stack: </Text>
-              <Text style={{ fontFamily: italic }}>{s(e.meta.slice('Tech Stack: '.length))}</Text>
-            </>
-          ) : (
-            s(e.meta)
-          )}
-        </Text>
-      ) : null}
-      {e.description ? <Text style={{ ...body, marginTop: 2 * scale }}>{s(e.description)}</Text> : null}
-    </View>
-  );
+    );
+  };
 
-  /** The part of an entry that must never be separated: its header and first bullet. */
+  const entryBullets = (e: EntryBlock, from = 0) => e.bullets.slice(from).map((b, i) => bullet(from + i, s(b)));
+  /** A whole entry. Short entries are kept on one page. */
+  const entryWhole = (e: EntryBlock) => (
+    <>
+      {entryHeader(e)}
+      {entryBullets(e)}
+    </>
+  );
+  /** The part of a long entry that must never be separated: its header and first bullet. */
   const entryLead = (e: EntryBlock) => (
     <>
       {entryHeader(e)}
       {e.bullets.length > 0 ? bullet(0, s(e.bullets[0])) : null}
     </>
   );
-  const entryRest = (e: EntryBlock) => e.bullets.slice(1).map((b, i) => bullet(i + 1, s(b)));
 
   const lineBullet = (l: { text: string; url?: string }, i: number) =>
     bullet(
@@ -138,34 +169,42 @@ function ResumePdf({ doc }: { doc: ResumeDoc }) {
     </Text>
   );
 
-  // The heading is always kept together with the first piece of content that follows it.
+  // The heading always travels with the first piece of content that follows it.
   const section = (sec: SectionDoc) => {
     const entries = sec.entries ?? [];
     const groups = sec.skillGroups ?? [];
     const lines = sec.lines ?? [];
+    const first = entries[0];
     return (
-      <View key={sec.key}>
+      <View key={sec.key} break={sec.pageBreakBefore === true}>
         <View wrap={false}>
           {heading(sec.title)}
           {sec.text ? <Text style={body}>{s(sec.text)}</Text> : null}
           {groups.length > 0 ? skillGroup(groups[0], 0) : null}
-          {entries.length > 0 ? <View key="lead">{entryLead(entries[0])}</View> : null}
+          {first ? <View>{isUnbreakable(first) ? entryWhole(first) : entryLead(first)}</View> : null}
           {lines.length > 0 ? lineBullet(lines[0], 0) : null}
         </View>
         {groups.slice(1).map((g, i) => skillGroup(g, i + 1))}
-        {entries.length > 0 ? entryRest(entries[0]) : null}
-        {entries.slice(1).map((e, i) => (
-          <View key={i + 1}>
-            <View wrap={false}>{entryLead(e)}</View>
-            {entryRest(e)}
-          </View>
-        ))}
+        {first && !isUnbreakable(first) ? entryBullets(first, 1) : null}
+        {entries.slice(1).map((e, i) =>
+          isUnbreakable(e) ? (
+            <View key={i + 1} wrap={false}>
+              {entryWhole(e)}
+            </View>
+          ) : (
+            <View key={i + 1}>
+              <View wrap={false}>{entryLead(e)}</View>
+              {entryBullets(e, 1)}
+            </View>
+          ),
+        )}
         {lines.slice(1).map((l, i) => lineBullet(l, i + 1))}
       </View>
     );
   };
 
   const vertical = t.margin * 0.8;
+  const name = t.nameUpper ? doc.name.toUpperCase() : doc.name;
   return (
     <Document title={s(doc.title)} author={s(doc.name)} creator="Resume Vault" producer="Resume Vault">
       <Page
@@ -173,10 +212,11 @@ function ResumePdf({ doc }: { doc: ResumeDoc }) {
         style={{ ...body, paddingTop: vertical, paddingBottom: vertical, paddingLeft: t.margin, paddingRight: t.margin }}
       >
         <View style={{ alignItems: t.headerAlign === 'center' ? 'center' : 'flex-start', marginBottom: 2 }}>
-          <Text style={{ fontFamily: bold, fontSize: t.nameSize, lineHeight: 1.2, color: accent, textAlign: t.headerAlign }}>{s(doc.name)}</Text>
+          <Text style={{ fontFamily: bold, fontSize: t.nameSize, lineHeight: 1.2, color: accent, textAlign: t.headerAlign }}>{s(name)}</Text>
           {doc.headline ? <Text style={{ ...body, color: GRAY, marginTop: 1, textAlign: t.headerAlign }}>{s(doc.headline)}</Text> : null}
           {doc.contact.length > 0 ? contact(doc.contact) : null}
         </View>
+        {t.headerRule ? <View style={{ marginTop: 13, borderBottomWidth: 1, borderBottomColor: accent }} /> : null}
         {doc.sections.map((sec) => section(sec))}
       </Page>
     </Document>

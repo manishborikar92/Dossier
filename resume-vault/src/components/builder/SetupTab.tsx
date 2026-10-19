@@ -102,7 +102,7 @@ export function SetupTab({ resume, mutate }: Props) {
 
       <section aria-labelledby="s-sections">
         <h3 id="s-sections" className="mb-1 font-serif text-base font-semibold">Sections</h3>
-        <p className="mb-2 text-sm text-muted">Choose which sections appear, their order, and the heading printed for each. Empty sections never print.</p>
+        <p className="mb-2 text-sm text-muted">Choose which sections appear, their order, the heading printed for each, and whether a section starts on a new page. Empty sections never print. Short entries are never split across two pages.</p>
         <ul className="divide-y divide-rule rounded-lg border border-rule bg-surface">
           {s.sectionOrder.map((key, i) => (
             <li key={key} className="flex flex-wrap items-center gap-3 px-3 py-2">
@@ -117,6 +117,15 @@ export function SetupTab({ resume, mutate }: Props) {
                   className="w-full rounded border border-rule px-2 py-1 text-sm"
                 />
               </div>
+              <label className="flex items-center gap-1.5 text-xs text-muted">
+                <input
+                  type="checkbox"
+                  checked={s.pageBreakBefore.includes(key)}
+                  onChange={(e) => void patchSettings({ pageBreakBefore: e.target.checked ? [...s.pageBreakBefore, key] : s.pageBreakBefore.filter((k) => k !== key) })}
+                  className="h-3.5 w-3.5 accent-navy"
+                />
+                Start on a new page
+              </label>
               <div className="flex">
                 <button type="button" aria-label={`Move ${DEFAULT_SECTION_TITLES[key]} up`} disabled={i === 0} onClick={() => moveSection(i, -1)} className="rounded p-1.5 text-muted hover:bg-navy-soft disabled:opacity-30">
                   <ArrowUp className="h-4 w-4" aria-hidden />

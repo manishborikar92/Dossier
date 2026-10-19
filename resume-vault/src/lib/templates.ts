@@ -16,7 +16,15 @@ export interface TemplateTokens {
   sectionGap: number; // pt before a section
   entryGap: number; // pt before an entry
   bulletGap: number; // pt between bullets
+  nameUpper: boolean; // print the name in capitals
+  headerRule: boolean; // a full-width rule under the contact line
+  contactSize: number; // pt
+  contactLinks: 'blue' | 'muted'; // hyperlink look in the contact line
+  titleLinks: 'title' | 'muted'; // links beside a project title: same bold style as the title, or small and grey
+  headingTracking: number; // extra letter spacing in section headings (pt)
 }
+
+export const LINK_BLUE = '#0563C1';
 
 export const TEMPLATES: Record<TemplateId, TemplateTokens> = {
   classic: {
@@ -35,6 +43,12 @@ export const TEMPLATES: Record<TemplateId, TemplateTokens> = {
     sectionGap: 11,
     entryGap: 7,
     bulletGap: 2.5,
+    nameUpper: true,
+    headerRule: true,
+    contactSize: 8.5,
+    contactLinks: 'blue',
+    titleLinks: 'title',
+    headingTracking: 0,
   },
   compact: {
     id: 'compact',
@@ -52,6 +66,12 @@ export const TEMPLATES: Record<TemplateId, TemplateTokens> = {
     sectionGap: 8,
     entryGap: 5,
     bulletGap: 1.5,
+    nameUpper: false,
+    headerRule: false,
+    contactSize: 8.5,
+    contactLinks: 'muted',
+    titleLinks: 'muted',
+    headingTracking: 0.4,
   },
   minimal: {
     id: 'minimal',
@@ -69,6 +89,12 @@ export const TEMPLATES: Record<TemplateId, TemplateTokens> = {
     sectionGap: 12,
     entryGap: 7,
     bulletGap: 2.5,
+    nameUpper: false,
+    headerRule: false,
+    contactSize: 9.5,
+    contactLinks: 'muted',
+    titleLinks: 'muted',
+    headingTracking: 0,
   },
 };
 
@@ -109,6 +135,7 @@ export function defaultSettings(overrides: Partial<ResumeSettings> = {}): Resume
     density: 'normal',
     sectionOrder: [...DEFAULT_SECTION_ORDER],
     hiddenSections: [],
+    pageBreakBefore: [],
     sectionTitles: {},
     ...overrides,
   };
@@ -122,6 +149,7 @@ export function normalizeSettings(raw: Partial<ResumeSettings> | undefined): Res
   for (const key of DEFAULT_SECTION_ORDER) if (!order.includes(key)) order.push(key);
   s.sectionOrder = order;
   s.hiddenSections = (s.hiddenSections ?? []).filter((k) => DEFAULT_SECTION_ORDER.includes(k));
+  s.pageBreakBefore = (s.pageBreakBefore ?? []).filter((k) => DEFAULT_SECTION_ORDER.includes(k));
   s.sectionTitles = s.sectionTitles ?? {};
   return s;
 }

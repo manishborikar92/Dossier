@@ -228,7 +228,17 @@ function ExperienceSection({ initial }: { initial: Experience[] }) {
                 <MonthField label="End" value={d.end} onChange={(v) => editor.patch({ end: v })} error={editor.errors.end} hint="Leave empty if this is current." />
               </div>
             </div>
-            <TextArea label="Description" value={d.description} onChange={(v) => editor.patch({ description: v })} error={editor.errors.description} hint="Optional short paragraph. Useful for leadership roles that do not need bullets." />
+            <TextArea
+              label="Description"
+              value={d.description}
+              onChange={(v) => editor.patch({ description: v })}
+              error={editor.errors.description}
+              hint={
+                d.kind === 'leadership' || d.kind === 'volunteer'
+                  ? 'Printed after the organisation name on the same grey line, joined with a dash, so it reads best as a continuing phrase such as "led a team that...".'
+                  : 'Optional short paragraph printed under the title.'
+              }
+            />
             <BulletList mode="library" bullets={d.bullets} onChange={(bullets) => editor.patch({ bullets })} errors={editor.errors} />
             <CheckField label="Hide from new resumes" checked={d.archived} onChange={(v) => editor.patch({ archived: v })} hint="Existing resumes are not affected." />
           </div>

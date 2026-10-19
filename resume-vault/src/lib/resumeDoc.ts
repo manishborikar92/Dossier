@@ -24,6 +24,8 @@ export interface EntryLink {
   url: string;
 }
 export interface EntryBlock {
+  /** 'role' (jobs, projects): italic grey date. 'plain' (education, leadership): regular black date, slightly smaller title. */
+  variant?: 'role' | 'plain';
   title: string;
   org?: string;
   right?: string;
@@ -40,6 +42,8 @@ export interface LineItem {
 export interface SectionDoc {
   key: SectionKey;
   title: string;
+  /** Start this section on a new page (never set for the first section). */
+  pageBreakBefore?: boolean;
   text?: string;
   skillGroups?: { category: string; items: string[] }[];
   entries?: EntryBlock[];
@@ -71,6 +75,11 @@ function bulletsOf(list: { text: string; included: boolean; verified: boolean }[
     if (!b.verified) unverified.push(b.text);
   }
   return out;
+}
+
+/** Entries this short are never split across two pages. */
+export function isUnbreakable(e: EntryBlock): boolean {
+  return e.bullets.length <= 8 && e.bullets.join('').length + (e.description?.length ?? 0) <= 1600;
 }
 
 export function buildResumeDoc(snapshot: Snapshot): ResumeDoc {
@@ -115,7 +124,7 @@ export function buildResumeDoc(snapshot: Snapshot): ResumeDoc {
         groups.set(d.category, [...(groups.get(d.category) ?? []), d.name]);
       }
       section.skillGroups = [...groups].map(([category, list]) => ({ category, items: list }));
-    } else if (key === 'experience' || key === 'leadership') {
+    } else if (key === 'experience') {
       section.entries = items.map((it) => {
         const d = it.data as ExperienceData;
         return {
@@ -123,6 +132,19 @@ export function buildResumeDoc(snapshot: Snapshot): ResumeDoc {
           org: [d.org, d.location].filter(Boolean).join(', '),
           right: formatRange(d.start, d.end),
           description: d.description || undefined,
+          links: [],
+          bullets: bulletsOf(d.bullets, unverified),
+        };
+      });
+    } else if (key === 'leadership') {
+      // Title and dates on the first line; organisation and description together on a grey line below.
+      section.entries = items.map((it) => {
+        const d = it.data as ExperienceData;
+        return {
+          variant: 'plain' as const,
+          title: d.title,
+          right: formatRange(d.start, d.end) || undefined,
+          sub: [[d.org, d.location].filter(Boolean).join(', '), d.description].filter(Boolean).join(' \u2014 ') || undefined,
           links: [],
           bullets: bulletsOf(d.bullets, unverified),
         };
@@ -144,8 +166,9 @@ export function buildResumeDoc(snapshot: Snapshot): ResumeDoc {
       section.entries = items.map((it) => {
         const d = it.data as EducationData;
         return {
+          variant: 'plain' as const,
           title: [d.degree, d.field].filter(Boolean).join(' \u2013 '),
-          right: formatRange(d.start, d.end) || undefined,
+          right: formatRange(d.start, d.end, 'long') || undefined,
           sub: [[d.institution, d.location].filter(Boolean).join(', '), d.grade].filter(Boolean).join('  |  '),
           description: d.details || undefined,
           links: [],
@@ -159,6 +182,7 @@ export function buildResumeDoc(snapshot: Snapshot): ResumeDoc {
         return { text, url: d.url || undefined };
       });
     }
+    section.pageBreakBefore = sections.length > 0 && settings.pageBreakBefore.includes(key);
     sections.push(section);
   }
 

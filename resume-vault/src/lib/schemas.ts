@@ -156,6 +156,7 @@ export const resumeSettingsSchema = z.object({
   density: z.enum(['compact', 'normal', 'relaxed']),
   sectionOrder: z.array(z.enum(SECTION_KEYS)),
   hiddenSections: z.array(z.enum(SECTION_KEYS)),
+  pageBreakBefore: z.array(z.enum(SECTION_KEYS)),
   sectionTitles: z.record(z.string(), z.string().trim().max(60)),
 });
 

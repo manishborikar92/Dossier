@@ -10,7 +10,7 @@ Environment for every run below: Linux, Node.js 22.22.2, npm 10.9.7.
 | `npm ci` from the lockfile in a clean copy extracted from the ZIP | Passed |
 | `npm run lint` (ESLint, Next.js rules) | 0 problems |
 | `npm run typecheck` (TypeScript, strict) | 0 errors |
-| `npm test` | **55 tests in 7 files, all passed** |
+| `npm test` | **62 tests in 7 files, all passed** |
 | `npm run build` (production build) | Passed, no warnings |
 | `npm run smoke` (end-to-end, against the running production server) | **46 of 46 checks passed** |
 | Server restarted for real on the same data folder | Profile, resumes, versions and bullets all still there; PDF export still works |
@@ -68,6 +68,30 @@ Run on your actual files (not shipped in the ZIP):
   organisation-then-description line. The PDF's only differences are the order in which a text extractor reads right-aligned
   dates; the page images show the same content as the original.
 - A stress resume with all 35 projects renders (6 pages), as expected.
+
+## Second round: comparison with the script-generated resume
+
+You supplied a PDF produced by `generate_resume.js` (Word, US Letter) and a PDF produced by the app (A4). I compared them as text
+and as page images and found these differences, all fixed except the two marked "left as is":
+
+| # | Script-generated resume | App (before) | Fix |
+| --- | --- | --- | --- |
+| 1 | Name in capitals | Name as typed | Classic prints the name in capitals |
+| 2 | Rule under the contact line | None | Classic draws it (PDF and Word) |
+| 3 | `in/...` and `github/...` are blue underlined links | Plain grey text | Classic styles contact links the same way (still clickable) |
+| 4 | "Key Projects" starts page 2 | Flowed on and split the first project across pages | New per-section **Start on a new page** option, and short entries are never split |
+| 5 | Education dates "April 2021", "March 2019" | "Apr 2021", "Mar 2019" | Education uses full month names |
+| 6 | Education and leadership dates are regular black | Italic grey | Education and leadership use the plain date style, with a slightly smaller title |
+| 7 | Leadership: title and dates, then organisation and description on one grey line | Organisation beside the title, description below | Same layout as the script |
+| 8 | `\| caworkflow.com` and `\| git.new/...` are bold like the title | Grey, underlined | Same bold title style in Classic (links stay clickable) |
+| 9 | First role ends **Jun 2026** | **Present** | Data difference: your script has changed since the copy I received. Your data file now says Jun 2026 |
+| 10 | Page size US Letter | A4 (the app default) | Your data file sets Letter as the default and for the imported resume |
+| 11 | Dates end short of the right margin | Dates sit on the right margin | **Left as is** (see README) |
+| 12 | Arial embedded | Helvetica, not embedded | **Left as is** (see README) |
+
+After the fixes, the re-exported resume has **exactly the same words** as the script-generated PDF (789 words each, identical
+multiset ignoring hyphenation at line ends), and the page images show the same layout. New tests cover items 1, 2, 4, 5, 7
+and the keep-together rule.
 
 ## Problems found and fixed during verification
 
