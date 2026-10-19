@@ -1,7 +1,7 @@
 {
   "app": "resume-vault",
   "formatVersion": 1,
-  "exportedAt": "2026-10-18T15:07:20.879Z",
+  "exportedAt": "2026-10-19T02:25:16.339Z",
   "migrations": [
     "001_initial"
   ],
@@ -15,7 +15,7 @@
         "phone": "+91 9309431756",
         "location": "Hyderabad, India",
         "version": 2,
-        "updated_at": "2026-10-18T15:07:20.852Z"
+        "updated_at": "2026-10-19T02:25:16.295Z"
       }
     ],
     "profile_links": [
@@ -39,8 +39,8 @@
         "text": "Full Stack Developer with hands-on experience building and deploying production-grade full-stack applications using Next.js, Node.js, Express.js, and MongoDB. Grounded in core Computer Science fundamentals including Object-Oriented Programming, DBMS, and Operating Systems. Experienced across web development, 3D data processing, and desktop application engineering — with a focus on clean code, maintainable systems, and practical problem-solving. Comfortable working across the full stack from frontend interfaces to backend APIs and database integration.",
         "sort": 0,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       }
     ],
     "experiences": [
@@ -50,14 +50,14 @@
         "title": "Full Stack Developer",
         "location": "",
         "start_date": "2025-06",
-        "end_date": "",
+        "end_date": "2026-06",
         "kind": "job",
         "description": "",
         "archived": 0,
         "sort": 0,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 2,
@@ -71,8 +71,8 @@
         "archived": 0,
         "sort": 1,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 3,
@@ -86,8 +86,8 @@
         "archived": 0,
         "sort": 2,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 4,
@@ -97,12 +97,12 @@
         "start_date": "2024-06",
         "end_date": "2025-04",
         "kind": "leadership",
-        "description": "Led technical initiatives and coordinated cross-departmental teams for community-focused projects.",
+        "description": "led technical initiatives and coordinated cross-departmental teams for community-focused projects.",
         "archived": 0,
         "sort": 3,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       }
     ],
     "education": [
@@ -118,8 +118,8 @@
         "details": "",
         "sort": 0,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 2,
@@ -133,8 +133,8 @@
         "details": "",
         "sort": 1,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 3,
@@ -148,8 +148,8 @@
         "details": "",
         "sort": 2,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       }
     ],
     "certifications": [
@@ -161,8 +161,8 @@
         "url": "",
         "sort": 0,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 2,
@@ -172,8 +172,8 @@
         "url": "",
         "sort": 1,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 3,
@@ -183,8 +183,8 @@
         "url": "",
         "sort": 2,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       }
     ],
     "skills": [
@@ -194,8 +194,8 @@
         "category": "Languages",
         "sort": 0,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 2,
@@ -203,8 +203,8 @@
         "category": "Languages",
         "sort": 1,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 3,
@@ -212,8 +212,8 @@
         "category": "Languages",
         "sort": 2,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 4,
@@ -221,8 +221,8 @@
         "category": "Frontend",
         "sort": 3,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 5,
@@ -230,8 +230,8 @@
         "category": "Frontend",
         "sort": 4,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 6,
@@ -239,8 +239,8 @@
         "category": "Frontend",
         "sort": 5,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 7,
@@ -248,8 +248,8 @@
         "category": "Frontend",
         "sort": 6,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 8,
@@ -257,8 +257,8 @@
         "category": "Backend & APIs",
         "sort": 7,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 9,
@@ -266,8 +266,8 @@
         "category": "Backend & APIs",
         "sort": 8,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 10,
@@ -275,8 +275,8 @@
         "category": "Backend & APIs",
         "sort": 9,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 11,
@@ -284,8 +284,8 @@
         "category": "Backend & APIs",
         "sort": 10,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 12,
@@ -293,8 +293,8 @@
         "category": "Backend & APIs",
         "sort": 11,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 13,
@@ -302,8 +302,8 @@
         "category": "Databases",
         "sort": 12,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 14,
@@ -311,8 +311,8 @@
         "category": "Databases",
         "sort": 13,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 15,
@@ -320,8 +320,8 @@
         "category": "Databases",
         "sort": 14,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 16,
@@ -329,8 +329,8 @@
         "category": "Core CS",
         "sort": 15,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 17,
@@ -338,8 +338,8 @@
         "category": "Core CS",
         "sort": 16,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 18,
@@ -347,8 +347,8 @@
         "category": "Core CS",
         "sort": 17,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 19,
@@ -356,8 +356,8 @@
         "category": "Core CS",
         "sort": 18,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 20,
@@ -365,8 +365,8 @@
         "category": "DevOps & Tools",
         "sort": 19,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 21,
@@ -374,8 +374,8 @@
         "category": "DevOps & Tools",
         "sort": 20,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 22,
@@ -383,8 +383,8 @@
         "category": "DevOps & Tools",
         "sort": 21,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 23,
@@ -392,8 +392,8 @@
         "category": "DevOps & Tools",
         "sort": 22,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 24,
@@ -401,8 +401,8 @@
         "category": "DevOps & Tools",
         "sort": 23,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 25,
@@ -410,8 +410,8 @@
         "category": "Cloud & Integrations",
         "sort": 24,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 26,
@@ -419,8 +419,8 @@
         "category": "Cloud & Integrations",
         "sort": 25,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 27,
@@ -428,8 +428,8 @@
         "category": "Cloud & Integrations",
         "sort": 26,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 28,
@@ -437,8 +437,8 @@
         "category": "Cloud & Integrations",
         "sort": 27,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 29,
@@ -446,8 +446,8 @@
         "category": "Cloud & Integrations",
         "sort": 28,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 30,
@@ -455,8 +455,8 @@
         "category": "Desktop & 3D",
         "sort": 29,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 31,
@@ -464,8 +464,8 @@
         "category": "Desktop & 3D",
         "sort": 30,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 32,
@@ -473,8 +473,8 @@
         "category": "Desktop & 3D",
         "sort": 31,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       }
     ],
     "projects": [
@@ -512,8 +512,8 @@
         "source_key": "kb:iwlars",
         "sort": 10,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 2,
@@ -551,8 +551,8 @@
         "source_key": "kb:ca-workflow",
         "sort": 70,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       },
       {
         "id": 3,
@@ -586,8 +586,8 @@
         "source_key": "kb:smart-healthcare",
         "sort": 120,
         "version": 1,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
       }
     ],
     "bullets": [
@@ -766,12 +766,15 @@
             "leadership"
           ],
           "hiddenSections": [],
+          "pageBreakBefore": [
+            "projects"
+          ],
           "sectionTitles": {}
         },
         "jd_text": "",
         "parent_id": null,
-        "created_at": "2026-10-18T15:07:20Z",
-        "updated_at": "2026-10-18T15:07:20.878Z"
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16.322Z"
       }
     ],
     "resume_items": [
@@ -837,7 +840,7 @@
           "title": "Full Stack Developer",
           "location": "",
           "start": "2025-06",
-          "end": "",
+          "end": "2026-06",
           "kind": "job",
           "description": "",
           "bullets": [
@@ -947,7 +950,7 @@
           "start": "2024-06",
           "end": "2025-04",
           "kind": "leadership",
-          "description": "Led technical initiatives and coordinated cross-departmental teams for community-focused projects.",
+          "description": "led technical initiatives and coordinated cross-departmental teams for community-focused projects.",
           "bullets": []
         }
       },
@@ -1628,6 +1631,15 @@
       }
     ],
     "resume_versions": [],
-    "app_settings": []
+    "app_settings": [
+      {
+        "key": "defaultPageSize",
+        "value": "\"LETTER\""
+      },
+      {
+        "key": "defaultTemplate",
+        "value": "\"classic\""
+      }
+    ]
   }
 }
