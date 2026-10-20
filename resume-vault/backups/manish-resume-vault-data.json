@@ -35,7 +35,7 @@
     "summaries": [
       {
         "id": 1,
-        "label": "Full stack (from my current resume)",
+        "label": "Full stack",
         "text": "Full Stack Developer with hands-on experience building and deploying production-grade full-stack applications using Next.js, Node.js, Express.js, and MongoDB. Grounded in core Computer Science fundamentals including Object-Oriented Programming, DBMS, and Operating Systems. Experienced across web development, 3D data processing, and desktop application engineering — with a focus on clean code, maintainable systems, and practical problem-solving. Comfortable working across the full stack from frontend interfaces to backend APIs and database integration.",
         "sort": 0,
         "version": 1,
@@ -747,7 +747,7 @@
     "resumes": [
       {
         "id": 1,
-        "name": "Current resume (imported)",
+        "name": "Manish Borikar Default",
         "target_title": "Full Stack Developer",
         "target_company": "",
         "template": "classic",
