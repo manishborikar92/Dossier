@@ -1,17 +1,17 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs/promises';
-import { readAll } from '../lib/store.js';
-import { extractTerms } from '../lib/terms.js';
-import { analyzeJD, tailor, coverage } from '../lib/tailor.js';
-import { buildModel, resolveResume, collectIncluded } from '../lib/model.js';
-import { mergeKB } from '../lib/kb-import.js';
-import { renderDocx } from '../lib/render-docx.js';
-import { renderPdf } from '../lib/render-pdf.js';
-import { renderText } from '../lib/render-text.js';
-import { buildPrep } from '../lib/interview.js';
-import { SCHEMAS } from '../lib/schemas.js';
-import { fitResume, measure, tighten } from '../lib/fit.js';
+import { readAll } from '../src/lib/server/store.js';
+import { extractTerms } from '../src/lib/domain/terms.js';
+import { analyzeJD, tailor, coverage } from '../src/lib/domain/tailor.js';
+import { buildModel, resolveResume, collectIncluded } from '../src/lib/domain/model.js';
+import { mergeKB } from '../src/lib/domain/kb-import.js';
+import { renderDocx } from '../src/lib/server/render/docx.js';
+import { renderPdf } from '../src/lib/server/render/pdf.js';
+import { renderText } from '../src/lib/server/render/text.js';
+import { buildPrep } from '../src/lib/domain/interview.js';
+import { SCHEMAS } from '../src/lib/domain/schemas.js';
+import { fitResume, measure, tighten } from '../src/lib/server/fit.js';
 
 const data = await readAll();
 const find = (id) => data.resumes.find((r) => r.id === id);

@@ -3,11 +3,11 @@
 //         npm run seed -- --force (wipes data/ and starts over - backups are kept in data/_backups)
 import fs from 'node:fs/promises';
 import path from 'node:path';
-import { writeCollection, DATA_DIR } from '../lib/store.js';
-import { mergeKB } from '../lib/kb-import.js';
-import { tailor } from '../lib/tailor.js';
-import { newResume } from '../lib/defaults.js';
-import { fitResume } from '../lib/fit.js';
+import { writeCollection, DATA_DIR } from '../src/lib/server/store.js';
+import { mergeKB } from '../src/lib/domain/kb-import.js';
+import { tailor } from '../src/lib/domain/tailor.js';
+import { newResume } from '../src/lib/domain/defaults.js';
+import { fitResume } from '../src/lib/server/fit.js';
 import * as seed from '../seed/resume-data.mjs';
 
 const force = process.argv.includes('--force');

@@ -1,7 +1,7 @@
 // Starting data for the library, taken from the resume you reviewed bullet-by-bullet.
 // Everything here is marked "confident" EXCEPT original-resume bullets for projects that were
 // cut from the final resume (those start as "prep" so you re-check them before use).
-import { bid } from '../lib/ids.js';
+import { bid } from '../src/lib/domain/ids.js';
 
 const B = (prefix, texts, status = 'confident', source = 'resume') =>
   texts.map((text) => ({ id: bid(prefix, text), text, tags: [], status, source }));
