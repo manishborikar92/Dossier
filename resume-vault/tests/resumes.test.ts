@@ -51,7 +51,11 @@ describe('creating a resume', () => {
 
   it('can pre-select projects that match a job description', () => {
     const db = freshDb();
-    const { items } = createResume(db, { ...NEW, preselect: 'match', jdText: 'We need someone with TensorFlow and Python experience for machine learning.' });
+    const { items } = createResume(db, {
+      ...NEW,
+      preselect: 'match',
+      jdText: 'We need someone with TensorFlow and Python experience for machine learning.',
+    });
     const names = items.filter((i) => i.section === 'projects').map((i) => (i.data as ProjectData).name);
     expect(names[0]).toBe('Sample Image Classifier');
   });
@@ -104,7 +108,11 @@ describe('library changes and the hybrid update strategy', () => {
     const projectItem = items.find((i) => i.section === 'projects')!;
     const before = projectItem.data as ProjectData;
     const lib = listEntities<Project>(db, 'projects').find((p) => p.id === projectItem.sourceId)!;
-    updateEntity(db, 'projects', lib.id, { ...lib, overview: 'A different overview.', bullets: [{ text: 'Library bullet changed.', verified: true }] });
+    updateEntity(db, 'projects', lib.id, {
+      ...lib,
+      overview: 'A different overview.',
+      bullets: [{ text: 'Library bullet changed.', verified: true }],
+    });
 
     const flagged = itemsOf(db, resume.id, 'projects').find((i) => i.id === projectItem.id)!;
     expect(flagged.sync).toBe('changed');
@@ -119,7 +127,11 @@ describe('library changes and the hybrid update strategy', () => {
     expect(kept.sync).toBe('current');
     expect((kept.data as ProjectData).bullets[0].text).toBe(before.bullets[0].text);
 
-    updateEntity(db, 'projects', lib.id, { ...lib, overview: 'Changed again.', bullets: [{ text: 'Second library change.', verified: true }] });
+    updateEntity(db, 'projects', lib.id, {
+      ...lib,
+      overview: 'Changed again.',
+      bullets: [{ text: 'Second library change.', verified: true }],
+    });
     const pulled = syncItem(db, resume.id, projectItem.id, 'pull');
     expect(pulled.sync).toBe('current');
     expect((pulled.data as ProjectData).bullets[0].text).toBe('Second library change.');
@@ -133,7 +145,7 @@ describe('library changes and the hybrid update strategy', () => {
     const header = items.find((i) => i.section === 'header')!;
     expect(syncItem(db, resume.id, header.id, 'pull').sync).toBe('current');
 
-    db.prepare("DELETE FROM skills WHERE id = ?").run(items.find((i) => i.section === 'skills')!.sourceId);
+    db.prepare('DELETE FROM skills WHERE id = ?').run(items.find((i) => i.section === 'skills')!.sourceId);
     const skill = itemsOf(db, resume.id, 'skills')[0];
     expect(skill.sync).toBe('missing');
     expect(docForResume(db, resume.id).sections.some((s) => s.key === 'skills')).toBe(true);
@@ -153,7 +165,9 @@ describe('versions', () => {
     updateResume(db, resume.id, { name: 'Renamed' });
 
     // The saved snapshot is unaffected by later edits.
-    const stored = JSON.parse((db.prepare('SELECT snapshot FROM resume_versions WHERE id = ?').get(v1.id) as { snapshot: string }).snapshot);
+    const stored = JSON.parse(
+      (db.prepare('SELECT snapshot FROM resume_versions WHERE id = ?').get(v1.id) as { snapshot: string }).snapshot,
+    );
     expect(stored.resume.name).toBe('General');
 
     expect(saveVersion(db, resume.id, { reason: 'export' }).created).toBe(true);
@@ -167,7 +181,9 @@ describe('versions', () => {
     const versions = listVersions(db, resume.id);
     expect(versions).toHaveLength(3);
     const protectedVersion = versions.find((v) => v.reason === 'before-restore')!;
-    const snap = JSON.parse((db.prepare('SELECT snapshot FROM resume_versions WHERE id = ?').get(protectedVersion.id) as { snapshot: string }).snapshot);
+    const snap = JSON.parse(
+      (db.prepare('SELECT snapshot FROM resume_versions WHERE id = ?').get(protectedVersion.id) as { snapshot: string }).snapshot,
+    );
     expect(JSON.stringify(snap.items)).toContain('Unsaved edit before restoring.');
   });
 
@@ -193,7 +209,11 @@ describe('managing resumes and sections', () => {
     expect((itemsOf(db, a.resume.id, 'summary')[0].data as SummaryData).text).not.toBe('Copy-only summary.');
 
     const skills = itemsOf(db, a.resume.id, 'skills');
-    reorderItems(db, a.resume.id, [...skills].reverse().map((s) => s.id));
+    reorderItems(
+      db,
+      a.resume.id,
+      [...skills].reverse().map((s) => s.id),
+    );
     expect(docForResume(db, a.resume.id).sections.find((s) => s.key === 'skills')!.skillGroups![0].category).toBe('Tools');
 
     updateResume(db, a.resume.id, { settings: { hiddenSections: ['certifications'], sectionOrder: ['experience', 'summary'] } });

@@ -15,7 +15,7 @@ Everything runs on your own computer. Your data is stored in a single SQLite fil
   and resume-ready bullet points. Import a `project_knowledge_base.json` file in one step.
 - **Multiple resumes**: each resume has its own selection, order, wording, template and saved versions. Duplicate,
   rename, mark draft/final, delete (with confirmation).
-- **Live preview**: the preview *is* the exported PDF, so what you see is what you download.
+- **Live preview**: the preview _is_ the exported PDF (drawn page by page with pdf.js), so what you see is what you download. Zoom to fit or to a fixed size.
 - **Keyword matching for a job description** (no AI): ranks your projects and skills for a posting, shows which
   requirements you have evidence for and which you do not. It never adds anything you have not recorded.
 - **Verified flags**: imported or unconfirmed bullets are marked unverified, and you are warned before exporting them.
@@ -23,9 +23,9 @@ Everything runs on your own computer. Your data is stored in a single SQLite fil
 
 ### How resumes relate to your library
 
-A resume gets its own *copy* of the library items you choose, remembers where each came from, and keeps your edits.
+A resume gets its own _copy_ of the library items you choose, remembers where each came from, and keeps your edits.
 If you later change something in the library, the resume shows **Library changed. Review** on that item and lets you
-compare, then either *use the library version* or *keep mine*. The resume never changes by itself. **Saved versions**
+compare, then either _use the library version_ or _keep mine_. The resume never changes by itself. **Saved versions**
 are frozen snapshots; a version is also saved automatically whenever you download a PDF or Word file, so you can always
 reproduce exactly what you sent.
 
@@ -57,7 +57,7 @@ The app only listens on `127.0.0.1` (your own computer) and refuses requests add
 ### Using your own data
 
 1. Open **Settings & backup → Restore from a backup file** and choose a Resume Vault backup file (for example
-   `my-resume-vault-data.json` if you were given one). Or fill in **Profile** and **Experience & skills** by hand.
+   `manish-resume-vault-data.json` if you were given one). Or fill in **Profile** and **Experience & skills** by hand.
 2. Open **Projects → Import knowledge base** and choose `project_knowledge_base.json`. Projects already in your library are
    skipped, so importing twice is safe. Imported bullets are marked unverified until you confirm them.
 3. Open **Resumes → New resume**.
@@ -68,33 +68,34 @@ To explore the app with clearly fictional data instead, use a separate data fold
 DATA_DIR=./data-demo npm run seed:sample      # macOS / Linux
 DATA_DIR=./data-demo npm start
 ```
+
 On Windows PowerShell: `$env:DATA_DIR="./data-demo"; npm run seed:sample; npm start`.
 
 ## Where your data lives
 
-| What | Where |
-| --- | --- |
-| Database | `data/vault.db` (plus `vault.db-wal` / `-shm` while the app runs) |
+| What                    | Where                                                                    |
+| ----------------------- | ------------------------------------------------------------------------ |
+| Database                | `data/vault.db` (plus `vault.db-wal` / `-shm` while the app runs)        |
 | Automatic safety copies | `data/backups/` (written before a restore and before a database upgrade) |
 
 Change the folder with the `DATA_DIR` environment variable (see `.env.example`; copy it to `.env` to use it).
 
-**Back up** from *Settings & backup → Download backup* (a JSON file). **Restore** with the same page; restoring replaces
+**Back up** from _Settings & backup → Download backup_ (a JSON file). **Restore** with the same page; restoring replaces
 everything, writes a safety copy first, and is all-or-nothing. To move to another computer, download a backup here and
 restore it there. You can also copy the `data` folder while the app is stopped.
 
 ## Scripts
 
-| Command | Purpose |
-| --- | --- |
-| `npm run dev` | Development server with reloading |
-| `npm run build` | Production build |
-| `npm start` | Run the production build |
-| `npm test` | Automated tests (Vitest) |
-| `npm run lint` | ESLint |
-| `npm run typecheck` | TypeScript type check |
-| `npm run smoke` | End-to-end check of a running copy of the app (see below) |
-| `npm run seed:sample` | Add fictional sample data to an empty library |
+| Command               | Purpose                                                   |
+| --------------------- | --------------------------------------------------------- |
+| `npm run dev`         | Development server with reloading                         |
+| `npm run build`       | Production build                                          |
+| `npm start`           | Run the production build                                  |
+| `npm test`            | Automated tests (Vitest)                                  |
+| `npm run lint`        | ESLint                                                    |
+| `npm run typecheck`   | TypeScript type check                                     |
+| `npm run smoke`       | End-to-end check of a running copy of the app (see below) |
+| `npm run seed:sample` | Add fictional sample data to an empty library             |
 
 ### Running the tests
 
@@ -105,7 +106,7 @@ npm run typecheck
 npm run build
 ```
 
-End-to-end smoke test (uses a throwaway data folder because it adds records and performs a restore):
+End-to-end smoke test of the server and API (uses a throwaway data folder because it adds records and performs a restore):
 
 ```bash
 npm run build
@@ -113,13 +114,26 @@ DATA_DIR=./data-smoke npm start -- -p 3100        # terminal 1
 BASE_URL=http://localhost:3100 npm run smoke       # terminal 2
 ```
 
+Real-browser test: it drives the actual interface (forms, dialogs, the builder and its live preview, exports, backup and
+restore, a phone-sized screen, keyboard and accessibility checks). It needs a Chrome, Chromium or Edge installation:
+
+```bash
+npm run build
+DATA_DIR=./data-e2e npm start -- -p 3100                                   # terminal 1
+CHROME_PATH="/path/to/chrome" BASE_URL=http://localhost:3100 npm run e2e   # terminal 2
+```
+
+`CHROME_PATH` is optional when Chrome is installed in a standard place. In containers add
+`E2E_CHROME_ARGS='["--no-sandbox","--disable-gpu"]'`, and set `E2E_SHOT_DIR=./shots` to save a screenshot whenever a step fails.
+Always use a throwaway data folder: the test creates records and restores a backup.
+
 ## Exports
 
 - **PDF**: real selectable text, clickable links, standard section headings, single column, built-in PDF fonts
   (Helvetica or Times), no hyphenation, and headings are never left stranded at the bottom of a page.
 - **Word (.docx)**: real paragraphs, a real bullet list, real hyperlinks and tab-aligned dates. It follows the same
   content and structure as the PDF, but it is laid out by Word, so spacing can differ slightly from the PDF.
-- **Print**: use **Open PDF** and print from your browser's PDF viewer.
+- **Print**: choose **Export → Open PDF to print** and print from your browser's PDF viewer.
 - **Backup**: JSON (see above).
 
 Three templates (Classic, Compact, Minimal), A4 or US Letter, three spacing levels, accent colours, custom section
@@ -133,15 +147,18 @@ role on one grey line. Short entries are never split across two pages.
 ## Project layout
 
 ```
-src/app/            pages and API routes (Next.js App Router)
-src/components/     interface components; builder/ holds the resume builder
-src/lib/            code shared by server and browser: schemas, matcher, templates, resume document model
-src/server/         database, repositories, resume service, backup, importer, PDF/DOCX renderers
-src/proxy.ts        localhost-only and same-origin request guard
-tests/              automated tests
-scripts/            sample-data seeder and smoke test
-docs/               architecture notes, database schema, verification report
+src/app/                 pages, error / not-found screens, and API routes (Next.js App Router)
+src/components/ui/       the design system: buttons, fields, dialogs, menu, tabs, toasts, cards, badges
+src/components/layout/   app shell and navigation
+src/components/          one folder per feature: profile, career, projects, resumes, builder, settings, shared
+src/lib/                 code shared by server and browser: schemas, types, typed API client, matcher, templates, resume document model
+src/server/              database, repositories, resume service (resumes/), backup, importer, stats, PDF/DOCX renderers
+src/proxy.ts             localhost-only and same-origin request guard
+tests/                   unit and integration tests (Vitest)
+scripts/                 smoke test, browser test, sample-data seeder
+docs/                    architecture notes, database schema, verification report
 ```
+
 See `docs/ARCHITECTURE.md` for the data model and design decisions, and `docs/schema.sql` for the database schema.
 
 ## Known limitations
@@ -151,7 +168,7 @@ See `docs/ARCHITECTURE.md` for the data model and design decisions, and `docs/sc
   Devanagari or Chinese) cannot be drawn; the preview warns you and such characters are replaced.
 - **Word and PDF are not pixel-identical.** Word lays text out itself. The Word file was checked by rendering it
   with LibreOffice, not with Microsoft Word.
-- **The PDF preview is a browser PDF viewer in a frame.** Some phone browsers do not show it; use **Open PDF**.
+- **The live preview is drawn by pdf.js in the browser.** If it ever fails to load, use **Export → Open PDF to print**.
 - **Job-description matching is keyword based.** It knows a fixed vocabulary of common technologies plus every term in
   your own skills and project technologies. It does not understand synonyms beyond that list.
 - **Months are abbreviated** (Jun 2025), except in education where they are written in full (April 2021). Items are reordered with up/down buttons, not drag and drop.
@@ -165,4 +182,4 @@ See `docs/ARCHITECTURE.md` for the data model and design decisions, and `docs/sc
 - **Port already in use**: `npm start -- -p 3001`.
 - **`better-sqlite3` fails to install**: use a current Node LTS, or install a C++ build toolchain and retry `npm install`.
 - **"database is locked"**: another copy of the app is using the same data folder. Stop it first.
-- **A resume looks different after a library edit**: it should not. Open the item and look for *Library changed. Review*.
+- **A resume looks different after a library edit**: it should not. Open the item and look for _Library changed. Review_.

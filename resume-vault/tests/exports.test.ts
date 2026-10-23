@@ -41,7 +41,16 @@ describe('PDF export', () => {
     const info = await inspectPdf(buffer);
     expect(info.pages).toBe(pages);
     expect(countPdfPages(buffer)).toBe(info.pages);
-    for (const needle of ['ALEX SAMPLE', 'alex.sample@example.com', 'PROFESSIONAL EXPERIENCE', 'Software Developer', 'Example Software Ltd', 'Jan 2024', 'Present', 'Tech Stack:']) {
+    for (const needle of [
+      'ALEX SAMPLE',
+      'alex.sample@example.com',
+      'PROFESSIONAL EXPERIENCE',
+      'Software Developer',
+      'Example Software Ltd',
+      'Jan 2024',
+      'Present',
+      'Tech Stack:',
+    ]) {
       expect(info.text).toContain(needle);
     }
     expect(info.links).toEqual(expect.arrayContaining(['https://github.com/alex-sample', 'mailto:alex.sample@example.com']));
@@ -89,9 +98,27 @@ describe('PDF export', () => {
     // Many entries of varying length so page breaks fall in many different places.
     for (let i = 0; i < 14; i++) {
       const p = createEntity<Project>(db, 'projects', {
-        name: `Generated project ${i + 1}`, category: '', overview: '', description: '', problem: '', solution: '', role: '', contributions: '',
-        technologies: ['Python', 'Docker'], features: '', decisions: '', results: '', repoUrl: '', demoUrl: '', docsUrl: '', tags: [], keywords: [],
-        yearLabel: '2024', family: '', status: 'active', notes: '',
+        name: `Generated project ${i + 1}`,
+        category: '',
+        overview: '',
+        description: '',
+        problem: '',
+        solution: '',
+        role: '',
+        contributions: '',
+        technologies: ['Python', 'Docker'],
+        features: '',
+        decisions: '',
+        results: '',
+        repoUrl: '',
+        demoUrl: '',
+        docsUrl: '',
+        tags: [],
+        keywords: [],
+        yearLabel: '2024',
+        family: '',
+        status: 'active',
+        notes: '',
         bullets: Array.from({ length: 2 + (i % 4) }, (_, k) => ({
           text: `Bullet ${k + 1} of project ${i + 1}: ${'a fairly long sentence about the work that wraps across lines '.repeat(1 + ((i + k) % 3))}`,
           verified: true,
@@ -105,7 +132,9 @@ describe('PDF export', () => {
       const info = await inspectPdf((await renderResumePdf(docForResume(db, resume.id))).buffer);
       expect(info.pages).toBeGreaterThanOrEqual(2);
       for (const last of info.lastLines.slice(0, -1)) {
-        expect(last).not.toMatch(/^(PROFESSIONAL|TECHNICAL|KEY PROJECTS|EDUCATION|CERTIFICATIONS|LEADERSHIP|Professional|Technical|Key projects|Education|Certifications|Leadership)/);
+        expect(last).not.toMatch(
+          /^(PROFESSIONAL|TECHNICAL|KEY PROJECTS|EDUCATION|CERTIFICATIONS|LEADERSHIP|Professional|Technical|Key projects|Education|Certifications|Leadership)/,
+        );
         expect(last).not.toMatch(/Tech Stack:/);
         expect(last).not.toMatch(/Generated project \d+\s+(\||2024)/);
       }
@@ -147,7 +176,15 @@ describe('DOCX export', () => {
     const xml = await zip.file('word/document.xml')!.async('string');
     const rels = await zip.file('word/_rels/document.xml.rels')!.async('string');
     const text = xml.replace(/<[^>]+>/g, ' ');
-    for (const needle of ['ALEX SAMPLE', 'PROFESSIONAL EXPERIENCE', 'Software Developer', 'Example Software Ltd', 'Jan 2024', 'Present', 'Tech Stack:']) {
+    for (const needle of [
+      'ALEX SAMPLE',
+      'PROFESSIONAL EXPERIENCE',
+      'Software Developer',
+      'Example Software Ltd',
+      'Jan 2024',
+      'Present',
+      'Tech Stack:',
+    ]) {
       expect(text).toContain(needle);
     }
     expect(xml).toContain('<w:hyperlink');
@@ -199,7 +236,16 @@ describe('matching the reference resume style', () => {
 
   it('prints education dates with full month names and everything else abbreviated', () => {
     const db = freshDb();
-    createEntity(db, 'education', { institution: 'Example College', degree: 'HSC', field: '', location: '', start: '', end: '2021-04', grade: '', details: '' });
+    createEntity(db, 'education', {
+      institution: 'Example College',
+      degree: 'HSC',
+      field: '',
+      location: '',
+      start: '',
+      end: '2021-04',
+      grade: '',
+      details: '',
+    });
     const { resume } = createResume(db, NEW);
     const doc = docForResume(db, resume.id);
     const education = doc.sections.find((s) => s.key === 'education')!.entries!;
@@ -251,10 +297,31 @@ describe('matching the reference resume style', () => {
     const { resume } = createResume(db, NEW);
     for (let i = 0; i < 12; i++) {
       const p = createEntity<Project>(db, 'projects', {
-        name: `Keep together project ${i + 1}`, category: '', overview: '', description: '', problem: '', solution: '', role: '', contributions: '',
-        technologies: ['Python'], features: '', decisions: '', results: '', repoUrl: '', demoUrl: '', docsUrl: '', tags: [], keywords: [],
-        yearLabel: '2024', family: '', status: 'active', notes: '',
-        bullets: Array.from({ length: 3 + (i % 3) }, (_, k) => ({ text: `Detail ${k + 1} of keep together project ${i + 1}: ${'words that make this bullet wrap onto a second line '.repeat(2)}`, verified: true })),
+        name: `Keep together project ${i + 1}`,
+        category: '',
+        overview: '',
+        description: '',
+        problem: '',
+        solution: '',
+        role: '',
+        contributions: '',
+        technologies: ['Python'],
+        features: '',
+        decisions: '',
+        results: '',
+        repoUrl: '',
+        demoUrl: '',
+        docsUrl: '',
+        tags: [],
+        keywords: [],
+        yearLabel: '2024',
+        family: '',
+        status: 'active',
+        notes: '',
+        bullets: Array.from({ length: 3 + (i % 3) }, (_, k) => ({
+          text: `Detail ${k + 1} of keep together project ${i + 1}: ${'words that make this bullet wrap onto a second line '.repeat(2)}`,
+          verified: true,
+        })),
       });
       addItem(db, resume.id, { sourceType: 'project', sourceId: p.id });
     }

@@ -1,4 +1,5 @@
 import type { z } from 'zod';
+import type { MatchResult } from './matcher';
 import type {
   bulletSchema,
   experienceSchema,
@@ -195,4 +196,53 @@ export interface ResumeVersion {
   label: string;
   reason: string;
   createdAt: string;
+}
+
+/* ---------- shapes returned by the API (shared by server and browser) ---------- */
+
+export interface ResumeListEntry extends ResumeRecord {
+  itemCount: number;
+  projectCount: number;
+  versionCount: number;
+  outdatedCount: number;
+}
+
+export interface ResumeDetail {
+  resume: ResumeRecord;
+  items: ResumeItem[];
+  versions: ResumeVersion[];
+}
+
+/** Side-by-side comparison of a resume item with the library item it was copied from. */
+export interface SyncDiff {
+  status: SyncStatus;
+  section: ItemSection;
+  mine: string[];
+  library: string[] | null;
+}
+
+export interface ResumeMatch {
+  result: MatchResult;
+  /** Library id -> whether it is currently included in this resume. */
+  projectsInResume: Record<number, boolean>;
+  skillsInResume: Record<number, boolean>;
+}
+
+export interface KbImportResult {
+  imported: number;
+  skipped: string[];
+  belowMinScore: number;
+  failed: { id: string; reason: string }[];
+}
+
+export interface RestoreResult {
+  counts: Record<string, number>;
+  safetyCopy: string | null;
+}
+
+export interface AppSettingsPayload {
+  defaultPageSize: 'A4' | 'LETTER';
+  defaultTemplate: TemplateId;
+  databasePath: string;
+  dataDir: string;
 }

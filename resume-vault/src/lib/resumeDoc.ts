@@ -207,7 +207,16 @@ export function allDocText(doc: ResumeDoc): string {
     for (const g of s.skillGroups ?? []) parts.push(g.category, ...g.items);
     for (const l of s.lines ?? []) parts.push(l.text);
     for (const e of s.entries ?? []) {
-      parts.push(e.title, e.org ?? '', e.right ?? '', e.sub ?? '', e.meta ?? '', e.description ?? '', ...e.bullets, ...e.links.map((l) => l.text));
+      parts.push(
+        e.title,
+        e.org ?? '',
+        e.right ?? '',
+        e.sub ?? '',
+        e.meta ?? '',
+        e.description ?? '',
+        ...e.bullets,
+        ...e.links.map((l) => l.text),
+      );
     }
   }
   return parts.join('\n');

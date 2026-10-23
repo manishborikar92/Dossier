@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import type { DB } from './db';
 import { createEntity } from './library';
+import type { KbImportResult } from '@/lib/types';
 import { badRequest } from './errors';
 
 /**
@@ -26,17 +27,8 @@ const entrySchema = z.object({
   last_commit: z.string().nullable().optional(),
   commit_count: z.number().optional(),
   local_path: z.string().optional(),
-  resume_entry: z
-    .object({ bullets: z.array(z.string()).optional(), year: z.string().optional() })
-    .optional(),
+  resume_entry: z.object({ bullets: z.array(z.string()).optional(), year: z.string().optional() }).optional(),
 });
-
-export interface KbImportResult {
-  imported: number;
-  skipped: string[];
-  belowMinScore: number;
-  failed: { id: string; reason: string }[];
-}
 
 const clip = (s: string | undefined, max: number): string => (s ?? '').trim().slice(0, max);
 
@@ -64,7 +56,9 @@ export function importKnowledgeBase(db: DB, input: unknown, opts: { minScore?: n
 
     const noteLines = [
       `Imported from the project knowledge base (id ${e.id}${e.rank !== undefined ? `, rank ${e.rank}` : ''}${e.score !== undefined ? `, score ${e.score}/100` : ''}).`,
-      e.commit_count !== undefined ? `Commits: ${e.commit_count}${e.first_commit ? `, ${e.first_commit} to ${e.last_commit ?? '?'}` : ''}.` : '',
+      e.commit_count !== undefined
+        ? `Commits: ${e.commit_count}${e.first_commit ? `, ${e.first_commit} to ${e.last_commit ?? '?'}` : ''}.`
+        : '',
       e.live_deployed_evidence ? `Deployment evidence: ${e.live_deployed_evidence}` : '',
       e.important_file_references?.length ? `Key files: ${e.important_file_references.join(', ')}` : '',
       e.local_path ? `Local folder: ${e.local_path}` : '',
@@ -84,7 +78,10 @@ export function importKnowledgeBase(db: DB, input: unknown, opts: { minScore?: n
           solution: '',
           role: '',
           contributions: '',
-          technologies: (e.primary_technologies ?? []).map((t) => t.trim().slice(0, 60)).filter(Boolean).slice(0, 60),
+          technologies: (e.primary_technologies ?? [])
+            .map((t) => t.trim().slice(0, 60))
+            .filter(Boolean)
+            .slice(0, 60),
           features: clip(e.key_implementation_details, 2000),
           decisions: clip(e.technical_analysis, 2000),
           results: '',

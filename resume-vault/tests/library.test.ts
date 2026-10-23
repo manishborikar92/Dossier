@@ -50,8 +50,18 @@ describe('library entities', () => {
   it('creates, reads, updates and deletes an experience with bullets', () => {
     const db = freshDb(false);
     const created = createEntity<Experience>(db, 'experiences', {
-      org: 'Acme', title: 'Engineer', location: '', start: '2024-02', end: '', kind: 'job', description: '', archived: false,
-      bullets: [{ text: 'Did a thing.', verified: false }, { text: 'Did another thing.', verified: true }],
+      org: 'Acme',
+      title: 'Engineer',
+      location: '',
+      start: '2024-02',
+      end: '',
+      kind: 'job',
+      description: '',
+      archived: false,
+      bullets: [
+        { text: 'Did a thing.', verified: false },
+        { text: 'Did another thing.', verified: true },
+      ],
     });
     expect(created.bullets.map((b) => b.text)).toEqual(['Did a thing.', 'Did another thing.']);
     expect(created.version).toBe(1);
@@ -75,7 +85,17 @@ describe('library entities', () => {
 
   it('validates dates and required fields', () => {
     const db = freshDb(false);
-    const bad = { org: 'Acme', title: 'Engineer', location: '', start: '2024-06', end: '2024-01', kind: 'job', description: '', archived: false, bullets: [] };
+    const bad = {
+      org: 'Acme',
+      title: 'Engineer',
+      location: '',
+      start: '2024-06',
+      end: '2024-01',
+      kind: 'job',
+      description: '',
+      archived: false,
+      bullets: [],
+    };
     expect(() => createEntity(db, 'experiences', bad)).toThrow(/end date/i);
     expect(() => createEntity(db, 'experiences', { ...bad, end: '', title: '' })).toThrow(/required/i);
     expect(() => createEntity(db, 'certifications', { name: 'X', issuer: '', year: '', url: 'not a url' })).toThrow(/link/i);
@@ -96,11 +116,20 @@ describe('library entities', () => {
   it('reports how many resumes used a deleted item, and those resumes keep their copy', () => {
     const db = freshDb();
     const project = listEntities<Project>(db, 'projects')[0];
-    const { resume } = createResume(db, { name: 'R', targetTitle: '', targetCompany: '', template: 'classic', jdText: '', preselect: 'top' });
+    const { resume } = createResume(db, {
+      name: 'R',
+      targetTitle: '',
+      targetCompany: '',
+      template: 'classic',
+      jdText: '',
+      preselect: 'top',
+    });
     expect(getEntity<Project>(db, 'projects', project.id).usedInCount).toBe(1);
     const res = deleteEntity(db, 'projects', project.id);
     expect(res.usedInResumes).toBe(1);
-    const row = db.prepare("SELECT COUNT(*) AS n FROM resume_items WHERE resume_id = ? AND source_type = 'project' AND source_id = ?").get(resume.id, project.id) as { n: number };
+    const row = db
+      .prepare("SELECT COUNT(*) AS n FROM resume_items WHERE resume_id = ? AND source_type = 'project' AND source_id = ?")
+      .get(resume.id, project.id) as { n: number };
     expect(row.n).toBe(1);
   });
 });

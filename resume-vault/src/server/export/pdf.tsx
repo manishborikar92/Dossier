@@ -34,7 +34,9 @@ function ResumePdf({ doc }: { doc: ResumeDoc }) {
   const small = t.base - 0.5;
 
   const contact = (parts: ContactPart[]) => (
-    <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: t.headerAlign === 'center' ? 'center' : 'flex-start', marginTop: 3 }}>
+    <View
+      style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: t.headerAlign === 'center' ? 'center' : 'flex-start', marginTop: 3 }}
+    >
       {parts.map((p, i) => (
         <Text key={i} style={{ ...body, fontSize: t.contactSize, color: GRAY }}>
           {p.url ? (
@@ -212,7 +214,9 @@ function ResumePdf({ doc }: { doc: ResumeDoc }) {
         style={{ ...body, paddingTop: vertical, paddingBottom: vertical, paddingLeft: t.margin, paddingRight: t.margin }}
       >
         <View style={{ alignItems: t.headerAlign === 'center' ? 'center' : 'flex-start', marginBottom: 2 }}>
-          <Text style={{ fontFamily: bold, fontSize: t.nameSize, lineHeight: 1.2, color: accent, textAlign: t.headerAlign }}>{s(name)}</Text>
+          <Text style={{ fontFamily: bold, fontSize: t.nameSize, lineHeight: 1.2, color: accent, textAlign: t.headerAlign }}>
+            {s(name)}
+          </Text>
           {doc.headline ? <Text style={{ ...body, color: GRAY, marginTop: 1, textAlign: t.headerAlign }}>{s(doc.headline)}</Text> : null}
           {doc.contact.length > 0 ? contact(doc.contact) : null}
         </View>

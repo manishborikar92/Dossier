@@ -1,27 +1,28 @@
-import { notFound } from 'next/navigation';
-import { ProjectForm } from '@/components/ProjectForm';
+import type { Metadata } from 'next';
+import { ProjectForm } from '@/components/projects/ProjectForm';
 import { PageHeader } from '@/components/ui';
 import { getDb } from '@/server/db';
-import { HttpError } from '@/server/errors';
 import { getEntity } from '@/server/library';
+import { idOrNotFound, orNotFound } from '@/server/pages';
 import type { Project } from '@/lib/types';
 
-export const dynamic = 'force-dynamic';
+type Props = { params: Promise<{ id: string }> };
 
-export default async function ProjectPage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const n = Number(id);
-  if (!Number.isInteger(n) || n <= 0) notFound();
-  let project: Project;
-  try {
-    project = getEntity<Project>(getDb(), 'projects', n);
-  } catch (error) {
-    if (error instanceof HttpError && error.status === 404) notFound();
-    throw error;
-  }
+const load = async ({ params }: Props) => {
+  const id = idOrNotFound((await params).id);
+  return orNotFound(() => getEntity<Project>(getDb(), 'projects', id));
+};
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const project = await load(props);
+  return { title: project.name };
+}
+
+export default async function ProjectPage(props: Props) {
+  const project = await load(props);
   return (
     <>
-      <PageHeader title={project.name} />
+      <PageHeader title={project.name} crumbs={[{ label: 'Projects', href: '/projects' }, { label: project.name }]} />
       <ProjectForm key={`${project.id}-${project.version}`} initial={project} />
     </>
   );

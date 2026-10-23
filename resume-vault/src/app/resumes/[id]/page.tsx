@@ -1,34 +1,34 @@
-import { notFound } from 'next/navigation';
+import type { Metadata } from 'next';
 import { ResumeBuilder } from '@/components/builder/ResumeBuilder';
 import type { BuilderLibrary } from '@/components/builder/helpers';
 import { getDb } from '@/server/db';
-import { HttpError } from '@/server/errors';
 import { listEntities } from '@/server/library';
+import { idOrNotFound, orNotFound } from '@/server/pages';
 import { getResume, listVersions } from '@/server/resumes';
 import type { Certification, Education, Experience, Project, Skill } from '@/lib/types';
 
-export const dynamic = 'force-dynamic';
-export const metadata = { title: 'Resume builder' };
+type Props = { params: Promise<{ id: string }> };
 
-export default async function ResumePage({ params }: { params: Promise<{ id: string }> }) {
-  const { id } = await params;
-  const n = Number(id);
-  if (!Number.isInteger(n) || n <= 0) notFound();
+const load = async ({ params }: Props) => {
+  const id = idOrNotFound((await params).id);
   const db = getDb();
-  let data;
-  try {
-    data = { ...getResume(db, n), versions: listVersions(db, n) };
-  } catch (error) {
-    if (error instanceof HttpError && error.status === 404) notFound();
-    throw error;
-  }
+  return { id, db, detail: orNotFound(() => ({ ...getResume(db, id), versions: listVersions(db, id) })) };
+};
+
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { detail } = await load(props);
+  return { title: detail.resume.name };
+}
+
+export default async function ResumePage(props: Props) {
+  const { id, db, detail } = await load(props);
   const library: BuilderLibrary = {
-    summaries: (db.prepare('SELECT id, label, text FROM summaries ORDER BY sort, id').all() as BuilderLibrary['summaries']),
+    summaries: db.prepare('SELECT id, label, text FROM summaries ORDER BY sort, id').all() as BuilderLibrary['summaries'],
     experiences: listEntities<Experience>(db, 'experiences'),
     projects: listEntities<Project>(db, 'projects'),
     education: listEntities<Education>(db, 'education'),
     certifications: listEntities<Certification>(db, 'certifications'),
     skills: listEntities<Skill>(db, 'skills'),
   };
-  return <ResumeBuilder key={n} initial={data} library={library} />;
+  return <ResumeBuilder key={id} initial={detail} library={library} />;
 }

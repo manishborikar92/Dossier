@@ -1,21 +1,8 @@
 import type { z } from 'zod';
 import type { DB } from './db';
 import { nowIso } from './db';
-import {
-  certificationSchema,
-  educationSchema,
-  experienceSchema,
-  profileSchema,
-  projectSchema,
-  skillSchema,
-} from '@/lib/schemas';
-import type {
-  Bullet,
-  EntityName,
-  ProfileData,
-  ProfileInput,
-  SourceType,
-} from '@/lib/types';
+import { certificationSchema, educationSchema, experienceSchema, profileSchema, projectSchema, skillSchema } from '@/lib/schemas';
+import type { Bullet, EntityName, ProfileData, ProfileInput, SourceType } from '@/lib/types';
 import { notFound } from './errors';
 
 /* ------------------------------------------------------------------ */
@@ -36,8 +23,7 @@ interface Spec {
 }
 
 const COLUMN_OVERRIDES: Record<string, string> = { start: 'start_date', end: 'end_date' };
-const col = (field: string): string =>
-  COLUMN_OVERRIDES[field] ?? field.replace(/[A-Z]/g, (m) => `_${m.toLowerCase()}`);
+const col = (field: string): string => COLUMN_OVERRIDES[field] ?? field.replace(/[A-Z]/g, (m) => `_${m.toLowerCase()}`);
 
 export const SPECS: Record<EntityName, Spec> = {
   experiences: {
@@ -85,9 +71,27 @@ export const SPECS: Record<EntityName, Spec> = {
     table: 'projects',
     sourceType: 'project',
     cols: [
-      'name', 'category', 'overview', 'description', 'problem', 'solution', 'role', 'contributions',
-      'technologies', 'features', 'decisions', 'results', 'repoUrl', 'demoUrl', 'docsUrl', 'tags',
-      'keywords', 'yearLabel', 'family', 'status', 'notes',
+      'name',
+      'category',
+      'overview',
+      'description',
+      'problem',
+      'solution',
+      'role',
+      'contributions',
+      'technologies',
+      'features',
+      'decisions',
+      'results',
+      'repoUrl',
+      'demoUrl',
+      'docsUrl',
+      'tags',
+      'keywords',
+      'yearLabel',
+      'family',
+      'status',
+      'notes',
     ],
     readOnly: ['sourceKey'],
     json: ['technologies', 'tags', 'keywords'],
@@ -162,10 +166,7 @@ export function getEntity<T = Entity>(db: DB, name: EntityName, id: number): T {
 
 function signature(spec: Spec, value: Record<string, unknown>): string {
   const fields = spec.cols.map((f) => value[f]);
-  const bullets = ((value.bullets as { text: string; verified: boolean }[] | undefined) ?? []).map((b) => [
-    b.text,
-    !!b.verified,
-  ]);
+  const bullets = ((value.bullets as { text: string; verified: boolean }[] | undefined) ?? []).map((b) => [b.text, !!b.verified]);
   return JSON.stringify([fields, bullets]);
 }
 
@@ -182,9 +183,7 @@ function writeBullets(
   bullets: { id?: number; text: string; verified: boolean }[],
 ): void {
   const existing = new Set(
-    (db.prepare('SELECT id FROM bullets WHERE owner_type = ? AND owner_id = ?').all(owner, ownerId) as { id: number }[]).map(
-      (r) => r.id,
-    ),
+    (db.prepare('SELECT id FROM bullets WHERE owner_type = ? AND owner_id = ?').all(owner, ownerId) as { id: number }[]).map((r) => r.id),
   );
   const keep = new Set(bullets.filter((b) => b.id !== undefined && existing.has(b.id)).map((b) => b.id as number));
   for (const id of existing) if (!keep.has(id)) db.prepare('DELETE FROM bullets WHERE id = ?').run(id);
@@ -212,9 +211,7 @@ export function createEntity<T = Entity>(db: DB, name: EntityName, input: unknow
   const spec = SPECS[name];
   const value = spec.schema.parse(input) as Record<string, unknown>;
   const id = db.transaction(() => {
-    const sort =
-      opts.sort ??
-      ((db.prepare(`SELECT COALESCE(MAX(sort), -1) + 1 AS n FROM ${spec.table}`).get() as { n: number }).n);
+    const sort = opts.sort ?? (db.prepare(`SELECT COALESCE(MAX(sort), -1) + 1 AS n FROM ${spec.table}`).get() as { n: number }).n;
     const columns = spec.cols.map(col);
     const extra: string[] = [];
     const extraValues: unknown[] = [];
@@ -222,16 +219,10 @@ export function createEntity<T = Entity>(db: DB, name: EntityName, input: unknow
       extra.push('source_key');
       extraValues.push(opts.sourceKey);
     }
-    const sql = `INSERT INTO ${spec.table} (${[...columns, ...extra, 'sort'].join(', ')}) VALUES (${[
-      ...columns,
-      ...extra,
-      'sort',
-    ]
+    const sql = `INSERT INTO ${spec.table} (${[...columns, ...extra, 'sort'].join(', ')}) VALUES (${[...columns, ...extra, 'sort']
       .map(() => '?')
       .join(', ')})`;
-    const info = db
-      .prepare(sql)
-      .run(...spec.cols.map((f) => toDbValue(spec, f, value[f])), ...extraValues, sort);
+    const info = db.prepare(sql).run(...spec.cols.map((f) => toDbValue(spec, f, value[f])), ...extraValues, sort);
     const newId = Number(info.lastInsertRowid);
     if (spec.bulletOwner) {
       writeBullets(db, spec.bulletOwner, newId, (value.bullets as never[]) ?? []);
@@ -284,7 +275,7 @@ export function reorderEntities(db: DB, name: EntityName, ids: number[]): void {
 export function getProfile(db: DB): ProfileData {
   const p = db.prepare('SELECT * FROM profile WHERE id = 1').get() as Row;
   const links = db.prepare('SELECT id, label, url FROM profile_links ORDER BY sort, id').all() as ProfileData['links'];
-  const summaries = (db.prepare('SELECT id, label, text, version FROM summaries ORDER BY sort, id').all() as ProfileData['summaries']);
+  const summaries = db.prepare('SELECT id, label, text, version FROM summaries ORDER BY sort, id').all() as ProfileData['summaries'];
   return {
     fullName: p.full_name as string,
     headline: p.headline as string,
@@ -303,17 +294,21 @@ export function saveProfile(db: DB, input: unknown): ProfileData {
   const before = getProfile(db);
 
   db.transaction(() => {
-    const coreSignature = (v: { fullName: string; headline: string; email: string; phone: string; location: string; links: { label: string; url: string }[] }) =>
-      JSON.stringify([v.fullName, v.headline, v.email, v.phone, v.location, v.links.map((l) => [l.label, l.url])]);
+    const coreSignature = (v: {
+      fullName: string;
+      headline: string;
+      email: string;
+      phone: string;
+      location: string;
+      links: { label: string; url: string }[];
+    }) => JSON.stringify([v.fullName, v.headline, v.email, v.phone, v.location, v.links.map((l) => [l.label, l.url])]);
     if (coreSignature(before) !== coreSignature(value)) {
       db.prepare(
         'UPDATE profile SET full_name = ?, headline = ?, email = ?, phone = ?, location = ?, version = version + 1, updated_at = ? WHERE id = 1',
       ).run(value.fullName, value.headline, value.email, value.phone, value.location, nowIso());
     }
     db.prepare('DELETE FROM profile_links').run();
-    value.links.forEach((l, i) =>
-      db.prepare('INSERT INTO profile_links (label, url, sort) VALUES (?,?,?)').run(l.label, l.url, i),
-    );
+    value.links.forEach((l, i) => db.prepare('INSERT INTO profile_links (label, url, sort) VALUES (?,?,?)').run(l.label, l.url, i));
 
     const existing = new Map(before.summaries.map((s) => [s.id, s]));
     const keep = new Set(value.summaries.filter((s) => s.id !== undefined && existing.has(s.id)).map((s) => s.id as number));

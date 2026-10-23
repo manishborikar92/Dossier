@@ -10,7 +10,14 @@ import type { Project } from '@/lib/types';
 import { seedSample } from '@/server/sample';
 import { freshDb } from './helpers';
 
-const NEW = { name: 'Backup me', targetTitle: 'Dev', targetCompany: 'Acme', template: 'compact', jdText: 'React and Node.js', preselect: 'top' } as const;
+const NEW = {
+  name: 'Backup me',
+  targetTitle: 'Dev',
+  targetCompany: 'Acme',
+  template: 'compact',
+  jdText: 'React and Node.js',
+  preselect: 'top',
+} as const;
 
 const strip = (b: ReturnType<typeof exportBackup>) => ({ ...b, exportedAt: '' });
 

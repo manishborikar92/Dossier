@@ -40,9 +40,7 @@ export function openDb(file: string, opts: { safetyBackupDir?: string } = {}): D
   db.pragma('foreign_keys = ON');
   db.exec('CREATE TABLE IF NOT EXISTS schema_migrations (id TEXT PRIMARY KEY, applied_at TEXT NOT NULL)');
 
-  const applied = new Set(
-    (db.prepare('SELECT id FROM schema_migrations').all() as { id: string }[]).map((r) => r.id),
-  );
+  const applied = new Set((db.prepare('SELECT id FROM schema_migrations').all() as { id: string }[]).map((r) => r.id));
   const pending = MIGRATIONS.filter((m) => !applied.has(m.id));
 
   if (pending.length > 0 && existedWithData && applied.size > 0 && opts.safetyBackupDir) {

@@ -1,6 +1,7 @@
 import path from 'node:path';
 import type { DB } from './db';
 import { copyDatabase, nowIso } from './db';
+import type { RestoreResult } from '@/lib/types';
 import { badRequest } from './errors';
 import { MIGRATIONS } from './migrations';
 
@@ -69,11 +70,6 @@ export function validateBackup(input: unknown): BackupFile {
     }
   }
   return f as BackupFile;
-}
-
-export interface RestoreResult {
-  counts: Record<string, number>;
-  safetyCopy: string | null;
 }
 
 /**

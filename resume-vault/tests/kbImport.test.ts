@@ -24,7 +24,12 @@ const entry = (id: string, rank: number, score: number, extra: Record<string, un
   last_commit: '2025-06-01',
   commit_count: 12,
   local_path: 'C:\\Fictional\\path',
-  resume_entry: { resume_title: `Fictional ${id}`, tech_stack_summary: 'Python', year: '2025', bullets: ['First fictional bullet.', 'Second fictional bullet.'] },
+  resume_entry: {
+    resume_title: `Fictional ${id}`,
+    tech_stack_summary: 'Python',
+    year: '2025',
+    bullets: ['First fictional bullet.', 'Second fictional bullet.'],
+  },
   ...extra,
 });
 

@@ -136,14 +136,20 @@ const LEXICON: LexEntry[] = LEXICON_SOURCE.trim()
   .split('\n')
   .map((line) => {
     const [label, canon, aliases] = line.split('|');
-    return { label, canon, aliases: (aliases ?? '').split(',').map((a) => a.trim()).filter(Boolean) };
+    return {
+      label,
+      canon,
+      aliases: (aliases ?? '')
+        .split(',')
+        .map((a) => a.trim())
+        .filter(Boolean),
+    };
   });
 
 const escapeRe = (s: string) => s.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&');
 const BOUNDARY_BEFORE = '(?<![a-z0-9+#])';
 const BOUNDARY_AFTER = '(?![a-z0-9+#])';
-const phraseRe = (phrase: string, flags = 'g') =>
-  new RegExp(`${BOUNDARY_BEFORE}${escapeRe(phrase)}${BOUNDARY_AFTER}`, flags);
+const phraseRe = (phrase: string, flags = 'g') => new RegExp(`${BOUNDARY_BEFORE}${escapeRe(phrase)}${BOUNDARY_AFTER}`, flags);
 
 // Alias -> canonical replacements, longest alias first so "react native" wins over "react".
 const ALIAS_RULES: { re: RegExp; canon: string }[] = LEXICON.flatMap((e) =>
@@ -220,7 +226,9 @@ export function matchJobDescription(jd: string, lib: MatchLibrary): MatchResult 
   const projectText = lib.projects.map((p) => ({
     p,
     tech: normalize([p.name, ...p.technologies, ...p.tags, ...p.keywords].join(' \n ')),
-    body: normalize([p.overview, p.description, p.role, p.contributions, p.features, p.results, ...p.bullets.map((b) => b.text)].join(' \n ')),
+    body: normalize(
+      [p.overview, p.description, p.role, p.contributions, p.features, p.results, ...p.bullets.map((b) => b.text)].join(' \n '),
+    ),
   }));
   const experienceText = lib.experiences.map((e) => ({
     e,
@@ -244,8 +252,10 @@ export function matchJobDescription(jd: string, lib: MatchLibrary): MatchResult 
     if (count === 0) continue;
     const evidence: Evidence[] = [];
     for (const { s, text: t } of skillText) if (has(t, canon)) evidence.push({ type: 'skill', id: s.id, name: s.name });
-    for (const { p, tech, body } of projectText) if (has(tech, canon) || has(body, canon)) evidence.push({ type: 'project', id: p.id, name: p.name });
-    for (const { e, text: t } of experienceText) if (has(t, canon)) evidence.push({ type: 'experience', id: e.id, name: `${e.title} at ${e.org}` });
+    for (const { p, tech, body } of projectText)
+      if (has(tech, canon) || has(body, canon)) evidence.push({ type: 'project', id: p.id, name: p.name });
+    for (const { e, text: t } of experienceText)
+      if (has(t, canon)) evidence.push({ type: 'experience', id: e.id, name: `${e.title} at ${e.org}` });
     (evidence.length > 0 ? matched : gaps).push({ label, canon, count, evidence });
   }
   const byCount = (a: MatchedTerm, b: MatchedTerm) => b.count - a.count || a.label.localeCompare(b.label);

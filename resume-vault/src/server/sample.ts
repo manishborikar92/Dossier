@@ -21,7 +21,10 @@ export function seedSample(db: DB): void {
       { label: 'linkedin.com/in/alex-sample', url: 'https://linkedin.com/in/alex-sample' },
     ],
     summaries: [
-      { label: 'General', text: 'Sample summary: a developer who builds and maintains web applications from the interface to the database.' },
+      {
+        label: 'General',
+        text: 'Sample summary: a developer who builds and maintains web applications from the interface to the database.',
+      },
       { label: 'Backend focus', text: 'Sample summary: a developer focused on APIs, data modelling and reliable back-end services.' },
     ],
   });
@@ -91,8 +94,23 @@ export function seedSample(db: DB): void {
   for (const [name, category] of skills) createEntity(db, 'skills', { name, category });
 
   const base = {
-    category: '', description: '', problem: '', solution: '', role: '', contributions: '', features: '', decisions: '', results: '',
-    repoUrl: '', demoUrl: '', docsUrl: '', tags: [], keywords: [], family: '', status: 'active', notes: '',
+    category: '',
+    description: '',
+    problem: '',
+    solution: '',
+    role: '',
+    contributions: '',
+    features: '',
+    decisions: '',
+    results: '',
+    repoUrl: '',
+    demoUrl: '',
+    docsUrl: '',
+    tags: [],
+    keywords: [],
+    family: '',
+    status: 'active',
+    notes: '',
   };
   createEntity(db, 'projects', {
     ...base,

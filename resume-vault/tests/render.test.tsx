@@ -9,12 +9,12 @@ vi.mock('next/navigation', () => ({
   useSearchParams: () => new URLSearchParams(),
 }));
 
-import { CareerManager } from '@/components/CareerManager';
-import { ProfileEditor } from '@/components/ProfileEditor';
-import { ProjectForm } from '@/components/ProjectForm';
-import { ProjectsManager } from '@/components/ProjectsManager';
-import { ResumesManager } from '@/components/ResumesManager';
-import { SettingsPanel } from '@/components/SettingsPanel';
+import { CareerManager } from '@/components/career/CareerManager';
+import { ProfileEditor } from '@/components/profile/ProfileEditor';
+import { ProjectForm } from '@/components/projects/ProjectForm';
+import { ProjectsManager } from '@/components/projects/ProjectsManager';
+import { ResumesManager } from '@/components/resumes/ResumesManager';
+import { SettingsPanel } from '@/components/settings/SettingsPanel';
 import { ToastProvider } from '@/components/ui';
 import { ContentTab } from '@/components/builder/ContentTab';
 import { ItemEditor } from '@/components/builder/ItemEditor';
@@ -50,18 +50,31 @@ describe('screens render without errors', () => {
     expect(out).toContain('Alex Sample');
     expect(out).toContain('github.com/alex-sample');
     expect(out).toContain('Summary variants');
+    expect(out).toContain('Header preview');
   });
 
   it('renders every tab of the experience and skills page, and its empty states', () => {
     const { db, library } = setup();
     for (const tab of ['experience', 'education', 'skills', 'certifications'] as const) {
-      const out = html(<CareerManager initialTab={tab} experiences={library.experiences} education={library.education} skills={library.skills} certifications={library.certifications} />);
+      const out = html(
+        <CareerManager
+          initialTab={tab}
+          experiences={library.experiences}
+          education={library.education}
+          skills={library.skills}
+          certifications={library.certifications}
+        />,
+      );
       expect(out).toContain(`id="panel-${tab}"`);
     }
-    const first = html(<CareerManager initialTab="experience" experiences={library.experiences} education={[]} skills={[]} certifications={[]} />);
+    const first = html(
+      <CareerManager initialTab="experience" experiences={library.experiences} education={[]} skills={[]} certifications={[]} />,
+    );
     expect(first).toContain('Software Developer');
     expect(first).toContain('Jan 2024');
-    expect(html(<CareerManager initialTab="skills" experiences={[]} education={[]} skills={[]} certifications={[]} />)).toContain('No skills yet');
+    expect(html(<CareerManager initialTab="skills" experiences={[]} education={[]} skills={[]} certifications={[]} />)).toContain(
+      'No skills yet',
+    );
     expect(db).toBeTruthy();
   });
 
@@ -85,7 +98,14 @@ describe('screens render without errors', () => {
     expect(out).toContain('Listed');
     expect(out).toContain('Dev at Acme');
     expect(html(<ResumesManager initial={[]} canCreate={false} defaultTemplate="classic" />)).toContain('Add your name on the');
-    const settings = html(<SettingsPanel defaults={{ defaultPageSize: 'A4', defaultTemplate: 'classic' }} databasePath="/x/vault.db" backupsPath="/x/backups" counts={[{ label: 'projects', value: 4 }]} />);
+    const settings = html(
+      <SettingsPanel
+        defaults={{ defaultPageSize: 'A4', defaultTemplate: 'classic' }}
+        databasePath="/x/vault.db"
+        backupsPath="/x/backups"
+        counts={[{ label: 'projects', value: 4 }]}
+      />,
+    );
     expect(settings).toContain('Download backup');
     expect(settings).toContain('/x/vault.db');
   });
@@ -94,9 +114,25 @@ describe('screens render without errors', () => {
 describe('resume builder renders', () => {
   it('renders the content tab with every section, and flags library changes', () => {
     const { db, library } = setup();
-    const { resume, items } = createResume(db, { name: 'B', targetTitle: '', targetCompany: '', template: 'classic', jdText: '', preselect: 'top' });
+    const { resume, items } = createResume(db, {
+      name: 'B',
+      targetTitle: '',
+      targetCompany: '',
+      template: 'classic',
+      jdText: '',
+      preselect: 'top',
+    });
     let out = html(<ContentTab resume={resume} items={items} library={library} mutate={mutate} />);
-    for (const label of ['Header: Alex Sample', 'Professional summary', 'Technical skills', 'Professional experience', 'Key projects', 'Education', 'Certifications', 'Leadership &amp; involvement']) {
+    for (const label of [
+      'Header: Alex Sample',
+      'Professional summary',
+      'Technical skills',
+      'Professional experience',
+      'Key projects',
+      'Education',
+      'Certifications',
+      'Leadership &amp; involvement',
+    ]) {
       expect(out).toContain(label);
     }
     expect(out).not.toContain('Library changed');
@@ -112,7 +148,14 @@ describe('resume builder renders', () => {
     const { db, library } = setup();
     const exp = listEntities<Experience>(db, 'experiences')[0];
     updateEntity(db, 'experiences', exp.id, { ...exp, bullets: [{ text: 'An imported claim.', verified: false }] });
-    const { resume, items } = createResume(db, { name: 'B', targetTitle: '', targetCompany: '', template: 'classic', jdText: '', preselect: 'top' });
+    const { resume, items } = createResume(db, {
+      name: 'B',
+      targetTitle: '',
+      targetCompany: '',
+      template: 'classic',
+      jdText: '',
+      preselect: 'top',
+    });
     const finalResume = { ...resume, status: 'final' as const };
     const out = html(<ContentTab resume={finalResume} items={items} library={library} mutate={mutate} />);
     expect(out).toContain('1 unverified');
@@ -121,7 +164,14 @@ describe('resume builder renders', () => {
 
   it('renders an editor for every kind of item', () => {
     const { db } = setup();
-    const { items } = createResume(db, { name: 'B', targetTitle: '', targetCompany: '', template: 'classic', jdText: '', preselect: 'top' });
+    const { items } = createResume(db, {
+      name: 'B',
+      targetTitle: '',
+      targetCompany: '',
+      template: 'classic',
+      jdText: '',
+      preselect: 'top',
+    });
     const expectations: Record<string, string[]> = {
       header: ['Full name', 'Show on this resume', 'Links'],
       summary: ['Summary'],
@@ -143,7 +193,14 @@ describe('resume builder renders', () => {
 
   it('renders the setup, versions and match tabs', () => {
     const { db } = setup();
-    const { resume } = createResume(db, { name: 'B', targetTitle: 'Dev', targetCompany: '', template: 'minimal', jdText: 'We need React and Node.js.', preselect: 'top' });
+    const { resume } = createResume(db, {
+      name: 'B',
+      targetTitle: 'Dev',
+      targetCompany: '',
+      template: 'minimal',
+      jdText: 'We need React and Node.js.',
+      preselect: 'top',
+    });
     saveVersion(db, resume.id, { label: 'First send' });
     const current = getResume(db, resume.id).resume;
 

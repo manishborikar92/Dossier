@@ -1,0 +1,8 @@
+.next
+node_modules
+data
+data-*
+coverage
+package-lock.json
+docs/schema.sql
+next-env.d.ts

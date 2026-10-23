@@ -15,7 +15,9 @@ export function itemsOf(db: DB, resumeId: number, section?: string): ResumeItem[
 }
 
 /** Extract page count, text and link targets from a PDF using pdf.js (no external tools needed). */
-export async function inspectPdf(buffer: Uint8Array): Promise<{ pages: number; text: string; links: string[]; lastLines: string[]; firstLines: string[]; pageTexts: string[] }> {
+export async function inspectPdf(
+  buffer: Uint8Array,
+): Promise<{ pages: number; text: string; links: string[]; lastLines: string[]; firstLines: string[]; pageTexts: string[] }> {
   const pdfjs = await import('pdfjs-dist/legacy/build/pdf.mjs');
   const task = pdfjs.getDocument({ data: new Uint8Array(buffer), useSystemFonts: false, verbosity: 0 });
   const pdf = await task.promise;
@@ -36,9 +38,21 @@ export async function inspectPdf(buffer: Uint8Array): Promise<{ pages: number; t
       .filter((it): it is typeof it & { str: string; transform: number[] } => 'str' in it && it.str.trim() !== '')
       .map((it) => ({ str: it.str, y: it.transform[5], x: it.transform[4] }));
     const highest = Math.max(...placed.map((p) => p.y));
-    firstLines.push(placed.filter((p) => Math.abs(p.y - highest) < 3).sort((a, b) => a.x - b.x).map((p) => p.str).join(' '));
+    firstLines.push(
+      placed
+        .filter((p) => Math.abs(p.y - highest) < 3)
+        .sort((a, b) => a.x - b.x)
+        .map((p) => p.str)
+        .join(' '),
+    );
     const lowest = Math.min(...placed.map((p) => p.y));
-    lastLines.push(placed.filter((p) => Math.abs(p.y - lowest) < 3).sort((a, b) => a.x - b.x).map((p) => p.str).join(' '));
+    lastLines.push(
+      placed
+        .filter((p) => Math.abs(p.y - lowest) < 3)
+        .sort((a, b) => a.x - b.x)
+        .map((p) => p.str)
+        .join(' '),
+    );
   }
   const pages = pdf.numPages;
   await pdf.destroy();

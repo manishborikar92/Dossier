@@ -1,19 +1,28 @@
 'use client';
 
-import { useState } from 'react';
 import { ArrowDown, ArrowUp } from 'lucide-react';
-import { api } from '@/lib/client';
-import { TEMPLATE_IDS } from '@/lib/schemas';
-import { ACCENT_PRESETS, DEFAULT_SECTION_TITLES, TEMPLATES } from '@/lib/templates';
+import { useState, type ReactNode } from 'react';
+import { api } from '@/lib/api';
+import { cx } from '@/lib/classes';
+import { ACCENT_PRESETS, DEFAULT_SECTION_TITLES } from '@/lib/templates';
 import type { ResumeRecord, ResumeSettings, SectionKey } from '@/lib/types';
-import { Button, SelectField, TextField, cx } from '../ui';
+import { TemplatePicker } from '../resumes/TemplatePicker';
+import { Button, IconButton, SelectField, TextField } from '../ui';
+import type { Mutate } from './types';
 
-interface Props {
-  resume: ResumeRecord;
-  mutate: (action: () => Promise<unknown>, successMessage?: string) => Promise<boolean>;
+function Group({ id, title, description, children }: { id: string; title: string; description?: string; children: ReactNode }) {
+  return (
+    <section aria-labelledby={id} className="border-line bg-surface shadow-card rounded-xl border p-5">
+      <h3 id={id} className="text-ink text-sm font-semibold tracking-tight">
+        {title}
+      </h3>
+      {description ? <p className="text-muted mt-0.5 mb-3 text-sm">{description}</p> : <div className="mb-3" />}
+      {children}
+    </section>
+  );
 }
 
-export function SetupTab({ resume, mutate }: Props) {
+export function SetupTab({ resume, mutate }: { resume: ResumeRecord; mutate: Mutate }) {
   const [name, setName] = useState(resume.name);
   const [targetTitle, setTargetTitle] = useState(resume.targetTitle);
   const [targetCompany, setTargetCompany] = useState(resume.targetCompany);
@@ -22,7 +31,8 @@ export function SetupTab({ resume, mutate }: Props) {
   const [nameError, setNameError] = useState('');
   const s = resume.settings;
 
-  const patch = (body: Record<string, unknown>, message?: string) => mutate(() => api(`/api/resumes/${resume.id}`, { method: 'PATCH', body }), message);
+  const patch = (body: Parameters<typeof api.resumes.update>[1], message?: string) =>
+    mutate(() => api.resumes.update(resume.id, body), message);
   const patchSettings = (settings: Partial<ResumeSettings>, message?: string) => patch({ settings }, message);
 
   const moveSection = (index: number, dir: -1 | 1) => {
@@ -34,21 +44,42 @@ export function SetupTab({ resume, mutate }: Props) {
   };
   const toggleSection = (key: SectionKey, visible: boolean) =>
     void patchSettings({ hiddenSections: visible ? s.hiddenSections.filter((k) => k !== key) : [...s.hiddenSections, key] });
+  const toggleBreak = (key: SectionKey, on: boolean) =>
+    void patchSettings({ pageBreakBefore: on ? [...s.pageBreakBefore, key] : s.pageBreakBefore.filter((k) => k !== key) });
 
   const validHex = /^#[0-9a-fA-F]{6}$/.test(accent);
+  const isCurrentAccent = (value: string) => s.accent.toLowerCase() === value.toLowerCase();
 
   return (
-    <div className="space-y-8">
-      <section aria-labelledby="s-details">
-        <h3 id="s-details" className="mb-2 font-serif text-base font-semibold">Details</h3>
+    <div className="space-y-5">
+      <Group id="s-details" title="Details">
         <div className="grid gap-4 sm:grid-cols-2">
-          <TextField label="Resume name" required value={name} onChange={(v) => { setName(v); setNameError(''); }} error={nameError} className="sm:col-span-2" />
+          <TextField
+            label="Resume name"
+            required
+            value={name}
+            onChange={(v) => {
+              setName(v);
+              setNameError('');
+            }}
+            error={nameError}
+            className="sm:col-span-2"
+          />
           <TextField label="Target job title" value={targetTitle} onChange={setTargetTitle} />
           <TextField label="Target company" value={targetCompany} onChange={setTargetCompany} />
-          <SelectField label="Status" value={resume.status} onChange={(v) => void patch({ status: v }, v === 'final' ? 'Marked as final.' : 'Marked as draft.')} options={[{ value: 'draft', label: 'Draft' }, { value: 'final', label: 'Final' }]} hint="A label for you. Saved versions are what protect a resume you have sent." />
+          <SelectField
+            label="Status"
+            value={resume.status}
+            onChange={(v) => void patch({ status: v as ResumeRecord['status'] }, v === 'final' ? 'Marked as final.' : 'Marked as draft.')}
+            options={[
+              { value: 'draft', label: 'Draft' },
+              { value: 'final', label: 'Final' },
+            ]}
+            hint="A label for you. Saved versions are what protect a resume you have sent."
+          />
         </div>
         <Button
-          className="mt-3"
+          className="mt-4"
           variant="primary"
           onClick={() => {
             if (name.trim() === '') return setNameError('Resume name is required');
@@ -57,87 +88,123 @@ export function SetupTab({ resume, mutate }: Props) {
         >
           Save details
         </Button>
-      </section>
+      </Group>
 
-      <section aria-labelledby="s-template">
-        <h3 id="s-template" className="mb-2 font-serif text-base font-semibold">Template</h3>
-        <div className="grid gap-2 sm:grid-cols-3">
-          {TEMPLATE_IDS.map((id) => (
-            <label key={id} className={cx('cursor-pointer rounded-md border p-2.5 text-sm', resume.template === id ? 'border-navy bg-navy-soft' : 'border-rule bg-surface')}>
-              <input type="radio" name="template" checked={resume.template === id} onChange={() => void patch({ template: id })} className="mr-2 accent-navy" />
-              <span className="font-medium">{TEMPLATES[id].label}</span>
-              <span className="mt-1 block text-xs text-muted">{TEMPLATES[id].description}</span>
-            </label>
-          ))}
-        </div>
-        <p className="mt-2 text-xs text-muted">All templates are single-column, use standard section headings and real text, which is what applicant tracking systems read best.</p>
-      </section>
+      <Group
+        id="s-template"
+        title="Template"
+        description="All templates are single-column with standard section headings and real text, which is what applicant tracking systems read best."
+      >
+        <TemplatePicker value={resume.template} onChange={(template) => void patch({ template })} name="builder-template" />
+      </Group>
 
-      <section aria-labelledby="s-look">
-        <h3 id="s-look" className="mb-2 font-serif text-base font-semibold">Look and page</h3>
+      <Group id="s-look" title="Look and page">
         <div className="grid gap-4 sm:grid-cols-2">
-          <SelectField label="Page size" value={s.pageSize} onChange={(v) => void patchSettings({ pageSize: v as ResumeSettings['pageSize'] })} options={[{ value: 'A4', label: 'A4' }, { value: 'LETTER', label: 'US Letter' }]} />
-          <SelectField label="Spacing" value={s.density} onChange={(v) => void patchSettings({ density: v as ResumeSettings['density'] })} options={[{ value: 'compact', label: 'Compact' }, { value: 'normal', label: 'Normal' }, { value: 'relaxed', label: 'Relaxed' }]} hint="Tighten it to fit on one page." />
+          <SelectField
+            label="Page size"
+            value={s.pageSize}
+            onChange={(v) => void patchSettings({ pageSize: v as ResumeSettings['pageSize'] })}
+            options={[
+              { value: 'A4', label: 'A4' },
+              { value: 'LETTER', label: 'US Letter' },
+            ]}
+          />
+          <SelectField
+            label="Spacing"
+            value={s.density}
+            onChange={(v) => void patchSettings({ density: v as ResumeSettings['density'] })}
+            options={[
+              { value: 'compact', label: 'Compact' },
+              { value: 'normal', label: 'Normal' },
+              { value: 'relaxed', label: 'Relaxed' },
+            ]}
+            hint="Tighten it to fit on one page."
+          />
         </div>
-        <fieldset className="mt-4">
-          <legend className="mb-1 text-sm font-medium">Accent colour</legend>
-          <div className="flex flex-wrap items-center gap-2">
+        <fieldset className="mt-5">
+          <legend className="text-ink-2 mb-2 text-[13px] font-medium">Accent colour</legend>
+          <div className="flex flex-wrap items-end gap-2">
             {ACCENT_PRESETS.map((p) => (
               <button
                 key={p.value}
                 type="button"
-                aria-pressed={s.accent.toLowerCase() === p.value.toLowerCase()}
-                onClick={() => { setAccent(p.value); void patchSettings({ accent: p.value }); }}
-                className={cx('flex items-center gap-1.5 rounded-md border px-2 py-1 text-sm', s.accent.toLowerCase() === p.value.toLowerCase() ? 'border-navy bg-navy-soft' : 'border-rule bg-surface')}
+                aria-pressed={isCurrentAccent(p.value)}
+                onClick={() => {
+                  setAccent(p.value);
+                  void patchSettings({ accent: p.value });
+                }}
+                className={cx(
+                  'flex h-9 items-center gap-2 rounded-lg border px-3 text-sm',
+                  isCurrentAccent(p.value)
+                    ? 'border-brand bg-brand-soft ring-brand/20 ring-2'
+                    : 'border-line-strong bg-surface hover:bg-sunken',
+                )}
               >
-                <span className="h-3.5 w-3.5 rounded-full border border-rule" style={{ background: p.value }} aria-hidden />
+                <span className="border-line size-4 rounded-full border" style={{ background: p.value }} aria-hidden />
                 {p.label}
               </button>
             ))}
             <TextField label="Custom" value={accent} onChange={setAccent} className="w-32" error={validHex ? undefined : 'Use #RRGGBB'} />
-            <Button size="sm" disabled={!validHex || accent.toLowerCase() === s.accent.toLowerCase()} onClick={() => void patchSettings({ accent })}>Apply</Button>
+            <Button disabled={!validHex || isCurrentAccent(accent)} onClick={() => void patchSettings({ accent })}>
+              Apply
+            </Button>
           </div>
         </fieldset>
-      </section>
+      </Group>
 
-      <section aria-labelledby="s-sections">
-        <h3 id="s-sections" className="mb-1 font-serif text-base font-semibold">Sections</h3>
-        <p className="mb-2 text-sm text-muted">Choose which sections appear, their order, the heading printed for each, and whether a section starts on a new page. Empty sections never print. Short entries are never split across two pages.</p>
-        <ul className="divide-y divide-rule rounded-lg border border-rule bg-surface">
+      <Group
+        id="s-sections"
+        title="Sections"
+        description="Choose which sections appear, their order, the heading printed for each, and whether a section starts on a new page. Empty sections never print. Short entries are never split across two pages."
+      >
+        <ul className="divide-line border-line divide-y rounded-lg border">
           {s.sectionOrder.map((key, i) => (
-            <li key={key} className="flex flex-wrap items-center gap-3 px-3 py-2">
-              <input type="checkbox" aria-label={`Show the ${DEFAULT_SECTION_TITLES[key]} section`} checked={!s.hiddenSections.includes(key)} onChange={(e) => toggleSection(key, e.target.checked)} className="h-4 w-4 accent-navy" />
-              <div className="min-w-[10rem] flex-1">
-                <input
-                  aria-label={`Heading for ${DEFAULT_SECTION_TITLES[key]}`}
-                  value={titles[key] ?? ''}
-                  placeholder={DEFAULT_SECTION_TITLES[key]}
-                  onChange={(e) => setTitles({ ...titles, [key]: e.target.value })}
-                  onBlur={() => { if ((titles[key] ?? '') !== (s.sectionTitles[key] ?? '')) void patchSettings({ sectionTitles: { ...s.sectionTitles, [key]: titles[key] ?? '' } }); }}
-                  className="w-full rounded border border-rule px-2 py-1 text-sm"
-                />
-              </div>
-              <label className="flex items-center gap-1.5 text-xs text-muted">
+            <li key={key} className="flex flex-wrap items-center gap-x-4 gap-y-2 px-3 py-2.5">
+              <input
+                type="checkbox"
+                aria-label={`Show the ${DEFAULT_SECTION_TITLES[key]} section`}
+                checked={!s.hiddenSections.includes(key)}
+                onChange={(e) => toggleSection(key, e.target.checked)}
+                className="accent-brand size-4"
+              />
+              <input
+                aria-label={`Heading for ${DEFAULT_SECTION_TITLES[key]}`}
+                value={titles[key] ?? ''}
+                placeholder={DEFAULT_SECTION_TITLES[key]}
+                onChange={(e) => setTitles({ ...titles, [key]: e.target.value })}
+                onBlur={() => {
+                  if ((titles[key] ?? '') !== (s.sectionTitles[key] ?? ''))
+                    void patchSettings({ sectionTitles: { ...s.sectionTitles, [key]: titles[key] ?? '' } });
+                }}
+                className="border-line-strong focus:border-brand focus:ring-brand/15 min-w-40 flex-1 rounded-lg border px-2.5 py-1.5 text-sm focus:ring-[3px] focus:outline-none"
+              />
+              <label className="text-muted flex items-center gap-1.5 text-xs">
                 <input
                   type="checkbox"
                   checked={s.pageBreakBefore.includes(key)}
-                  onChange={(e) => void patchSettings({ pageBreakBefore: e.target.checked ? [...s.pageBreakBefore, key] : s.pageBreakBefore.filter((k) => k !== key) })}
-                  className="h-3.5 w-3.5 accent-navy"
+                  onChange={(e) => toggleBreak(key, e.target.checked)}
+                  className="accent-brand size-3.5"
                 />
                 Start on a new page
               </label>
               <div className="flex">
-                <button type="button" aria-label={`Move ${DEFAULT_SECTION_TITLES[key]} up`} disabled={i === 0} onClick={() => moveSection(i, -1)} className="rounded p-1.5 text-muted hover:bg-navy-soft disabled:opacity-30">
-                  <ArrowUp className="h-4 w-4" aria-hidden />
-                </button>
-                <button type="button" aria-label={`Move ${DEFAULT_SECTION_TITLES[key]} down`} disabled={i === s.sectionOrder.length - 1} onClick={() => moveSection(i, 1)} className="rounded p-1.5 text-muted hover:bg-navy-soft disabled:opacity-30">
-                  <ArrowDown className="h-4 w-4" aria-hidden />
-                </button>
+                <IconButton
+                  label={`Move ${DEFAULT_SECTION_TITLES[key]} up`}
+                  icon={ArrowUp}
+                  disabled={i === 0}
+                  onClick={() => moveSection(i, -1)}
+                />
+                <IconButton
+                  label={`Move ${DEFAULT_SECTION_TITLES[key]} down`}
+                  icon={ArrowDown}
+                  disabled={i === s.sectionOrder.length - 1}
+                  onClick={() => moveSection(i, 1)}
+                />
               </div>
             </li>
           ))}
         </ul>
-      </section>
+      </Group>
     </div>
   );
 }

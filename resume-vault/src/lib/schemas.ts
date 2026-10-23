@@ -2,15 +2,7 @@ import { z } from 'zod';
 
 /* ---------- small building blocks ---------- */
 
-export const SECTION_KEYS = [
-  'summary',
-  'skills',
-  'experience',
-  'projects',
-  'education',
-  'certifications',
-  'leadership',
-] as const;
+export const SECTION_KEYS = ['summary', 'skills', 'experience', 'projects', 'education', 'certifications', 'leadership'] as const;
 export type SectionKey = (typeof SECTION_KEYS)[number];
 
 export const EXPERIENCE_KINDS = ['job', 'internship', 'freelance', 'leadership', 'volunteer'] as const;
@@ -33,9 +25,7 @@ export const isHttpUrl = (value: string): boolean => {
 const text = (max: number) => z.string().trim().max(max, `Keep this under ${max} characters`);
 const required = (max: number, label: string) =>
   z.string().trim().min(1, `${label} is required`).max(max, `Keep this under ${max} characters`);
-const monthOrEmpty = z
-  .string()
-  .refine((v) => v === '' || MONTH_RE.test(v), 'Use a month like 2025-06, or leave it empty');
+const monthOrEmpty = z.string().refine((v) => v === '' || MONTH_RE.test(v), 'Use a month like 2025-06, or leave it empty');
 const urlOrEmpty = z
   .string()
   .trim()
@@ -244,6 +234,9 @@ export const appSettingsSchema = z.object({
   defaultPageSize: z.enum(['A4', 'LETTER']),
   defaultTemplate: z.enum(TEMPLATE_IDS),
 });
+
+/** A list of record ids in their new order. */
+export const idListSchema = z.object({ ids: z.array(z.number().int().positive()) });
 
 /* ---------- helpers ---------- */
 

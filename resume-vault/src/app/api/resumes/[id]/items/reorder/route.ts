@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { idListSchema } from '@/lib/schemas';
 import { getDb } from '@/server/db';
 import { handle, intParam, json, readJson } from '@/server/http';
 import { reorderItems } from '@/server/resumes';
@@ -10,7 +10,7 @@ type Ctx = { params: Promise<{ id: string }> };
 
 export const POST = handle<Ctx>(async (req, ctx) => {
   const id = intParam((await ctx.params).id);
-  const { ids } = z.object({ ids: z.array(z.number().int().positive()) }).parse(await readJson(req));
+  const { ids } = idListSchema.parse(await readJson(req));
   reorderItems(getDb(), id, ids);
   return json({ ok: true });
 });

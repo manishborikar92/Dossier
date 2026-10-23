@@ -33,7 +33,11 @@ export async function renderResumeDocx(doc: ResumeDoc): Promise<Buffer> {
   const run = (text: string, o: { bold?: boolean; italics?: boolean; color?: string; size?: number } = {}) =>
     new TextRun({ text, font, size: size(o.size ?? t.base), bold: o.bold, italics: o.italics, color: o.color ?? BLACK });
 
-  const link = (text: string, url: string, o: { color?: string; pt?: number; underlined?: boolean; bold?: boolean } = {}): ExternalHyperlink =>
+  const link = (
+    text: string,
+    url: string,
+    o: { color?: string; pt?: number; underlined?: boolean; bold?: boolean } = {},
+  ): ExternalHyperlink =>
     new ExternalHyperlink({
       link: url,
       children: [
@@ -82,7 +86,9 @@ export async function renderResumeDocx(doc: ResumeDoc): Promise<Buffer> {
       }
     }
     if (e.right) {
-      head.push(plain ? run(`\t${e.right}`, { size: t.base - 0.5 }) : run(`\t${e.right}`, { italics: true, color: GRAY, size: t.base - 0.5 }));
+      head.push(
+        plain ? run(`\t${e.right}`, { size: t.base - 0.5 }) : run(`\t${e.right}`, { italics: true, color: GRAY, size: t.base - 0.5 }),
+      );
     }
 
     const hasMore = (from: 'sub' | 'meta' | 'description') => {
@@ -101,7 +107,14 @@ export async function renderResumeDocx(doc: ResumeDoc): Promise<Buffer> {
       }),
     ];
     if (e.sub) {
-      out.push(new Paragraph({ keepNext: hasMore('sub'), keepLines: true, spacing: { before: 0, after: twips(1) }, children: [run(e.sub, { color: GRAY, size: t.base - 0.5 })] }));
+      out.push(
+        new Paragraph({
+          keepNext: hasMore('sub'),
+          keepLines: true,
+          spacing: { before: 0, after: twips(1) },
+          children: [run(e.sub, { color: GRAY, size: t.base - 0.5 })],
+        }),
+      );
     }
     if (e.meta) {
       const children: ParagraphChild[] = e.meta.startsWith('Tech Stack: ')
@@ -113,7 +126,14 @@ export async function renderResumeDocx(doc: ResumeDoc): Promise<Buffer> {
       out.push(new Paragraph({ keepNext: hasMore('meta'), keepLines: true, spacing: { before: 0, after: twips(2) }, children }));
     }
     if (e.description) {
-      out.push(new Paragraph({ keepNext: hasMore('description'), keepLines: true, spacing: { before: twips(2 * scale), after: twips(2) }, children: [run(e.description)] }));
+      out.push(
+        new Paragraph({
+          keepNext: hasMore('description'),
+          keepLines: true,
+          spacing: { before: twips(2 * scale), after: twips(2) },
+          children: [run(e.description)],
+        }),
+      );
     }
     // A short entry is kept together on one page. A long one only keeps its header with its first bullet
     // (the header paragraphs above already carry "keep with next").
@@ -139,10 +159,16 @@ export async function renderResumeDocx(doc: ResumeDoc): Promise<Buffer> {
 
   const name = t.nameUpper ? doc.name.toUpperCase() : doc.name;
   const header: Paragraph[] = [
-    new Paragraph({ alignment: align, spacing: { before: 0, after: twips(3) }, children: [run(name, { bold: true, color: accent, size: t.nameSize })] }),
+    new Paragraph({
+      alignment: align,
+      spacing: { before: 0, after: twips(3) },
+      children: [run(name, { bold: true, color: accent, size: t.nameSize })],
+    }),
   ];
   if (doc.headline) {
-    header.push(new Paragraph({ alignment: align, spacing: { before: 0, after: twips(2) }, children: [run(doc.headline, { color: GRAY })] }));
+    header.push(
+      new Paragraph({ alignment: align, spacing: { before: 0, after: twips(2) }, children: [run(doc.headline, { color: GRAY })] }),
+    );
   }
   if (doc.contact.length > 0) {
     const children: ParagraphChild[] = [];
@@ -156,7 +182,13 @@ export async function renderResumeDocx(doc: ResumeDoc): Promise<Buffer> {
     header.push(new Paragraph({ alignment: align, spacing: { before: 0, after: twips(2) }, children }));
   }
   if (t.headerRule) {
-    header.push(new Paragraph({ border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: accent, space: 1 } }, spacing: { before: 80, after: 80 }, children: [] }));
+    header.push(
+      new Paragraph({
+        border: { bottom: { style: BorderStyle.SINGLE, size: 8, color: accent, space: 1 } },
+        spacing: { before: 80, after: 80 },
+        children: [],
+      }),
+    );
   }
 
   const document = new Document({

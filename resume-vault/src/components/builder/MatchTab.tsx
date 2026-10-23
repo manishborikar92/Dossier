@@ -1,18 +1,24 @@
 'use client';
 
-import { useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
-import { api, errorMessage } from '@/lib/client';
-import type { ResumeMatch } from '@/server/resumes';
-import type { ResumeRecord } from '@/lib/types';
-import { Badge, Button, Spinner, TextArea, useToast } from '../ui';
+import { useEffect, useState } from 'react';
+import { api, errorMessage } from '@/lib/api';
+import type { ResumeMatch, ResumeRecord } from '@/lib/types';
+import { Badge, Button, Notice, Spinner, TextArea, useToast } from '../ui';
+import type { Mutate } from './types';
 
-interface Props {
-  resume: ResumeRecord;
-  mutate: (action: () => Promise<unknown>, successMessage?: string) => Promise<boolean>;
+function Block({ id, title, children }: { id: string; title: string; children: React.ReactNode }) {
+  return (
+    <section aria-labelledby={id}>
+      <h3 id={id} className="text-ink mb-2 text-sm font-semibold tracking-tight">
+        {title}
+      </h3>
+      {children}
+    </section>
+  );
 }
 
-export function MatchTab({ resume, mutate }: Props) {
+export function MatchTab({ resume, mutate }: { resume: ResumeRecord; mutate: Mutate }) {
   const toast = useToast();
   const [jd, setJd] = useState(resume.jdText);
   const [match, setMatch] = useState<ResumeMatch | null>(null);
@@ -22,11 +28,18 @@ export function MatchTab({ resume, mutate }: Props) {
   // Show results for the saved job description when the tab opens or the resume changes.
   useEffect(() => {
     let cancelled = false;
-    api<ResumeMatch>(`/api/resumes/${resume.id}/match`)
+    api.resumes
+      .match(resume.id)
       .then((m) => {
         if (cancelled) return;
         setMatch(m);
-        setSelected(new Set(Object.entries(m.projectsInResume).filter(([, inc]) => inc).map(([id]) => Number(id))));
+        setSelected(
+          new Set(
+            Object.entries(m.projectsInResume)
+              .filter(([, included]) => included)
+              .map(([id]) => Number(id)),
+          ),
+        );
       })
       .catch((e) => toast.error(errorMessage(e)));
     return () => {
@@ -36,8 +49,8 @@ export function MatchTab({ resume, mutate }: Props) {
 
   async function analyse() {
     setLoading(true);
-    // Saving the text refreshes the resume, which in turn reloads the analysis below.
-    await mutate(() => api(`/api/resumes/${resume.id}`, { method: 'PATCH', body: { jdText: jd } }));
+    // Saving the text refreshes the resume, which in turn reloads the analysis above.
+    await mutate(() => api.resumes.update(resume.id, { jdText: jd }));
     setLoading(false);
   }
 
@@ -53,68 +66,91 @@ export function MatchTab({ resume, mutate }: Props) {
     });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <div>
-        <TextArea label="Job description" rows={8} value={jd} onChange={setJd} hint="Paste the posting. The analysis only looks at your own library: it ranks and highlights what you already have, and never adds anything you have not done." />
-        <div className="mt-2 flex items-center gap-3">
+        <TextArea
+          label="Job description"
+          rows={8}
+          value={jd}
+          onChange={setJd}
+          hint="Paste the posting. The analysis only looks at your own library: it ranks and highlights what you already have, and never adds anything you have not done."
+        />
+        <div className="mt-3 flex items-center gap-3">
           <Button variant="primary" loading={loading} onClick={analyse} disabled={jd.trim() === ''}>
             Save and analyse
           </Button>
-          {jd !== resume.jdText && jd.trim() !== '' ? <span className="text-xs text-muted">Not analysed yet</span> : null}
+          {jd !== resume.jdText && jd.trim() !== '' ? <span className="text-muted text-xs">Not analysed yet</span> : null}
         </div>
       </div>
 
       {!match ? <Spinner /> : null}
-      {match && result && !result.hasJobDescription ? <p className="text-sm text-muted">Paste a job description above to see which of your projects and skills fit it best.</p> : null}
+      {match && result && !result.hasJobDescription ? (
+        <p className="text-muted text-sm">Paste a job description above to see which of your projects and skills fit it best.</p>
+      ) : null}
 
       {result?.hasJobDescription ? (
         <>
-          <section aria-labelledby="m-projects">
-            <h3 id="m-projects" className="mb-1 font-serif text-base font-semibold">Projects ranked for this job</h3>
-            <p className="mb-2 text-sm text-muted">A technology listed on a project counts more than a mention in its text. You decide what goes on the resume.</p>
+          <Block id="m-projects" title="Projects ranked for this job">
+            <p className="text-muted mb-3 text-sm">
+              A technology listed on a project counts more than a mention in its text. You decide what goes on the resume.
+            </p>
             {result.projects.length === 0 ? (
-              <p className="rounded-md bg-paper p-3 text-sm text-muted">None of your active projects mention terms from this job description.</p>
+              <Notice>None of your active projects mention terms from this job description.</Notice>
             ) : (
               <>
                 <ul className="space-y-2">
                   {result.projects.map((p) => (
-                    <li key={p.id} className="rounded-lg border border-rule bg-surface p-3">
-                      <label className="flex items-start gap-2.5">
-                        <input type="checkbox" checked={selected.has(p.id)} onChange={() => toggle(p.id)} className="mt-1 h-4 w-4 accent-navy" />
+                    <li key={p.id} className="border-line bg-surface rounded-lg border p-3">
+                      <label className="flex items-start gap-3">
+                        <input
+                          type="checkbox"
+                          checked={selected.has(p.id)}
+                          onChange={() => toggle(p.id)}
+                          className="accent-brand mt-1 size-4"
+                        />
                         <span className="min-w-0 flex-1">
-                          <span className="flex items-center justify-between gap-2 text-sm font-medium">
+                          <span className="text-ink flex items-center justify-between gap-2 text-sm font-medium">
                             {p.name}
-                            <span className="text-xs font-normal text-muted">{p.percent}% match</span>
+                            <span className="text-muted text-xs font-normal tabular-nums">{p.percent}% match</span>
                           </span>
-                          <span className="mt-1 block h-1.5 overflow-hidden rounded bg-navy-soft" aria-hidden>
-                            <span className="block h-full bg-navy" style={{ width: `${p.percent}%` }} />
+                          <span className="bg-line mt-1.5 block h-1.5 overflow-hidden rounded-full" aria-hidden>
+                            <span className="bg-brand block h-full rounded-full" style={{ width: `${p.percent}%` }} />
                           </span>
-                          <span className="mt-1 block text-xs text-muted">Matches: {p.terms.join(', ')}</span>
-                          {projectsIn[p.id] === undefined ? <span className="mt-1 block text-xs text-muted">Not on this resume yet</span> : projectsIn[p.id] ? <span className="mt-1 block text-xs text-ok">On this resume</span> : <span className="mt-1 block text-xs text-muted">On this resume but hidden</span>}
+                          <span className="text-muted mt-1.5 block text-xs">Matches: {p.terms.join(', ')}</span>
+                          <span className="mt-1 block text-xs">
+                            {projectsIn[p.id] === undefined ? (
+                              <span className="text-muted">Not on this resume yet</span>
+                            ) : projectsIn[p.id] ? (
+                              <span className="text-ok font-medium">On this resume</span>
+                            ) : (
+                              <span className="text-muted">On this resume but hidden</span>
+                            )}
+                          </span>
                         </span>
                       </label>
                     </li>
                   ))}
                 </ul>
                 <div className="mt-3 flex flex-wrap gap-2">
-                  <Button size="sm" onClick={() => setSelected(new Set(result.projects.slice(0, 3).map((p) => p.id)))}>Select the top three</Button>
+                  <Button size="sm" onClick={() => setSelected(new Set(result.projects.slice(0, 3).map((p) => p.id)))}>
+                    Select the top three
+                  </Button>
                   <Button
                     size="sm"
                     variant="primary"
-                    onClick={() => mutate(() => api(`/api/resumes/${resume.id}/match/apply`, { body: { projectIds: [...selected] } }), 'Projects updated on this resume.')}
+                    onClick={() => mutate(() => api.resumes.applyProjects(resume.id, [...selected]), 'Projects updated on this resume.')}
                   >
                     Show only the selected projects
                   </Button>
                 </div>
-                <p className="mt-1 text-xs text-muted">Projects that are not ticked are hidden on this resume, not deleted.</p>
+                <p className="text-muted mt-1.5 text-xs">Projects that are not ticked are hidden on this resume, not deleted.</p>
               </>
             )}
-          </section>
+          </Block>
 
-          <section aria-labelledby="m-matched">
-            <h3 id="m-matched" className="mb-1 font-serif text-base font-semibold">In the job description, and in your library</h3>
+          <Block id="m-matched" title="In the job description, and in your library">
             {result.matched.length === 0 ? (
-              <p className="text-sm text-muted">No recognised skills or technologies from the posting appear in your library.</p>
+              <p className="text-muted text-sm">No recognised skills or technologies from the posting appear in your library.</p>
             ) : (
               <ul className="flex flex-wrap gap-1.5">
                 {result.matched.map((m) => (
@@ -127,12 +163,11 @@ export function MatchTab({ resume, mutate }: Props) {
                 ))}
               </ul>
             )}
-          </section>
+          </Block>
 
-          <section aria-labelledby="m-gaps">
-            <h3 id="m-gaps" className="mb-1 font-serif text-base font-semibold">In the job description, but not in your library</h3>
+          <Block id="m-gaps" title="In the job description, but not in your library">
             {result.gaps.length === 0 ? (
-              <p className="text-sm text-muted">No gaps found among the terms this tool recognises.</p>
+              <p className="text-muted text-sm">No gaps found among the terms this tool recognises.</p>
             ) : (
               <>
                 <ul className="flex flex-wrap gap-1.5">
@@ -142,27 +177,34 @@ export function MatchTab({ resume, mutate }: Props) {
                     </li>
                   ))}
                 </ul>
-                <p className="mt-2 text-sm text-muted">Nothing in your library mentions these. They are not added to your resume. Only add one if you genuinely have the experience, by recording it in your library first.</p>
+                <p className="text-muted mt-2 text-sm">
+                  Nothing in your library mentions these. They are not added to your resume. Only add one if you genuinely have the
+                  experience, by recording it in your library first.
+                </p>
               </>
             )}
-          </section>
+          </Block>
 
-          <section aria-labelledby="m-skills">
-            <h3 id="m-skills" className="mb-1 font-serif text-base font-semibold">Your skills that fit</h3>
+          <Block id="m-skills" title="Your skills that fit">
             {result.skills.length === 0 ? (
-              <p className="text-sm text-muted">None of your listed skills match the posting.</p>
+              <p className="text-muted text-sm">None of your listed skills match the posting.</p>
             ) : (
-              <ul className="space-y-1">
+              <ul className="divide-line border-line bg-surface divide-y rounded-lg border">
                 {result.skills.map((s) => {
                   const inResume = skillsIn[s.id];
                   return (
-                    <li key={s.id} className="flex items-center justify-between gap-2 text-sm">
+                    <li key={s.id} className="flex items-center justify-between gap-2 px-3 py-2 text-sm">
                       <span>
-                        {s.name} <span className="text-xs text-muted">({s.term})</span>
+                        {s.name} <span className="text-muted text-xs">({s.term})</span>
                       </span>
                       {inResume === undefined ? (
-                        <Button size="sm" onClick={() => mutate(() => api(`/api/resumes/${resume.id}/items`, { body: { sourceType: 'skill', sourceId: s.id } }), 'Skill added.')}>
-                          <Plus className="h-3.5 w-3.5" aria-hidden />
+                        <Button
+                          size="sm"
+                          onClick={() =>
+                            mutate(() => api.resumes.addItem(resume.id, { sourceType: 'skill', sourceId: s.id }), 'Skill added.')
+                          }
+                        >
+                          <Plus className="size-3.5" aria-hidden />
                           Add to resume
                         </Button>
                       ) : inResume ? (
@@ -175,19 +217,18 @@ export function MatchTab({ resume, mutate }: Props) {
                 })}
               </ul>
             )}
-          </section>
+          </Block>
 
           {result.experiences.length > 0 ? (
-            <section aria-labelledby="m-exp">
-              <h3 id="m-exp" className="mb-1 font-serif text-base font-semibold">Most relevant roles</h3>
+            <Block id="m-exp" title="Most relevant roles">
               <ul className="space-y-1 text-sm">
                 {result.experiences.slice(0, 4).map((e) => (
                   <li key={e.id}>
-                    {e.title} at {e.org} <span className="text-xs text-muted">({e.terms.join(', ')})</span>
+                    {e.title} at {e.org} <span className="text-muted text-xs">({e.terms.join(', ')})</span>
                   </li>
                 ))}
               </ul>
-            </section>
+            </Block>
           ) : null}
         </>
       ) : null}
