@@ -8,6 +8,7 @@ import { issuesToFields, projectSchema } from '@/lib/schemas';
 import type { Project } from '@/lib/types';
 import { BulletList, type EditableBullet } from '../shared/BulletList';
 import { Badge, Button, ConfirmDialog, Notice, SectionCard, SelectField, TagInput, TextArea, TextField, useToast } from '../ui';
+import { useHeader } from '../layout/HeaderContext';
 
 interface Draft {
   name: string;
@@ -134,8 +135,15 @@ export function ProjectForm({ initial }: { initial: Project | null }) {
 
   const saveLabel = initial ? 'Save changes' : 'Add project';
 
+  useHeader({
+    crumbs: initial
+      ? [{ label: 'Projects', href: '/projects' }, { label: draft.name || initial.name }]
+      : [{ label: 'Projects', href: '/projects' }, { label: 'New project' }],
+    title: initial ? draft.name || initial.name : 'Add a project',
+  });
+
   return (
-    <div className="grid items-start gap-6 pb-20 lg:grid-cols-[minmax(0,1fr)_17rem] lg:pb-0">
+    <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">
       <div className="space-y-6">
         <SectionCard id="basics" title="The basics">
           <div className="grid gap-4 sm:grid-cols-2">
@@ -328,7 +336,7 @@ export function ProjectForm({ initial }: { initial: Project | null }) {
         </SectionCard>
       </div>
 
-      <aside className="space-y-4 lg:sticky lg:top-6">
+      <aside className="space-y-4 lg:sticky lg:top-20">
         <div className="border-line bg-surface shadow-card rounded-xl border p-5">
           <div className="mb-3 flex flex-wrap items-center gap-1.5">
             {initial ? (
@@ -390,13 +398,6 @@ export function ProjectForm({ initial }: { initial: Project | null }) {
           </ul>
         </nav>
       </aside>
-
-      <div className="border-line bg-surface fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t px-4 py-3 lg:hidden">
-        <span className="text-muted text-sm">{initial ? (dirty ? 'Unsaved changes' : 'All changes saved') : 'New project'}</span>
-        <Button variant="primary" loading={saving} disabled={initial ? !dirty : false} onClick={() => persist(draft, 'Project saved.')}>
-          {saveLabel}
-        </Button>
-      </div>
 
       <ConfirmDialog
         open={confirmDelete}

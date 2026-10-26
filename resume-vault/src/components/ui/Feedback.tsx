@@ -15,14 +15,14 @@ export function EmptyState({
   action?: ReactNode;
 }) {
   return (
-    <div className="border-line-strong bg-surface rounded-xl border border-dashed px-6 py-12 text-center">
+    <div className="border-line bg-surface/50 rounded-2xl border border-dashed px-6 py-14 text-center">
       {Icon ? (
-        <span className="bg-brand-soft text-brand mx-auto mb-3 flex size-11 items-center justify-center rounded-full">
-          <Icon className="size-5" aria-hidden />
+        <span className="bg-brand/10 text-brand dark:bg-brand/20 dark:text-blue-400 mx-auto mb-3.5 flex size-12 items-center justify-center rounded-full">
+          <Icon className="size-6" aria-hidden />
         </span>
       ) : null}
       <p className="text-ink text-base font-semibold">{title}</p>
-      {children ? <p className="text-muted mx-auto mt-1 max-w-md text-sm">{children}</p> : null}
+      {children ? <p className="text-muted mx-auto mt-1.5 max-w-md text-sm leading-relaxed">{children}</p> : null}
       {action ? <div className="mt-5 flex flex-wrap justify-center gap-2">{action}</div> : null}
     </div>
   );

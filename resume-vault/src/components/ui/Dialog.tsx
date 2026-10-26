@@ -45,25 +45,25 @@ export function Dialog({ open, onClose, title, description, children, footer, si
     >
       {open ? (
         <div className="flex max-h-[88vh] flex-col">
-          <div className="flex items-start justify-between gap-4 px-6 pt-5 pb-3">
+          <div className="flex items-start justify-between gap-4 px-4 sm:px-6 pt-4 sm:pt-5 pb-2.5 sm:pb-3">
             <div>
-              <h2 id={titleId} className="text-ink text-lg font-semibold tracking-tight">
+              <h2 id={titleId} className="text-ink text-base sm:text-lg font-semibold tracking-tight">
                 {title}
               </h2>
-              {description ? <p className="text-muted mt-0.5 text-sm">{description}</p> : null}
+              {description ? <p className="text-muted mt-0.5 text-xs sm:text-sm">{description}</p> : null}
             </div>
             <button
               type="button"
               onClick={onClose}
               aria-label="Close"
-              className="text-muted hover:bg-sunken hover:text-ink -mt-1 -mr-2 rounded-lg p-1.5"
+              className="text-muted hover:bg-sunken hover:text-ink -mt-1 -mr-1 rounded-lg p-1.5"
             >
               <X className="size-5" aria-hidden />
             </button>
           </div>
-          <div className="overflow-y-auto px-6 pb-5">{children}</div>
+          <div className="overflow-y-auto px-4 sm:px-6 pb-4 sm:pb-5">{children}</div>
           {footer ? (
-            <div className="border-line bg-sunken flex flex-wrap justify-end gap-2 rounded-b-2xl border-t px-6 py-3.5">{footer}</div>
+            <div className="border-line bg-sunken flex flex-wrap justify-end gap-2 rounded-b-2xl border-t px-4 sm:px-6 py-3">{footer}</div>
           ) : null}
         </div>
       ) : null}

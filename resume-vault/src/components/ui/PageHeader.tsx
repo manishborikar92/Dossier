@@ -1,11 +1,9 @@
-import { ChevronRight } from 'lucide-react';
-import Link from 'next/link';
-import type { ReactNode } from 'react';
+'use client';
 
-export interface Crumb {
-  label: string;
-  href?: string;
-}
+import { useMemo, type ReactNode } from 'react';
+import { useHeader, type Crumb } from '../layout/HeaderContext';
+
+export type { Crumb };
 
 export function PageHeader({
   title,
@@ -20,32 +18,32 @@ export function PageHeader({
   crumbs?: Crumb[];
   meta?: ReactNode;
 }) {
+  const resolvedCrumbs = useMemo(() => crumbs ?? [{ label: title }], [crumbs, title]);
+
+  // Register breadcrumbs and top-right actions into the layout Header
+  useHeader({
+    crumbs: resolvedCrumbs,
+    actions,
+    title,
+  });
+
   return (
-    <header className="mb-6">
-      {crumbs && crumbs.length > 0 ? (
-        <nav aria-label="Breadcrumb" className="text-muted mb-2 flex flex-wrap items-center gap-1 text-[13px]">
-          {crumbs.map((c, i) => (
-            <span key={c.label} className="inline-flex items-center gap-1">
-              {c.href ? (
-                <Link href={c.href} className="hover:text-brand font-medium">
-                  {c.label}
-                </Link>
-              ) : (
-                <span aria-current="page">{c.label}</span>
-              )}
-              {i < crumbs.length - 1 ? <ChevronRight className="size-3.5" aria-hidden /> : null}
-            </span>
-          ))}
-        </nav>
-      ) : null}
+    <div className="mb-6">
       <div className="flex flex-wrap items-start justify-between gap-x-6 gap-y-3">
-        <div className="min-w-0 max-w-2xl">
-          <h1 className="text-ink text-[1.65rem] leading-tight font-semibold tracking-tight break-words">{title}</h1>
-          {description ? <p className="text-muted mt-1.5 text-[15px]">{description}</p> : null}
-          {meta ? <div className="mt-2 flex flex-wrap items-center gap-1.5">{meta}</div> : null}
+        <div className="min-w-0 max-w-3xl">
+          <h1 className="text-ink text-2xl sm:text-[1.75rem] leading-tight font-bold tracking-tight break-words">
+            {title}
+          </h1>
+          {description ? (
+            <p className="text-muted mt-1.5 text-sm sm:text-[15px] leading-relaxed">
+              {description}
+            </p>
+          ) : null}
+          {meta ? <div className="mt-3 flex flex-wrap items-center gap-2">{meta}</div> : null}
         </div>
-        {actions ? <div className="flex flex-wrap items-center gap-2">{actions}</div> : null}
+        {/* On very small mobile screens (<640px), keep actions accessible inline as well */}
+        {actions ? <div className="flex flex-wrap items-center gap-2 sm:hidden w-full pt-1">{actions}</div> : null}
       </div>
-    </header>
+    </div>
   );
 }

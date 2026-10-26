@@ -12,6 +12,7 @@ import { TEMPLATES } from '@/lib/templates';
 import type { ResumeListEntry, TemplateId } from '@/lib/types';
 import { Badge, Button, Card, ConfirmDialog, Dialog, EmptyState, Notice, TextArea, TextField, useToast } from '../ui';
 import { TemplatePicker } from './TemplatePicker';
+import { useHeader } from '../layout/HeaderContext';
 
 type Preselect = 'none' | 'top' | 'match';
 
@@ -101,6 +102,11 @@ export function ResumesManager({ initial, canCreate, defaultTemplate }: Props) {
     </Button>
   );
 
+  useHeader({
+    crumbs: [{ label: 'Resumes' }],
+    title: 'Resumes',
+  });
+
   return (
     <div>
       {!canCreate ? (
@@ -153,7 +159,19 @@ export function ResumesManager({ initial, canCreate, defaultTemplate }: Props) {
                     {r.outdatedCount > 0 ? <Badge tone="warn">{r.outdatedCount} changed in library</Badge> : null}
                     {r.parentId ? <Badge title="Created by duplicating another resume">Copy</Badge> : null}
                   </div>
-                  <p className="text-muted mt-3 text-xs">Updated {formatDateTime(r.updatedAt)}</p>
+                  {r.outdatedCount > 0 ? (
+                    <div className="bg-warn-soft/40 border border-warn/25 rounded-lg px-3 py-2 mt-3 flex items-center justify-between text-xs">
+                      <span className="text-ink font-medium">
+                        ⚠️ {r.outdatedCount} {r.outdatedCount === 1 ? 'item' : 'items'} changed in library
+                      </span>
+                      <Link href={`/resumes/${r.id}?review=1`} className="text-warn font-semibold hover:underline ml-2">
+                        Review
+                      </Link>
+                    </div>
+                  ) : null}
+                  <p className="text-muted mt-3 text-xs" suppressHydrationWarning>
+                    Updated {formatDateTime(r.updatedAt)}
+                  </p>
                   <div className="border-line mt-4 flex flex-wrap items-center gap-2 border-t pt-4">
                     <Link href={`/resumes/${r.id}`} className={buttonClass('primary', 'sm')}>
                       Open

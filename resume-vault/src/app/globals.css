@@ -63,6 +63,7 @@
 
   dialog {
     color: var(--color-ink);
+    background: var(--color-surface);
   }
   dialog::backdrop {
     background: rgb(17 24 39 / 0.5);

@@ -157,7 +157,7 @@ export function ResumeBuilder({ initial, library }: { initial: ResumeDetail; lib
             {tab === 'versions' ? <VersionsTab resume={resume} versions={versions} mutate={mutate} /> : null}
           </div>
         </div>
-        <div className={cx('min-w-0 lg:sticky lg:top-6', pane === 'edit' && 'hidden lg:block')}>
+        <div className={cx('min-w-0 lg:sticky lg:top-20', pane === 'edit' && 'hidden lg:block')}>
           <PdfPreview resumeId={id} refreshKey={previewKey} />
         </div>
       </div>

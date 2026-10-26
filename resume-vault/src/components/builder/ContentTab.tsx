@@ -1,6 +1,6 @@
 'use client';
 
-import { ChevronDown, Plus } from 'lucide-react';
+import { ChevronDown, Plus, RefreshCw } from 'lucide-react';
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { cx } from '@/lib/classes';
@@ -31,6 +31,7 @@ export function ContentTab({ resume, items, library, mutate }: Props) {
 
   const header = items.find((i) => i.section === 'header');
   const ofSection = (key: SectionKey) => items.filter((i) => i.section === key).sort((a, b) => a.position - b.position);
+  const changedItems = items.filter((i) => i.sync === 'changed');
 
   const move = (list: ResumeItem[], index: number, dir: -1 | 1) => {
     const j = index + dir;
@@ -79,6 +80,30 @@ export function ContentTab({ resume, items, library, mutate }: Props) {
         <Notice tone="info">
           This resume is marked <strong>final</strong>. Edits here are not part of your saved versions until you save a new version.
         </Notice>
+      ) : null}
+
+      {changedItems.length > 0 ? (
+        <div className="border border-warn/30 bg-warn-soft/40 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-start gap-3 min-w-0">
+            <RefreshCw className="size-5 text-warn shrink-0 mt-0.5" aria-hidden />
+            <div>
+              <p className="text-ink text-sm font-semibold">
+                {changedItems.length} {changedItems.length === 1 ? 'item has' : 'items have'} changed in your library
+              </p>
+              <p className="text-muted text-xs mt-0.5">
+                Your library was updated since these items were added to this resume. Review each change to use the library version or keep this resume&apos;s version.
+              </p>
+            </div>
+          </div>
+          <Button
+            size="sm"
+            variant="primary"
+            onClick={() => setReviewing(changedItems[0])}
+            className="shrink-0"
+          >
+            Review changes ({changedItems.length})
+          </Button>
+        </div>
       ) : null}
       <p className="text-muted text-sm">
         Everything here is this resume&apos;s own copy. Editing it never changes your library or your other resumes. Untick an item to hide

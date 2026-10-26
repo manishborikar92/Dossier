@@ -65,7 +65,7 @@ export function VersionsTab({ resume, versions, mutate }: { resume: ResumeRecord
                 </p>
                 <Badge>{REASON[v.reason] ?? v.reason}</Badge>
               </div>
-              <p className="text-muted text-xs">{formatDateTime(v.createdAt)}</p>
+              <p className="text-muted text-xs" suppressHydrationWarning>{formatDateTime(v.createdAt)}</p>
               <div className="mt-2.5 flex flex-wrap gap-2">
                 <a
                   href={resumeFileUrl(resume.id, 'pdf', { version: v.id })}

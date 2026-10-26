@@ -5,6 +5,7 @@ export interface NavItem {
   href: string;
   label: string;
   icon: LucideIcon;
+  exact?: boolean;
 }
 
 export interface NavGroup {
@@ -12,8 +13,13 @@ export interface NavGroup {
   items: NavItem[];
 }
 
-export const NAV_GROUPS: NavGroup[] = [
-  { items: [{ href: '/', label: 'Dashboard', icon: LayoutDashboard }] },
+export const MAIN_NAV_GROUPS: NavGroup[] = [
+  {
+    label: 'Main',
+    items: [
+      { href: '/', label: 'Dashboard', icon: LayoutDashboard, exact: true },
+    ],
+  },
   {
     label: 'Library',
     items: [
@@ -22,9 +28,23 @@ export const NAV_GROUPS: NavGroup[] = [
       { href: '/projects', label: 'Projects', icon: FolderGit2 },
     ],
   },
-  { label: 'Resumes', items: [{ href: '/resumes', label: 'Resumes', icon: FileText }] },
-  { label: 'System', items: [{ href: '/settings', label: 'Settings & backup', icon: Settings }] },
+  {
+    label: 'Resumes',
+    items: [
+      { href: '/resumes', label: 'Resumes', icon: FileText },
+    ],
+  },
 ];
 
-export const isNavActive = (pathname: string, href: string): boolean =>
-  href === '/' ? pathname === '/' : pathname === href || pathname.startsWith(`${href}/`);
+export const SETTINGS_NAV_ITEM: NavItem = {
+  href: '/settings',
+  label: 'Settings & backup',
+  icon: Settings,
+};
+
+export const isNavActive = (pathname: string, href: string, exact = false): boolean => {
+  if (exact || href === '/') {
+    return pathname === href;
+  }
+  return pathname === href || pathname.startsWith(`${href}/`);
+};

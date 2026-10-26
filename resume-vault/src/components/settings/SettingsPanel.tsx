@@ -8,6 +8,7 @@ import { buttonClass } from '@/lib/classes';
 import { TEMPLATES } from '@/lib/templates';
 import type { TemplateId } from '@/lib/types';
 import { Button, ConfirmDialog, Notice, SectionCard, SelectField, useToast } from '../ui';
+import { useHeader } from '../layout/HeaderContext';
 
 interface Props {
   defaults: { defaultPageSize: 'A4' | 'LETTER'; defaultTemplate: TemplateId };
@@ -28,6 +29,11 @@ export function SettingsPanel({ defaults, databasePath, backupsPath, counts }: P
   const [fileError, setFileError] = useState('');
   const [confirmOpen, setConfirmOpen] = useState(false);
   const [restoring, setRestoring] = useState(false);
+
+  useHeader({
+    crumbs: [{ label: 'Settings & backup' }],
+    title: 'Settings & backup',
+  });
 
   async function saveDefaults() {
     setSaving(true);

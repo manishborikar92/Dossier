@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowDown, ArrowUp, Plus, Trash2 } from 'lucide-react';
+import { ArrowDown, ArrowUp, CheckCircle2, Plus, Trash2 } from 'lucide-react';
 import { Badge, Button, IconButton } from '../ui';
 import { cx } from '@/lib/classes';
 
@@ -32,9 +32,24 @@ export function BulletList({ bullets, onChange, mode, errors = {}, errorPrefix =
     onChange(next);
   };
 
+  const unverifiedCount = bullets.filter((b) => !b.verified).length;
+
   return (
     <fieldset>
-      <legend className="text-ink-2 mb-2 text-[13px] font-medium">{label}</legend>
+      <div className="flex items-center justify-between mb-2">
+        <legend className="text-ink-2 text-[13px] font-medium">{label}</legend>
+        {mode === 'library' && unverifiedCount > 0 ? (
+          <button
+            type="button"
+            onClick={() => onChange(bullets.map((b) => ({ ...b, verified: true })))}
+            className="text-brand dark:text-blue-400 hover:underline text-xs font-medium inline-flex items-center gap-1"
+            title="Mark all bullets verified on this item"
+          >
+            <CheckCircle2 className="size-3.5" aria-hidden />
+            Verify all {unverifiedCount} {unverifiedCount === 1 ? 'bullet' : 'bullets'}
+          </button>
+        ) : null}
+      </div>
       {bullets.length === 0 ? <p className="text-muted mb-2 text-sm">No bullet points yet.</p> : null}
       <ul className="space-y-2">
         {bullets.map((b, i) => {

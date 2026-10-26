@@ -89,7 +89,7 @@ export function Menu({
                 </span>
               </>
             );
-            const cls = 'hover:bg-sunken focus:bg-sunken flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left outline-none';
+            const cls = 'hover:bg-sunken flex w-full items-start gap-2.5 rounded-lg px-2.5 py-2 text-left outline-none';
             return item.href ? (
               <a
                 key={item.label}

@@ -7,6 +7,7 @@ import { ApiError, api, errorMessage } from '@/lib/api';
 import { issuesToFields, profileSchema } from '@/lib/schemas';
 import type { ProfileData } from '@/lib/types';
 import { Badge, Button, IconButton, SectionCard, TextArea, TextField, useToast } from '../ui';
+import { useHeader } from '../layout/HeaderContext';
 
 interface FormState {
   fullName: string;
@@ -63,6 +64,11 @@ export function ProfileEditor({ initial }: { initial: ProfileData }) {
   }
 
   const contactPreview = [form.location, form.email, form.phone, ...form.links.map((l) => l.label)].filter(Boolean).join('  ·  ');
+
+  useHeader({
+    crumbs: [{ label: 'Profile' }],
+    title: 'Profile',
+  });
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_20rem]">
@@ -222,7 +228,7 @@ export function ProfileEditor({ initial }: { initial: ProfileData }) {
         </SectionCard>
       </div>
 
-      <aside className="space-y-4 lg:sticky lg:top-6">
+      <aside className="space-y-4 lg:sticky lg:top-20">
         <div className="border-line bg-surface shadow-card rounded-xl border p-5">
           <p className="text-muted mb-3 text-[11px] font-semibold tracking-wider uppercase">Header preview</p>
           <p className="text-brand text-lg font-semibold tracking-tight">{form.fullName || 'Your name'}</p>

@@ -94,6 +94,7 @@ export type ResumePatchInput = z.infer<typeof resumePatchSchema>;
 
 export const api = {
   profile: {
+    get: () => request<ProfileData>('/api/profile'),
     save: (body: ProfileInput) => request<ProfileData>('/api/profile', 'PUT', body),
   },
 
