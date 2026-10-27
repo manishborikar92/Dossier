@@ -147,11 +147,16 @@ export function Sidebar({
         aria-label="Sidebar navigation"
         className={cx(
           'border-line bg-surface hidden shrink-0 border-r lg:flex lg:flex-col lg:h-dvh lg:sticky lg:top-0 z-30 transition-[width] duration-300 ease-in-out overflow-x-hidden',
-          collapsed ? 'w-16' : 'w-64',
+          collapsed ? 'w-14' : 'w-64',
         )}
       >
-        {/* TOP HEADER ROW (height: 56px / h-14, padding: px-3) */}
-        <div className="border-line flex h-14 shrink-0 items-center justify-between border-b px-3 overflow-hidden">
+        {/* TOP HEADER ROW (height: 56px / h-14, padding: px-2 when collapsed, px-3 when expanded) */}
+        <div
+          className={cx(
+            'border-line flex h-14 shrink-0 items-center justify-between border-b overflow-hidden transition-[padding] duration-300 ease-in-out',
+            collapsed ? 'px-2' : 'px-3',
+          )}
+        >
           {/* Left item: Logo + Title (or Toggle in collapsed state) */}
           <div className="flex items-center min-w-0">
             <div className="relative group/topbtn flex size-10 shrink-0 items-center justify-center">
@@ -159,6 +164,7 @@ export function Sidebar({
                 <button
                   type="button"
                   onClick={onToggleCollapse}
+                  title="Expand sidebar (Ctrl+Shift+S)"
                   aria-label="Toggle sidebar (Ctrl+Shift+S)"
                   className="flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
                 >
@@ -213,6 +219,7 @@ export function Sidebar({
               type="button"
               onClick={onToggleCollapse}
               tabIndex={collapsed ? -1 : 0}
+              title="Collapse sidebar (Ctrl+Shift+S)"
               aria-label="Toggle sidebar (Ctrl+Shift+S)"
               className="text-ink-2 hover:text-ink hover:bg-sunken flex size-8 items-center justify-center rounded-lg transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
             >
@@ -226,8 +233,13 @@ export function Sidebar({
           aria-label="Main"
           className="flex flex-col flex-1 min-h-0 justify-between"
         >
-          {/* MIDDLE NAVIGATION CONTAINER (fixed px-3, overflow-y-auto, overflow-x-hidden) */}
-          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 px-3">
+          {/* MIDDLE NAVIGATION CONTAINER (px-2 when collapsed, px-3 when expanded) */}
+          <div
+            className={cx(
+              'flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 transition-[padding] duration-300 ease-in-out',
+              collapsed ? 'px-2' : 'px-3',
+            )}
+          >
             <div className="flex flex-col gap-3">
               {MAIN_NAV_GROUPS.map((group, groupIdx) => (
                 <div key={group.label ?? groupIdx} className="flex flex-col">
@@ -249,8 +261,8 @@ export function Sidebar({
                   {groupIdx > 0 ? (
                     <div
                       className={cx(
-                        'mx-auto border-t border-line transition-[max-height,opacity,margin,width] duration-300 ease-in-out overflow-hidden',
-                        collapsed ? 'max-h-4 opacity-100 my-1.5 w-8' : 'max-h-0 opacity-0 my-0 w-0',
+                        'border-t border-line transition-[max-height,opacity,margin,width] duration-300 ease-in-out overflow-hidden',
+                        collapsed ? 'max-h-4 opacity-100 my-1.5 w-8 mx-1' : 'max-h-0 opacity-0 my-0 w-0 mx-0',
                       )}
                       aria-hidden
                     />
@@ -263,19 +275,21 @@ export function Sidebar({
                       const navLabel = badgeText !== null ? `${label} (${badgeText})` : label;
 
                       return (
-                        <li key={href} className="w-full">
+                        <li key={href} className={cx('w-full flex', collapsed ? 'justify-start' : '')}>
                           <Link
                             href={href}
                             aria-label={navLabel}
+                            title={collapsed ? navLabel : undefined}
                             aria-current={active ? 'page' : undefined}
                             className={cx(
-                              'relative flex h-10 w-full items-center rounded-lg transition-colors overflow-hidden',
+                              'relative flex h-10 items-center rounded-lg transition-colors overflow-hidden',
+                              collapsed ? 'w-10 shrink-0' : 'w-full',
                               active
                                 ? 'bg-brand-soft text-brand font-semibold'
                                 : 'text-ink-2 hover:bg-sunken hover:text-ink',
                             )}
                           >
-                            {/* Left Icon Container: size-10 (40px) exactly centered at 32px */}
+                            {/* Left Icon Container: size-10 (40px) */}
                             <div className="relative size-10 shrink-0 flex items-center justify-center">
                               <Icon
                                 className={cx('size-5 shrink-0 transition-colors', active ? 'text-brand' : 'text-muted')}
@@ -327,20 +341,27 @@ export function Sidebar({
             </div>
           </div>
 
-          {/* BOTTOM FIXED SETTINGS (smooth slide and fade, icon centered at 32px) */}
-          <div className="shrink-0 border-t border-line p-3 overflow-hidden">
+          {/* BOTTOM FIXED SETTINGS (p-2 when collapsed, p-3 when expanded) */}
+          <div
+            className={cx(
+              'shrink-0 border-t border-line overflow-hidden transition-[padding] duration-300 ease-in-out',
+              collapsed ? 'p-2' : 'p-3',
+            )}
+          >
             <Link
               href={SETTINGS_NAV_ITEM.href}
               aria-label={SETTINGS_NAV_ITEM.label}
+              title={collapsed ? SETTINGS_NAV_ITEM.label : undefined}
               aria-current={isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'page' : undefined}
               className={cx(
-                'flex h-10 w-full items-center rounded-lg transition-colors overflow-hidden',
+                'flex h-10 items-center rounded-lg transition-colors overflow-hidden',
+                collapsed ? 'w-10 shrink-0' : 'w-full',
                 isNavActive(pathname, SETTINGS_NAV_ITEM.href)
                   ? 'bg-brand-soft text-brand font-semibold'
                   : 'text-ink-2 hover:bg-sunken hover:text-ink',
               )}
             >
-              {/* Left Icon Container: size-10 (40px) exactly centered at 32px */}
+              {/* Left Icon Container: size-10 (40px) */}
               <div className="size-10 shrink-0 flex items-center justify-center">
                 <Settings
                   className={cx(
