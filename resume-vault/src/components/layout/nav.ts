@@ -42,6 +42,9 @@ export const SETTINGS_NAV_ITEM: NavItem = {
   icon: Settings,
 };
 
+export const SIDEBAR_STORAGE_KEY = 'resume_vault_sidebar_collapsed';
+export const SIDEBAR_COOKIE_NAME = SIDEBAR_STORAGE_KEY;
+
 export const isNavActive = (pathname: string, href: string, exact = false): boolean => {
   if (exact || href === '/') {
     return pathname === href;

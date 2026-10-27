@@ -1,16 +1,26 @@
 'use client';
 
 import { usePathname } from 'next/navigation';
-import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
+import { useCallback, useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { api } from '@/lib/api';
 import { cx } from '@/lib/classes';
 import { ToastProvider } from '../ui';
 import { Header } from './Header';
 import { HeaderProvider } from './HeaderContext';
+import { SIDEBAR_STORAGE_KEY } from './nav';
 import { Sidebar } from './Sidebar';
 
-const SIDEBAR_STORAGE_KEY = 'resume_vault_sidebar_collapsed';
 const sidebarListeners = new Set<() => void>();
+
+function setSidebarCookie(collapsed: boolean) {
+  try {
+    const isSecure = typeof location !== 'undefined' && location.protocol === 'https:';
+    const secureFlag = isSecure ? '; Secure' : '';
+    document.cookie = `${SIDEBAR_STORAGE_KEY}=${String(collapsed)}; path=/; max-age=31536000; SameSite=Lax${secureFlag}`;
+  } catch {
+    // ignore
+  }
+}
 
 function subscribeToSidebar(listener: () => void) {
   sidebarListeners.add(listener);
@@ -24,37 +34,68 @@ function subscribeToSidebar(listener: () => void) {
   };
 }
 
-function getSidebarSnapshot(): boolean {
+function readStoredSidebarState(fallback: boolean): boolean {
   try {
-    return localStorage.getItem(SIDEBAR_STORAGE_KEY) === 'true';
+    const item = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+    if (item !== null) return item === 'true';
   } catch {
-    return false;
+    // ignore
   }
+  return fallback;
 }
 
-function getSidebarServerSnapshot(): boolean {
-  return false;
-}
-
-function toggleSidebarCollapsed(current: boolean) {
+function toggleSidebarCollapsed(fallback: boolean): boolean {
+  const current = readStoredSidebarState(fallback);
   const next = !current;
   try {
     localStorage.setItem(SIDEBAR_STORAGE_KEY, String(next));
   } catch {
     // ignore
   }
+  setSidebarCookie(next);
   sidebarListeners.forEach((l) => l());
+  return next;
 }
 
-export function Shell({ children }: { children: ReactNode }) {
+export function Shell({
+  children,
+  initialCollapsed = false,
+}: {
+  children: ReactNode;
+  initialCollapsed?: boolean;
+}) {
   const pathname = usePathname();
   const [mobileOpen, setMobileOpen] = useState(false);
 
+  const getSnapshot = useCallback(() => {
+    return readStoredSidebarState(initialCollapsed);
+  }, [initialCollapsed]);
+
+  const getServerSnapshot = useCallback(() => initialCollapsed, [initialCollapsed]);
+
   const sidebarCollapsed = useSyncExternalStore(
     subscribeToSidebar,
-    getSidebarSnapshot,
-    getSidebarServerSnapshot,
+    getSnapshot,
+    getServerSnapshot,
   );
+
+  const handleToggleCollapse = useCallback(() => {
+    toggleSidebarCollapsed(initialCollapsed);
+  }, [initialCollapsed]);
+
+  // Sync cookie with legacy localStorage on initial client mount
+  useEffect(() => {
+    try {
+      const item = localStorage.getItem(SIDEBAR_STORAGE_KEY);
+      if (item !== null) {
+        setSidebarCookie(item === 'true');
+      } else if (initialCollapsed) {
+        localStorage.setItem(SIDEBAR_STORAGE_KEY, 'true');
+      }
+    } catch {
+      // ignore
+    }
+  }, [initialCollapsed]);
 
   const [projectCount, setProjectCount] = useState<number | undefined>(undefined);
   const [resumeCount, setResumeCount] = useState<number | undefined>(undefined);
@@ -67,13 +108,13 @@ export function Shell({ children }: { children: ReactNode }) {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 's' || e.key === 'S')) {
         e.preventDefault();
-        toggleSidebarCollapsed(sidebarCollapsed);
+        toggleSidebarCollapsed(initialCollapsed);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [sidebarCollapsed]);
+  }, [initialCollapsed]);
 
   // Fetch counts for sidebar badges
   useEffect(() => {
@@ -120,7 +161,7 @@ export function Shell({ children }: { children: ReactNode }) {
             mobileOpen={mobileOpen}
             onCloseMobile={() => setMobileOpen(false)}
             collapsed={sidebarCollapsed}
-            onToggleCollapse={() => toggleSidebarCollapsed(sidebarCollapsed)}
+            onToggleCollapse={handleToggleCollapse}
             projectCount={projectCount}
             resumeCount={resumeCount}
             needsReviewCount={needsReviewCount}

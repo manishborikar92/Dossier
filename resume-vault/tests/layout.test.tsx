@@ -10,6 +10,8 @@ vi.mock('next/navigation', () => ({
 
 import { Header } from '@/components/layout/Header';
 import { HeaderProvider } from '@/components/layout/HeaderContext';
+import { SIDEBAR_COOKIE_NAME, SIDEBAR_STORAGE_KEY } from '@/components/layout/nav';
+import { Shell } from '@/components/layout/Shell';
 import { Sidebar, SidebarIcon } from '@/components/layout/Sidebar';
 
 const renderWithProviders = (el: ReactElement) =>
@@ -156,5 +158,36 @@ describe('Header & Sidebar Layout (Matching Reference Layout)', () => {
       />,
     );
     expect(collapsed).toContain('aria-label="Main"');
+  });
+
+  it('renders Shell with initialCollapsed=true generating w-14 rail for SSR zero-flicker', () => {
+    const markup = renderToStaticMarkup(
+      <Shell initialCollapsed={true}>
+        <div data-testid="page-child">Test Page Content</div>
+      </Shell>,
+    );
+
+    // Sidebar rendered collapsed directly during SSR
+    expect(markup).toContain('w-14');
+    expect(markup).not.toContain('w-64');
+    expect(markup).toContain('Test Page Content');
+    expect(markup).toContain('Skip to content');
+  });
+
+  it('renders Shell with initialCollapsed=false generating w-64 rail for SSR expanded mode', () => {
+    const markup = renderToStaticMarkup(
+      <Shell initialCollapsed={false}>
+        <div data-testid="page-child">Test Page Content</div>
+      </Shell>,
+    );
+
+    // Sidebar rendered expanded during SSR
+    expect(markup).toContain('w-64');
+    expect(markup).toContain('Test Page Content');
+  });
+
+  it('ensures sidebar cookie name and storage key match the unified constant', () => {
+    expect(SIDEBAR_STORAGE_KEY).toBe('resume_vault_sidebar_collapsed');
+    expect(SIDEBAR_COOKIE_NAME).toBe(SIDEBAR_STORAGE_KEY);
   });
 });
