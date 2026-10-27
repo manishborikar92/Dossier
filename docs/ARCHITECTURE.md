@@ -29,7 +29,7 @@ Dossier/
 ├── web/                        # Independent Next.js 16 frontend application
 │   ├── backups/                # Starter backup files (manish-dossier-data.json, etc.)
 │   ├── public/                 # Static web assets
-│   ├── scripts/                # Frontend smoke tests, E2E runner, sample seeder
+│   ├── scripts/                # Frontend smoke tests and E2E browser runner
 │   ├── src/                    # Application source code
 │   │   ├── app/                # App Router pages and route handlers
 │   │   ├── components/         # UI component library, layout, and feature screens

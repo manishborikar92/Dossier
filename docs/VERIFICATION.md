@@ -32,6 +32,11 @@ Summary of validation checks, test suites, automated builds, and manual verifica
    - Database storage convention updated to `dossier.db` with seamless fallback for existing `vault.db`.
    - Backup format updated to `app: "dossier"` with backward-compatible support for restoring legacy backups.
 
+3. **Removal of Sample Seeder**:
+   - Removed `web/scripts/seed-sample.ts` and `web/src/server/sample.ts`.
+   - Removed `tsx` dependency and `seed:sample` scripts.
+   - Consolidated test fixture setup inside `web/tests/helpers.ts`.
+
 ---
 
 ## Test Suite Coverage

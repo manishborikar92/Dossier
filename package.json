@@ -14,7 +14,6 @@
     "lint": "npm --prefix web run lint",
     "typecheck": "npm --prefix web run typecheck",
     "test": "npm --prefix web test",
-    "seed:sample": "npm --prefix web run seed:sample",
     "smoke": "npm --prefix web run smoke",
     "e2e": "npm --prefix web run e2e",
     "format": "npm --prefix web run format",

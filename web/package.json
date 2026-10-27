@@ -14,7 +14,6 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "seed:sample": "tsx scripts/seed-sample.ts",
     "smoke": "node scripts/smoke-test.mjs",
     "e2e": "node scripts/e2e.mjs",
     "format": "prettier --write .",
@@ -46,7 +45,6 @@
     "prettier": "^3.9.10",
     "puppeteer-core": "^25.16.0",
     "tailwindcss": "^4.3.3",
-    "tsx": "^4.23.15",
     "typescript": "^6.0.3",
     "vite": "^8.3.5",
     "vitest": "^5.0.5"

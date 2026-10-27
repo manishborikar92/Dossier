@@ -7,8 +7,7 @@ import { openDb } from '@/server/db';
 import { createResume, saveVersion, updateItem } from '@/server/resumes';
 import { listEntities } from '@/server/library';
 import type { Project } from '@/lib/types';
-import { seedSample } from '@/server/sample';
-import { freshDb } from './helpers';
+import { freshDb, seedTestFixtures } from './helpers';
 
 const NEW = {
   name: 'Backup me',
@@ -70,7 +69,7 @@ describe('backup and restore', () => {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'dossier-test-'));
     try {
       const db = openDb(path.join(dir, 'dossier.db'));
-      seedSample(db);
+      seedTestFixtures(db);
       const backup = JSON.parse(JSON.stringify(exportBackup(db)));
       const result = restoreBackup(db, backup, { safetyDir: path.join(dir, 'backups') });
       expect(result.safetyCopy).toBeTruthy();
@@ -89,7 +88,7 @@ describe('backup and restore', () => {
     try {
       const file = path.join(dir, 'dossier.db');
       const first = openDb(file);
-      seedSample(first);
+      seedTestFixtures(first);
       createResume(first, NEW);
       first.close();
 

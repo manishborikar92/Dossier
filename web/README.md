@@ -51,13 +51,6 @@ The application binds to `127.0.0.1` by default and enforces same-origin securit
 2. Navigate to **Projects → Import knowledge base** and select `backups/project_knowledge_base.json`.
 3. Navigate to **Resumes → New resume** to generate a targeted document.
 
-For demo or testing purposes with a dedicated database:
-
-```bash
-DATA_DIR=./data-demo npm run seed:sample
-DATA_DIR=./data-demo npm start
-```
-
 ## Data Storage
 
 | Item                     | Location                                                        |
@@ -69,17 +62,16 @@ To customize the storage directory, set `DATA_DIR` in your environment or `.env`
 
 ## Available Scripts
 
-| Command               | Description                                              |
-| --------------------- | -------------------------------------------------------- |
-| `npm run dev`         | Starts local Next.js development server                  |
-| `npm run build`       | Produces optimized Next.js production build              |
-| `npm start`           | Runs built production server                             |
-| `npm test`            | Executes unit and integration test suite via Vitest      |
-| `npm run lint`        | Runs ESLint analysis                                     |
-| `npm run typecheck`   | Validates TypeScript types                               |
-| `npm run smoke`       | Runs end-to-end API smoke tests against a running server |
-| `npm run e2e`         | Executes Playwright browser automation suite             |
-| `npm run seed:sample` | Populates database with sample test records              |
+| Command             | Description                                              |
+| ------------------- | -------------------------------------------------------- |
+| `npm run dev`       | Starts local Next.js development server                  |
+| `npm run build`     | Produces optimized Next.js production build              |
+| `npm start`         | Runs built production server                             |
+| `npm test`          | Executes unit and integration test suite via Vitest      |
+| `npm run lint`      | Runs ESLint analysis                                     |
+| `npm run typecheck` | Validates TypeScript types                               |
+| `npm run smoke`     | Runs end-to-end API smoke tests against a running server |
+| `npm run e2e`       | Executes Playwright browser automation suite             |
 
 ## Directory Layout
 
@@ -87,7 +79,7 @@ To customize the storage directory, set `DATA_DIR` in your environment or `.env`
 web/
 ├── backups/             Seed and sample data files
 ├── public/              Static web assets
-├── scripts/             Test and seeding automation (smoke, e2e, seed)
+├── scripts/             Test automation (smoke, e2e)
 ├── src/
 │   ├── app/             Next.js 16 App Router (pages, layouts, route handlers)
 │   ├── components/      Modular React components (ui/, layout/, feature modules)

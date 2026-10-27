@@ -19,7 +19,7 @@ Dossier/
 ├── web/                        # Next.js 16 frontend application
 │   ├── backups/                # Starter datasets and export backups
 │   ├── public/                 # Static web assets
-│   ├── scripts/                # Frontend smoke tests, E2E checks, and seeders
+│   ├── scripts/                # Frontend smoke tests and E2E browser tests
 │   ├── src/
 │   │   ├── app/                # App Router pages, global styling, API routes
 │   │   ├── components/         # Design system (ui/), layout, and feature views
@@ -127,7 +127,6 @@ For in-depth architectural details, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE
 | `npm run lint` | Runs ESLint on `web/` |
 | `npm run typecheck` | Validates TypeScript types across `web/` |
 | `npm run smoke` | Runs automated HTTP API smoke tests |
-| `npm run seed:sample` | Populates the database with sample career records |
 | `npm run format` | Formats all code using Prettier |
 | `npm run format:check` | Verifies code formatting consistency |
 
