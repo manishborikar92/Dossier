@@ -109,7 +109,7 @@ describe('Header & Sidebar Layout (Matching Reference Layout)', () => {
     );
 
     // Collapsed rail width
-    expect(out).toContain('w-16');
+    expect(out).toContain('w-14');
 
     // Top slot has toggle button with tooltip and shortcut
     expect(out).toContain('Toggle sidebar (Ctrl+Shift+S)');

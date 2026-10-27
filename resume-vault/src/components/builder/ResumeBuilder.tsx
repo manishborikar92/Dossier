@@ -52,77 +52,96 @@ export function ResumeBuilder({ initial, library }: { initial: ResumeDetail; lib
   const unverified = useMemo(() => items.reduce((n, i) => n + unverifiedCount(i), 0), [items]);
   const outdated = items.filter((i) => i.sync === 'changed').length;
 
-  function download(format: ExportFormat) {
-    const link = document.createElement('a');
-    link.href = resumeFileUrl(id, format, { download: true });
-    link.download = '';
-    document.body.appendChild(link);
-    link.click();
-    link.remove();
-    // A version is saved automatically on download; refresh the list shortly after.
-    window.setTimeout(() => void reload().catch(() => undefined), 1500);
-  }
-  const startExport = (format: ExportFormat) => (unverified > 0 ? setExportAsk(format) : download(format));
+  const download = useCallback(
+    (format: ExportFormat) => {
+      const link = document.createElement('a');
+      link.href = resumeFileUrl(id, format, { download: true });
+      link.download = '';
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      // A version is saved automatically on download; refresh the list shortly after.
+      window.setTimeout(() => void reload().catch(() => undefined), 1500);
+    },
+    [id, reload],
+  );
+
+  const startExport = useCallback(
+    (format: ExportFormat) => (unverified > 0 ? setExportAsk(format) : download(format)),
+    [download, unverified],
+  );
+
+  const targetRole = [resume.targetTitle, resume.targetCompany].filter(Boolean).join(' at ');
+
+  const headerActions = useMemo(
+    () => (
+      <>
+        <Button onClick={() => void mutate(() => api.resumes.saveVersion(id), 'Version saved.')}>
+          <History className="size-4" aria-hidden />
+          Save version
+        </Button>
+        <Menu
+          variant="primary"
+          icon={Download}
+          label="Export"
+          items={[
+            {
+              label: 'Download PDF',
+              description: 'Selectable text, clickable links',
+              icon: FileDown,
+              onSelect: () => startExport('pdf'),
+            },
+            {
+              label: 'Download Word (.docx)',
+              description: 'Editable in Word and Google Docs',
+              icon: FileDown,
+              onSelect: () => startExport('docx'),
+            },
+            {
+              label: 'Open PDF to print',
+              description: 'Opens in a new tab',
+              icon: ExternalLink,
+              href: resumeFileUrl(id, 'pdf'),
+              newTab: true,
+            },
+          ]}
+        />
+      </>
+    ),
+    [id, mutate, startExport],
+  );
+
+  const crumbs = useMemo(
+    () => [{ label: 'Resumes', href: '/resumes' }, { label: resume.name }],
+    [resume.name],
+  );
+
+  const meta = useMemo(
+    () => (
+      <>
+        <Badge tone={resume.status === 'final' ? 'ok' : 'neutral'}>
+          {resume.status === 'final' ? 'Final' : 'Draft'}
+        </Badge>
+        <span className="text-muted text-sm">
+          {targetRole || 'No target role set'}
+        </span>
+        {outdated > 0 ? (
+          <Badge tone="warn">
+            {outdated} {outdated === 1 ? 'item' : 'items'} changed in library
+          </Badge>
+        ) : null}
+        {unverified > 0 ? (
+          <Badge tone="warn">
+            {unverified} unverified {unverified === 1 ? 'bullet' : 'bullets'}
+          </Badge>
+        ) : null}
+      </>
+    ),
+    [outdated, resume.status, targetRole, unverified],
+  );
 
   return (
     <div>
-      <PageHeader
-        title={resume.name}
-        crumbs={[{ label: 'Resumes', href: '/resumes' }, { label: resume.name }]}
-        meta={
-          <>
-            <Badge tone={resume.status === 'final' ? 'ok' : 'neutral'}>{resume.status === 'final' ? 'Final' : 'Draft'}</Badge>
-            <span className="text-muted text-sm">
-              {[resume.targetTitle, resume.targetCompany].filter(Boolean).join(' at ') || 'No target role set'}
-            </span>
-            {outdated > 0 ? (
-              <Badge tone="warn">
-                {outdated} {outdated === 1 ? 'item' : 'items'} changed in library
-              </Badge>
-            ) : null}
-            {unverified > 0 ? (
-              <Badge tone="warn">
-                {unverified} unverified {unverified === 1 ? 'bullet' : 'bullets'}
-              </Badge>
-            ) : null}
-          </>
-        }
-        actions={
-          <>
-            <Button onClick={() => void mutate(() => api.resumes.saveVersion(id), 'Version saved.')}>
-              <History className="size-4" aria-hidden />
-              Save version
-            </Button>
-            <Menu
-              variant="primary"
-              icon={Download}
-              label="Export"
-              items={[
-                {
-                  label: 'Download PDF',
-                  description: 'Selectable text, clickable links',
-                  icon: FileDown,
-                  onSelect: () => startExport('pdf'),
-                },
-                {
-                  label: 'Download Word (.docx)',
-                  description: 'Editable in Word and Google Docs',
-                  icon: FileDown,
-                  onSelect: () => startExport('docx'),
-                },
-                {
-                  label: 'Open PDF to print',
-                  description: 'Opens in a new tab',
-                  icon: ExternalLink,
-                  href: resumeFileUrl(id, 'pdf'),
-                  newTab: true,
-                },
-              ]}
-            />
-          </>
-        }
-      />
-
       <div className="border-line bg-surface mb-4 flex gap-1 rounded-lg border p-1 lg:hidden" role="group" aria-label="Show">
         {(['edit', 'preview'] as const).map((p) => (
           <button
@@ -139,6 +158,13 @@ export function ResumeBuilder({ initial, library }: { initial: ResumeDetail; lib
 
       <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] 2xl:grid-cols-[minmax(0,5fr)_minmax(0,4fr)]">
         <div className={cx('min-w-0', pane === 'preview' && 'hidden lg:block')}>
+          <PageHeader
+            title={resume.name}
+            crumbs={crumbs}
+            meta={meta}
+            actions={headerActions}
+          />
+
           <Tabs
             label="Resume sections"
             value={tab}
@@ -157,7 +183,7 @@ export function ResumeBuilder({ initial, library }: { initial: ResumeDetail; lib
             {tab === 'versions' ? <VersionsTab resume={resume} versions={versions} mutate={mutate} /> : null}
           </div>
         </div>
-        <div className={cx('min-w-0 lg:sticky lg:top-20', pane === 'edit' && 'hidden lg:block')}>
+        <div className={cx('min-w-0 lg:sticky lg:top-[5.5rem]', pane === 'edit' && 'hidden lg:block')}>
           <PdfPreview resumeId={id} refreshKey={previewKey} />
         </div>
       </div>

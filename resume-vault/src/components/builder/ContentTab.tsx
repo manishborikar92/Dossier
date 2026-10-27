@@ -75,96 +75,98 @@ export function ContentTab({ resume, items, library, mutate }: Props) {
   };
 
   return (
-    <div className="space-y-5">
-      {resume.status === 'final' ? (
-        <Notice tone="info">
-          This resume is marked <strong>final</strong>. Edits here are not part of your saved versions until you save a new version.
-        </Notice>
-      ) : null}
+    <>
+      <div className="space-y-5">
+        {resume.status === 'final' ? (
+          <Notice tone="info">
+            This resume is marked <strong>final</strong>. Edits here are not part of your saved versions until you save a new version.
+          </Notice>
+        ) : null}
 
-      {changedItems.length > 0 ? (
-        <div className="border border-warn/30 bg-warn-soft/40 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-start gap-3 min-w-0">
-            <RefreshCw className="size-5 text-warn shrink-0 mt-0.5" aria-hidden />
-            <div>
-              <p className="text-ink text-sm font-semibold">
-                {changedItems.length} {changedItems.length === 1 ? 'item has' : 'items have'} changed in your library
-              </p>
-              <p className="text-muted text-xs mt-0.5">
-                Your library was updated since these items were added to this resume. Review each change to use the library version or keep this resume&apos;s version.
-              </p>
-            </div>
-          </div>
-          <Button
-            size="sm"
-            variant="primary"
-            onClick={() => setReviewing(changedItems[0])}
-            className="shrink-0"
-          >
-            Review changes ({changedItems.length})
-          </Button>
-        </div>
-      ) : null}
-      <p className="text-muted text-sm">
-        Everything here is this resume&apos;s own copy. Editing it never changes your library or your other resumes. Untick an item to hide
-        it without losing your edits.
-      </p>
-
-      {header ? <ul>{row(header, [header], 0)}</ul> : null}
-
-      {resume.settings.sectionOrder.map((key) => {
-        const list = ofSection(key);
-        const hidden = resume.settings.hiddenSections.includes(key);
-        const title = resume.settings.sectionTitles[key]?.trim() || DEFAULT_SECTION_TITLES[key];
-        const shown = list.filter((i) => i.included).length;
-        const isOpen = open[key] ?? startsOpen(key, list.length);
-        const panelId = `section-panel-${key}`;
-        return (
-          <section key={key} aria-label={title} className="border-line bg-surface shadow-card rounded-xl border">
-            <div className="flex items-center gap-2 px-4 py-3">
-              <button
-                type="button"
-                aria-expanded={isOpen}
-                aria-controls={panelId}
-                onClick={() => setOpen((o) => ({ ...o, [key]: !isOpen }))}
-                className="flex min-w-0 flex-1 items-center gap-2 text-left"
-              >
-                <ChevronDown className={cx('text-muted size-4 shrink-0 transition-transform', !isOpen && '-rotate-90')} aria-hidden />
-                <h3 className="text-ink text-sm leading-snug font-semibold tracking-tight">{title}</h3>
-                <span className="text-muted hidden shrink-0 text-xs min-[460px]:inline">
-                  {shown} of {list.length} shown
-                </span>
-                {hidden ? <Badge tone="warn">Section hidden</Badge> : null}
-              </button>
-              <Button size="sm" onClick={() => setAdding(key)}>
-                <Plus className="size-3.5" aria-hidden />
-                {key === 'summary' ? (
-                  'Choose'
-                ) : (
-                  <>
-                    <span className="hidden sm:inline">Add from library</span>
-                    <span className="sm:hidden">Add</span>
-                  </>
-                )}
-              </Button>
-            </div>
-            {isOpen ? (
-              <div id={panelId} className="border-line border-t px-4 py-3">
-                {hidden ? (
-                  <p className="text-muted mb-2 text-xs">This section is hidden on the resume. Show it again in the Setup tab.</p>
-                ) : null}
-                {list.length === 0 ? (
-                  <p className="text-muted py-2 text-sm">
-                    Nothing here yet. Use “{key === 'summary' ? 'Choose summary' : 'Add from library'}” to bring something in.
-                  </p>
-                ) : (
-                  renderItems(key, list)
-                )}
+        {changedItems.length > 0 ? (
+          <div className="border border-warn/30 bg-warn-soft/40 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div className="flex items-start gap-3 min-w-0">
+              <RefreshCw className="size-5 text-warn shrink-0 mt-0.5" aria-hidden />
+              <div>
+                <p className="text-ink text-sm font-semibold">
+                  {changedItems.length} {changedItems.length === 1 ? 'item has' : 'items have'} changed in your library
+                </p>
+                <p className="text-muted text-xs mt-0.5">
+                  Your library was updated since these items were added to this resume. Review each change to use the library version or keep this resume&apos;s version.
+                </p>
               </div>
-            ) : null}
-          </section>
-        );
-      })}
+            </div>
+            <Button
+              size="sm"
+              variant="primary"
+              onClick={() => setReviewing(changedItems[0])}
+              className="shrink-0"
+            >
+              Review changes ({changedItems.length})
+            </Button>
+          </div>
+        ) : null}
+        <p className="text-muted text-sm">
+          Everything here is this resume&apos;s own copy. Editing it never changes your library or your other resumes. Untick an item to hide
+          it without losing your edits.
+        </p>
+
+        {header ? <ul>{row(header, [header], 0)}</ul> : null}
+
+        {resume.settings.sectionOrder.map((key) => {
+          const list = ofSection(key);
+          const hidden = resume.settings.hiddenSections.includes(key);
+          const title = resume.settings.sectionTitles[key]?.trim() || DEFAULT_SECTION_TITLES[key];
+          const shown = list.filter((i) => i.included).length;
+          const isOpen = open[key] ?? startsOpen(key, list.length);
+          const panelId = `section-panel-${key}`;
+          return (
+            <section key={key} aria-label={title} className="border-line bg-surface shadow-card rounded-xl border">
+              <div className="flex items-center gap-2 px-4 py-3">
+                <button
+                  type="button"
+                  aria-expanded={isOpen}
+                  aria-controls={panelId}
+                  onClick={() => setOpen((o) => ({ ...o, [key]: !isOpen }))}
+                  className="flex min-w-0 flex-1 items-center gap-2 text-left"
+                >
+                  <ChevronDown className={cx('text-muted size-4 shrink-0 transition-transform', !isOpen && '-rotate-90')} aria-hidden />
+                  <h3 className="text-ink text-sm leading-snug font-semibold tracking-tight">{title}</h3>
+                  <span className="text-muted hidden shrink-0 text-xs min-[460px]:inline">
+                    {shown} of {list.length} shown
+                  </span>
+                  {hidden ? <Badge tone="warn">Section hidden</Badge> : null}
+                </button>
+                <Button size="sm" onClick={() => setAdding(key)}>
+                  <Plus className="size-3.5" aria-hidden />
+                  {key === 'summary' ? (
+                    'Choose'
+                  ) : (
+                    <>
+                      <span className="hidden sm:inline">Add from library</span>
+                      <span className="sm:hidden">Add</span>
+                    </>
+                  )}
+                </Button>
+              </div>
+              {isOpen ? (
+                <div id={panelId} className="border-line border-t px-4 py-3">
+                  {hidden ? (
+                    <p className="text-muted mb-2 text-xs">This section is hidden on the resume. Show it again in the Setup tab.</p>
+                  ) : null}
+                  {list.length === 0 ? (
+                    <p className="text-muted py-2 text-sm">
+                      Nothing here yet. Use “{key === 'summary' ? 'Choose summary' : 'Add from library'}” to bring something in.
+                    </p>
+                  ) : (
+                    renderItems(key, list)
+                  )}
+                </div>
+              ) : null}
+            </section>
+          );
+        })}
+      </div>
 
       <AddFromLibraryDialog
         section={adding}
@@ -197,6 +199,6 @@ export function ContentTab({ resume, items, library, mutate }: Props) {
       </ConfirmDialog>
 
       <ReviewChangeDialog resumeId={resume.id} item={reviewing} onClose={() => setReviewing(null)} mutate={mutate} />
-    </div>
+    </>
   );
 }

@@ -164,7 +164,7 @@ export function PdfPreview({
 
   const loading = loadedKey !== refreshKey;
   return (
-    <div className="border-line bg-surface shadow-card flex h-full flex-col overflow-hidden rounded-xl border">
+    <div className="border-line bg-surface shadow-card flex flex-col overflow-hidden rounded-xl border lg:h-[calc(100dvh-7.5rem)]">
       <div className="border-line flex flex-wrap items-center justify-between gap-2 border-b px-3.5 py-2.5">
         <div className="flex items-center gap-2">
           <h2 className="text-ink text-sm font-semibold">Live preview</h2>
@@ -217,7 +217,7 @@ export function PdfPreview({
 
       <div
         ref={scroller}
-        className={cx('bg-desk flex-1 overflow-auto p-4 lg:max-h-[calc(100dvh-11.5rem)]', !pdf && 'min-h-[50vh]')}
+        className={cx('bg-desk flex-1 min-h-0 overflow-auto p-4', !pdf && 'min-h-[50vh]')}
         data-testid="preview-scroller"
       >
         {pdf ? (
