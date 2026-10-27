@@ -1,0 +1,23 @@
+{
+  "name": "dossier",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Dossier - Local-first career library and tailored resume engine",
+  "type": "module",
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "dev": "npm --prefix web run dev",
+    "build": "npm --prefix web run build",
+    "start": "npm --prefix web start",
+    "lint": "npm --prefix web run lint",
+    "typecheck": "npm --prefix web run typecheck",
+    "test": "npm --prefix web test",
+    "seed:sample": "npm --prefix web run seed:sample",
+    "smoke": "npm --prefix web run smoke",
+    "e2e": "npm --prefix web run e2e",
+    "format": "npm --prefix web run format",
+    "format:check": "npm --prefix web run format:check"
+  }
+}

@@ -1,0 +1,1619 @@
+{
+  "app": "dossier",
+  "formatVersion": 1,
+  "exportedAt": "2026-10-19T02:25:16.339Z",
+  "migrations": ["001_initial"],
+  "tables": {
+    "profile": [
+      {
+        "id": 1,
+        "full_name": "Manish Borikar",
+        "headline": "",
+        "email": "manishborikar92@gmail.com",
+        "phone": "+91 9309431756",
+        "location": "Hyderabad, India",
+        "version": 2,
+        "updated_at": "2026-10-19T02:25:16.295Z"
+      }
+    ],
+    "profile_links": [
+      {
+        "id": 1,
+        "label": "in/manishborikar",
+        "url": "https://www.linkedin.com/in/manishborikar",
+        "sort": 0
+      },
+      {
+        "id": 2,
+        "label": "github/manishborikar92",
+        "url": "https://github.com/manishborikar92",
+        "sort": 1
+      }
+    ],
+    "summaries": [
+      {
+        "id": 1,
+        "label": "Full stack",
+        "text": "Full Stack Developer with hands-on experience building and deploying production-grade full-stack applications using Next.js, Node.js, Express.js, and MongoDB. Grounded in core Computer Science fundamentals including Object-Oriented Programming, DBMS, and Operating Systems. Experienced across web development, 3D data processing, and desktop application engineering — with a focus on clean code, maintainable systems, and practical problem-solving. Comfortable working across the full stack from frontend interfaces to backend APIs and database integration.",
+        "sort": 0,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      }
+    ],
+    "experiences": [
+      {
+        "id": 1,
+        "org": "Quantneural Pvt Ltd",
+        "title": "Full Stack Developer",
+        "location": "",
+        "start_date": "2025-06",
+        "end_date": "2026-06",
+        "kind": "job",
+        "description": "",
+        "archived": 0,
+        "sort": 0,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 2,
+        "org": "Quantneural Pvt Ltd",
+        "title": "Full Stack Developer Intern",
+        "location": "",
+        "start_date": "2025-02",
+        "end_date": "2025-05",
+        "kind": "internship",
+        "description": "",
+        "archived": 0,
+        "sort": 1,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 3,
+        "org": "PHN Technology Pvt. Ltd.",
+        "title": "Web Development Intern",
+        "location": "",
+        "start_date": "2023-04",
+        "end_date": "2023-06",
+        "kind": "internship",
+        "description": "",
+        "archived": 0,
+        "sort": 2,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 4,
+        "org": "Kavi Kulguru Institute of Technology and Science, Ramtek",
+        "title": "Technical Head – National Service Scheme (NSS)",
+        "location": "",
+        "start_date": "2024-06",
+        "end_date": "2025-04",
+        "kind": "leadership",
+        "description": "led technical initiatives and coordinated cross-departmental teams for community-focused projects.",
+        "archived": 0,
+        "sort": 3,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      }
+    ],
+    "education": [
+      {
+        "id": 1,
+        "institution": "Kavi Kulguru Institute of Technology and Science, Ramtek",
+        "degree": "B.Tech",
+        "field": "Information Technology",
+        "location": "",
+        "start_date": "",
+        "end_date": "2025-05",
+        "grade": "CGPA: 6.85/10",
+        "details": "",
+        "sort": 0,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 2,
+        "institution": "Lokmanya Vidhyalaya and Junior College, Warora",
+        "degree": "HSC",
+        "field": "Computer Science",
+        "location": "",
+        "start_date": "",
+        "end_date": "2021-04",
+        "grade": "79.33%",
+        "details": "",
+        "sort": 1,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 3,
+        "institution": "Z.P. (Ex. Govt.) Jubilee High School, Chandrapur",
+        "degree": "SSC",
+        "field": "",
+        "location": "",
+        "start_date": "",
+        "end_date": "2019-03",
+        "grade": "66.20%",
+        "details": "",
+        "sort": 2,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      }
+    ],
+    "certifications": [
+      {
+        "id": 1,
+        "name": "JavaScript Foundations Professional Certificate",
+        "issuer": "Mozilla",
+        "year": "2025",
+        "url": "",
+        "sort": 0,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 2,
+        "name": "OpenEDG Python Institute: Programming with Python Professional Certificate",
+        "issuer": "OpenEDG",
+        "year": "2025",
+        "url": "",
+        "sort": 1,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 3,
+        "name": "Career Essentials in Software Development, Generative AI & GitHub",
+        "issuer": "Microsoft & LinkedIn / GitHub",
+        "year": "2025",
+        "url": "",
+        "sort": 2,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      }
+    ],
+    "skills": [
+      {
+        "id": 1,
+        "name": "Python",
+        "category": "Languages",
+        "sort": 0,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 2,
+        "name": "JavaScript (ES6+)",
+        "category": "Languages",
+        "sort": 1,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 3,
+        "name": "SQL",
+        "category": "Languages",
+        "sort": 2,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 4,
+        "name": "Next.js 16 (App Router)",
+        "category": "Frontend",
+        "sort": 3,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 5,
+        "name": "Tailwind CSS",
+        "category": "Frontend",
+        "sort": 4,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 6,
+        "name": "HTML5",
+        "category": "Frontend",
+        "sort": 5,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 7,
+        "name": "CSS3",
+        "category": "Frontend",
+        "sort": 6,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 8,
+        "name": "Node.js 18+",
+        "category": "Backend & APIs",
+        "sort": 7,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 9,
+        "name": "Express.js 5",
+        "category": "Backend & APIs",
+        "sort": 8,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 10,
+        "name": "REST APIs",
+        "category": "Backend & APIs",
+        "sort": 9,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 11,
+        "name": "JWT Authentication",
+        "category": "Backend & APIs",
+        "sort": 10,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 12,
+        "name": "RBAC",
+        "category": "Backend & APIs",
+        "sort": 11,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 13,
+        "name": "MongoDB/Mongoose",
+        "category": "Databases",
+        "sort": 12,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 14,
+        "name": "MySQL",
+        "category": "Databases",
+        "sort": 13,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 15,
+        "name": "Firebase Firestore",
+        "category": "Databases",
+        "sort": 14,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 16,
+        "name": "OOP",
+        "category": "Core CS",
+        "sort": 15,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 17,
+        "name": "DBMS",
+        "category": "Core CS",
+        "sort": 16,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 18,
+        "name": "Operating Systems",
+        "category": "Core CS",
+        "sort": 17,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 19,
+        "name": "Data Structures & Algorithms",
+        "category": "Core CS",
+        "sort": 18,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 20,
+        "name": "Git/GitHub",
+        "category": "DevOps & Tools",
+        "sort": 19,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 21,
+        "name": "npm",
+        "category": "DevOps & Tools",
+        "sort": 20,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 22,
+        "name": "VS Code",
+        "category": "DevOps & Tools",
+        "sort": 21,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 23,
+        "name": "Postman",
+        "category": "DevOps & Tools",
+        "sort": 22,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 24,
+        "name": "PyInstaller",
+        "category": "DevOps & Tools",
+        "sort": 23,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 25,
+        "name": "Firebase",
+        "category": "Cloud & Integrations",
+        "sort": 24,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 26,
+        "name": "Cloudinary",
+        "category": "Cloud & Integrations",
+        "sort": 25,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 27,
+        "name": "Razorpay",
+        "category": "Cloud & Integrations",
+        "sort": 26,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 28,
+        "name": "Resend",
+        "category": "Cloud & Integrations",
+        "sort": 27,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 29,
+        "name": "Google OAuth",
+        "category": "Cloud & Integrations",
+        "sort": 28,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 30,
+        "name": "PyQt6",
+        "category": "Desktop & 3D",
+        "sort": 29,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 31,
+        "name": "Open3D",
+        "category": "Desktop & 3D",
+        "sort": 30,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 32,
+        "name": "NumPy",
+        "category": "Desktop & 3D",
+        "sort": 31,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      }
+    ],
+    "projects": [
+      {
+        "id": 1,
+        "name": "IWLARS – Intelligent Wagon Load Analysis & Reporting System",
+        "category": "Desktop and web platform",
+        "overview": "",
+        "description": "",
+        "problem": "",
+        "solution": "",
+        "role": "",
+        "contributions": "",
+        "technologies": ["Python", "Open3D", "NumPy", "Next.js 16", "Firebase", "Matplotlib", "WeasyPrint"],
+        "features": "",
+        "decisions": "",
+        "results": "",
+        "repo_url": "",
+        "demo_url": "",
+        "docs_url": "",
+        "tags": [],
+        "keywords": [],
+        "year_label": "2025",
+        "family": "",
+        "status": "active",
+        "notes": "",
+        "source_key": "kb:iwlars",
+        "sort": 10,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 2,
+        "name": "CA-Workflow – Workflow Management Platform",
+        "category": "Web application",
+        "overview": "",
+        "description": "",
+        "problem": "",
+        "solution": "",
+        "role": "",
+        "contributions": "",
+        "technologies": [
+          "Next.js 16",
+          "Node.js 18+",
+          "Express.js 5",
+          "MongoDB/Mongoose 8",
+          "Cloudinary",
+          "Razorpay",
+          "Resend",
+          "JWT",
+          "RBAC"
+        ],
+        "features": "",
+        "decisions": "",
+        "results": "",
+        "repo_url": "",
+        "demo_url": "https://www.caworkflow.com/",
+        "docs_url": "",
+        "tags": [],
+        "keywords": [],
+        "year_label": "2025",
+        "family": "",
+        "status": "active",
+        "notes": "",
+        "source_key": "kb:ca-workflow",
+        "sort": 70,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      },
+      {
+        "id": 3,
+        "name": "Smart Healthcare – AI Skin Disease Detection",
+        "category": "College project",
+        "overview": "",
+        "description": "",
+        "problem": "",
+        "solution": "",
+        "role": "",
+        "contributions": "",
+        "technologies": ["Python", "ResNet50V2", "Deep Learning", "Hugging Face", "JavaScript"],
+        "features": "",
+        "decisions": "",
+        "results": "",
+        "repo_url": "https://git.new/smart-healthcare",
+        "demo_url": "",
+        "docs_url": "",
+        "tags": [],
+        "keywords": [],
+        "year_label": "2024",
+        "family": "",
+        "status": "active",
+        "notes": "",
+        "source_key": "kb:smart-healthcare",
+        "sort": 120,
+        "version": 1,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16Z"
+      }
+    ],
+    "bullets": [
+      {
+        "id": 1,
+        "owner_type": "experience",
+        "owner_id": 1,
+        "text": "Led end-to-end full-stack development of two production platforms (CA-Workflow and IWLARS), handling system design, implementation, and deployment for real enterprise clients.",
+        "verified": 1,
+        "sort": 0
+      },
+      {
+        "id": 2,
+        "owner_type": "experience",
+        "owner_id": 1,
+        "text": "Built backend services using Node.js and Express.js with JWT-based RBAC, ensuring secure and role-restricted access across both platforms.",
+        "verified": 1,
+        "sort": 1
+      },
+      {
+        "id": 3,
+        "owner_type": "experience",
+        "owner_id": 1,
+        "text": "Engineered an end-to-end 3D point cloud preprocessing pipeline using Open3D, implementing downsampling, ground filtering, and wagon segmentation algorithms to process large-scale LiDAR scan data reliably.",
+        "verified": 1,
+        "sort": 2
+      },
+      {
+        "id": 4,
+        "owner_type": "experience",
+        "owner_id": 1,
+        "text": "Designed wagon load classification algorithms (Underloaded, Overloaded, Unbalanced) and implemented volume estimation using Digital Elevation Models (DEM), enabling automated load quality control at scale.",
+        "verified": 1,
+        "sort": 3
+      },
+      {
+        "id": 5,
+        "owner_type": "experience",
+        "owner_id": 1,
+        "text": "Built interactive 3D visualization and structural analysis tooling using PyQt6 and Matplotlib, with automated PDF/HTML report generation via WeasyPrint for engineering review workflows.",
+        "verified": 1,
+        "sort": 4
+      },
+      {
+        "id": 6,
+        "owner_type": "experience",
+        "owner_id": 2,
+        "text": "Built and deployed the Second Opinion telemedicine platform — a full-stack healthcare application with secure OAuth authentication and health record integration.",
+        "verified": 1,
+        "sort": 0
+      },
+      {
+        "id": 7,
+        "owner_type": "experience",
+        "owner_id": 2,
+        "text": "Developed frontend components using Next.js, reducing page load times by optimizing server-side rendering and code-splitting strategies.",
+        "verified": 1,
+        "sort": 1
+      },
+      {
+        "id": 8,
+        "owner_type": "experience",
+        "owner_id": 2,
+        "text": "Integrated Google OAuth via Firebase for social sign-in and implemented JWT-based email authentication with RBAC to manage role-specific access for doctors and patients.",
+        "verified": 1,
+        "sort": 2
+      },
+      {
+        "id": 9,
+        "owner_type": "experience",
+        "owner_id": 3,
+        "text": "Designed and implemented responsive web interfaces using HTML, CSS, and JavaScript, delivering client-facing features with cross-browser compatibility and clean, maintainable code.",
+        "verified": 1,
+        "sort": 0
+      },
+      {
+        "id": 10,
+        "owner_type": "project",
+        "owner_id": 1,
+        "text": "Engineered a dual-component platform combining a Python desktop application for 3D point cloud processing with a Next.js web dashboard for viewing analytics and generated reports.",
+        "verified": 1,
+        "sort": 0
+      },
+      {
+        "id": 11,
+        "owner_type": "project",
+        "owner_id": 1,
+        "text": "Developed an end-to-end preprocessing pipeline using Open3D for point cloud downsampling, ground filtering, wagon segmentation, and alignment — processing large LiDAR datasets efficiently.",
+        "verified": 1,
+        "sort": 1
+      },
+      {
+        "id": 12,
+        "owner_type": "project",
+        "owner_id": 1,
+        "text": "Designed classification algorithms to detect wagon load status (Underloaded, Overloaded, Unbalanced) with volume estimation via Digital Elevation Models (DEM), enabling automated quality control.",
+        "verified": 1,
+        "sort": 2
+      },
+      {
+        "id": 13,
+        "owner_type": "project",
+        "owner_id": 1,
+        "text": "Built a secure Firebase dashboard with RBAC and automated PDF/HTML report generation via WeasyPrint, eliminating manual reporting overhead.",
+        "verified": 1,
+        "sort": 3
+      },
+      {
+        "id": 14,
+        "owner_type": "project",
+        "owner_id": 2,
+        "text": "Architected a secure, cloud-based workflow management system for Chartered Accountants, streamlining document exchange and client communication for professional CA firms.",
+        "verified": 1,
+        "sort": 0
+      },
+      {
+        "id": 15,
+        "owner_type": "project",
+        "owner_id": 2,
+        "text": "Implemented dual authentication (Google OAuth for CA admins, ID-based for clients) with JWT session management and RBAC across all API routes.",
+        "verified": 1,
+        "sort": 1
+      },
+      {
+        "id": 16,
+        "owner_type": "project",
+        "owner_id": 2,
+        "text": "Developed and maintained the API backend using Node.js and Express.js, with optimized MongoDB queries handling data operations across multiple users.",
+        "verified": 1,
+        "sort": 2
+      },
+      {
+        "id": 17,
+        "owner_type": "project",
+        "owner_id": 2,
+        "text": "Integrated thread-based client communication with read receipts, automated Resend email notifications, and Razorpay payment gateway for three billing models (pay-per-document, invoice, subscriptions).",
+        "verified": 1,
+        "sort": 3
+      },
+      {
+        "id": 18,
+        "owner_type": "project",
+        "owner_id": 3,
+        "text": "Built an AI diagnostic web application classifying skin conditions (malignant, benign, burns, healthy) by fine-tuning a ResNet50V2 model on a custom dataset and hosting it on Hugging Face.",
+        "verified": 1,
+        "sort": 0
+      },
+      {
+        "id": 19,
+        "owner_type": "project",
+        "owner_id": 3,
+        "text": "Integrated the Hugging Face-hosted model API into the frontend, enabling users to upload skin images and receive classification results directly in the browser.",
+        "verified": 1,
+        "sort": 1
+      }
+    ],
+    "resumes": [
+      {
+        "id": 1,
+        "name": "Manish Borikar Default",
+        "target_title": "Full Stack Developer",
+        "target_company": "",
+        "template": "classic",
+        "status": "draft",
+        "settings": {
+          "pageSize": "LETTER",
+          "accent": "#1F3864",
+          "density": "normal",
+          "sectionOrder": ["summary", "skills", "experience", "projects", "education", "certifications", "leadership"],
+          "hiddenSections": [],
+          "pageBreakBefore": ["projects"],
+          "sectionTitles": {}
+        },
+        "jd_text": "",
+        "parent_id": null,
+        "created_at": "2026-10-19T02:25:16Z",
+        "updated_at": "2026-10-19T02:25:16.322Z"
+      }
+    ],
+    "resume_items": [
+      {
+        "id": 1,
+        "resume_id": 1,
+        "section": "header",
+        "source_type": "profile",
+        "source_id": 1,
+        "source_version": 2,
+        "position": 0,
+        "included": 1,
+        "data": {
+          "fullName": "Manish Borikar",
+          "headline": "",
+          "email": "manishborikar92@gmail.com",
+          "phone": "+91 9309431756",
+          "location": "Hyderabad, India",
+          "links": [
+            {
+              "label": "in/manishborikar",
+              "url": "https://www.linkedin.com/in/manishborikar",
+              "show": true
+            },
+            {
+              "label": "github/manishborikar92",
+              "url": "https://github.com/manishborikar92",
+              "show": true
+            }
+          ],
+          "show": {
+            "headline": false,
+            "email": true,
+            "phone": true,
+            "location": true
+          }
+        }
+      },
+      {
+        "id": 2,
+        "resume_id": 1,
+        "section": "summary",
+        "source_type": "summary",
+        "source_id": 1,
+        "source_version": 1,
+        "position": 0,
+        "included": 1,
+        "data": {
+          "text": "Full Stack Developer with hands-on experience building and deploying production-grade full-stack applications using Next.js, Node.js, Express.js, and MongoDB. Grounded in core Computer Science fundamentals including Object-Oriented Programming, DBMS, and Operating Systems. Experienced across web development, 3D data processing, and desktop application engineering — with a focus on clean code, maintainable systems, and practical problem-solving. Comfortable working across the full stack from frontend interfaces to backend APIs and database integration."
+        }
+      },
+      {
+        "id": 3,
+        "resume_id": 1,
+        "section": "experience",
+        "source_type": "experience",
+        "source_id": 1,
+        "source_version": 1,
+        "position": 0,
+        "included": 1,
+        "data": {
+          "org": "Quantneural Pvt Ltd",
+          "title": "Full Stack Developer",
+          "location": "",
+          "start": "2025-06",
+          "end": "2026-06",
+          "kind": "job",
+          "description": "",
+          "bullets": [
+            {
+              "text": "Led end-to-end full-stack development of two production platforms (CA-Workflow and IWLARS), handling system design, implementation, and deployment for real enterprise clients.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Built backend services using Node.js and Express.js with JWT-based RBAC, ensuring secure and role-restricted access across both platforms.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Engineered an end-to-end 3D point cloud preprocessing pipeline using Open3D, implementing downsampling, ground filtering, and wagon segmentation algorithms to process large-scale LiDAR scan data reliably.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Designed wagon load classification algorithms (Underloaded, Overloaded, Unbalanced) and implemented volume estimation using Digital Elevation Models (DEM), enabling automated load quality control at scale.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Built interactive 3D visualization and structural analysis tooling using PyQt6 and Matplotlib, with automated PDF/HTML report generation via WeasyPrint for engineering review workflows.",
+              "included": true,
+              "verified": true
+            }
+          ]
+        }
+      },
+      {
+        "id": 4,
+        "resume_id": 1,
+        "section": "experience",
+        "source_type": "experience",
+        "source_id": 2,
+        "source_version": 1,
+        "position": 1,
+        "included": 1,
+        "data": {
+          "org": "Quantneural Pvt Ltd",
+          "title": "Full Stack Developer Intern",
+          "location": "",
+          "start": "2025-02",
+          "end": "2025-05",
+          "kind": "internship",
+          "description": "",
+          "bullets": [
+            {
+              "text": "Built and deployed the Second Opinion telemedicine platform — a full-stack healthcare application with secure OAuth authentication and health record integration.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Developed frontend components using Next.js, reducing page load times by optimizing server-side rendering and code-splitting strategies.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Integrated Google OAuth via Firebase for social sign-in and implemented JWT-based email authentication with RBAC to manage role-specific access for doctors and patients.",
+              "included": true,
+              "verified": true
+            }
+          ]
+        }
+      },
+      {
+        "id": 5,
+        "resume_id": 1,
+        "section": "experience",
+        "source_type": "experience",
+        "source_id": 3,
+        "source_version": 1,
+        "position": 2,
+        "included": 1,
+        "data": {
+          "org": "PHN Technology Pvt. Ltd.",
+          "title": "Web Development Intern",
+          "location": "",
+          "start": "2023-04",
+          "end": "2023-06",
+          "kind": "internship",
+          "description": "",
+          "bullets": [
+            {
+              "text": "Designed and implemented responsive web interfaces using HTML, CSS, and JavaScript, delivering client-facing features with cross-browser compatibility and clean, maintainable code.",
+              "included": true,
+              "verified": true
+            }
+          ]
+        }
+      },
+      {
+        "id": 6,
+        "resume_id": 1,
+        "section": "leadership",
+        "source_type": "experience",
+        "source_id": 4,
+        "source_version": 1,
+        "position": 0,
+        "included": 1,
+        "data": {
+          "org": "Kavi Kulguru Institute of Technology and Science, Ramtek",
+          "title": "Technical Head – National Service Scheme (NSS)",
+          "location": "",
+          "start": "2024-06",
+          "end": "2025-04",
+          "kind": "leadership",
+          "description": "led technical initiatives and coordinated cross-departmental teams for community-focused projects.",
+          "bullets": []
+        }
+      },
+      {
+        "id": 7,
+        "resume_id": 1,
+        "section": "education",
+        "source_type": "education",
+        "source_id": 1,
+        "source_version": 1,
+        "position": 0,
+        "included": 1,
+        "data": {
+          "institution": "Kavi Kulguru Institute of Technology and Science, Ramtek",
+          "degree": "B.Tech",
+          "field": "Information Technology",
+          "location": "",
+          "start": "",
+          "end": "2025-05",
+          "grade": "CGPA: 6.85/10",
+          "details": ""
+        }
+      },
+      {
+        "id": 8,
+        "resume_id": 1,
+        "section": "education",
+        "source_type": "education",
+        "source_id": 2,
+        "source_version": 1,
+        "position": 1,
+        "included": 1,
+        "data": {
+          "institution": "Lokmanya Vidhyalaya and Junior College, Warora",
+          "degree": "HSC",
+          "field": "Computer Science",
+          "location": "",
+          "start": "",
+          "end": "2021-04",
+          "grade": "79.33%",
+          "details": ""
+        }
+      },
+      {
+        "id": 9,
+        "resume_id": 1,
+        "section": "education",
+        "source_type": "education",
+        "source_id": 3,
+        "source_version": 1,
+        "position": 2,
+        "included": 1,
+        "data": {
+          "institution": "Z.P. (Ex. Govt.) Jubilee High School, Chandrapur",
+          "degree": "SSC",
+          "field": "",
+          "location": "",
+          "start": "",
+          "end": "2019-03",
+          "grade": "66.20%",
+          "details": ""
+        }
+      },
+      {
+        "id": 10,
+        "resume_id": 1,
+        "section": "certifications",
+        "source_type": "certification",
+        "source_id": 1,
+        "source_version": 1,
+        "position": 0,
+        "included": 1,
+        "data": {
+          "name": "JavaScript Foundations Professional Certificate",
+          "issuer": "Mozilla",
+          "year": "2025",
+          "url": ""
+        }
+      },
+      {
+        "id": 11,
+        "resume_id": 1,
+        "section": "certifications",
+        "source_type": "certification",
+        "source_id": 2,
+        "source_version": 1,
+        "position": 1,
+        "included": 1,
+        "data": {
+          "name": "OpenEDG Python Institute: Programming with Python Professional Certificate",
+          "issuer": "OpenEDG",
+          "year": "2025",
+          "url": ""
+        }
+      },
+      {
+        "id": 12,
+        "resume_id": 1,
+        "section": "certifications",
+        "source_type": "certification",
+        "source_id": 3,
+        "source_version": 1,
+        "position": 2,
+        "included": 1,
+        "data": {
+          "name": "Career Essentials in Software Development, Generative AI & GitHub",
+          "issuer": "Microsoft & LinkedIn / GitHub",
+          "year": "2025",
+          "url": ""
+        }
+      },
+      {
+        "id": 13,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 1,
+        "source_version": 1,
+        "position": 0,
+        "included": 1,
+        "data": {
+          "name": "Python",
+          "category": "Languages"
+        }
+      },
+      {
+        "id": 14,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 2,
+        "source_version": 1,
+        "position": 1,
+        "included": 1,
+        "data": {
+          "name": "JavaScript (ES6+)",
+          "category": "Languages"
+        }
+      },
+      {
+        "id": 15,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 3,
+        "source_version": 1,
+        "position": 2,
+        "included": 1,
+        "data": {
+          "name": "SQL",
+          "category": "Languages"
+        }
+      },
+      {
+        "id": 16,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 4,
+        "source_version": 1,
+        "position": 3,
+        "included": 1,
+        "data": {
+          "name": "Next.js 16 (App Router)",
+          "category": "Frontend"
+        }
+      },
+      {
+        "id": 17,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 5,
+        "source_version": 1,
+        "position": 4,
+        "included": 1,
+        "data": {
+          "name": "Tailwind CSS",
+          "category": "Frontend"
+        }
+      },
+      {
+        "id": 18,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 6,
+        "source_version": 1,
+        "position": 5,
+        "included": 1,
+        "data": {
+          "name": "HTML5",
+          "category": "Frontend"
+        }
+      },
+      {
+        "id": 19,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 7,
+        "source_version": 1,
+        "position": 6,
+        "included": 1,
+        "data": {
+          "name": "CSS3",
+          "category": "Frontend"
+        }
+      },
+      {
+        "id": 20,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 8,
+        "source_version": 1,
+        "position": 7,
+        "included": 1,
+        "data": {
+          "name": "Node.js 18+",
+          "category": "Backend & APIs"
+        }
+      },
+      {
+        "id": 21,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 9,
+        "source_version": 1,
+        "position": 8,
+        "included": 1,
+        "data": {
+          "name": "Express.js 5",
+          "category": "Backend & APIs"
+        }
+      },
+      {
+        "id": 22,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 10,
+        "source_version": 1,
+        "position": 9,
+        "included": 1,
+        "data": {
+          "name": "REST APIs",
+          "category": "Backend & APIs"
+        }
+      },
+      {
+        "id": 23,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 11,
+        "source_version": 1,
+        "position": 10,
+        "included": 1,
+        "data": {
+          "name": "JWT Authentication",
+          "category": "Backend & APIs"
+        }
+      },
+      {
+        "id": 24,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 12,
+        "source_version": 1,
+        "position": 11,
+        "included": 1,
+        "data": {
+          "name": "RBAC",
+          "category": "Backend & APIs"
+        }
+      },
+      {
+        "id": 25,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 13,
+        "source_version": 1,
+        "position": 12,
+        "included": 1,
+        "data": {
+          "name": "MongoDB/Mongoose",
+          "category": "Databases"
+        }
+      },
+      {
+        "id": 26,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 14,
+        "source_version": 1,
+        "position": 13,
+        "included": 1,
+        "data": {
+          "name": "MySQL",
+          "category": "Databases"
+        }
+      },
+      {
+        "id": 27,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 15,
+        "source_version": 1,
+        "position": 14,
+        "included": 1,
+        "data": {
+          "name": "Firebase Firestore",
+          "category": "Databases"
+        }
+      },
+      {
+        "id": 28,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 16,
+        "source_version": 1,
+        "position": 15,
+        "included": 1,
+        "data": {
+          "name": "OOP",
+          "category": "Core CS"
+        }
+      },
+      {
+        "id": 29,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 17,
+        "source_version": 1,
+        "position": 16,
+        "included": 1,
+        "data": {
+          "name": "DBMS",
+          "category": "Core CS"
+        }
+      },
+      {
+        "id": 30,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 18,
+        "source_version": 1,
+        "position": 17,
+        "included": 1,
+        "data": {
+          "name": "Operating Systems",
+          "category": "Core CS"
+        }
+      },
+      {
+        "id": 31,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 19,
+        "source_version": 1,
+        "position": 18,
+        "included": 1,
+        "data": {
+          "name": "Data Structures & Algorithms",
+          "category": "Core CS"
+        }
+      },
+      {
+        "id": 32,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 20,
+        "source_version": 1,
+        "position": 19,
+        "included": 1,
+        "data": {
+          "name": "Git/GitHub",
+          "category": "DevOps & Tools"
+        }
+      },
+      {
+        "id": 33,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 21,
+        "source_version": 1,
+        "position": 20,
+        "included": 1,
+        "data": {
+          "name": "npm",
+          "category": "DevOps & Tools"
+        }
+      },
+      {
+        "id": 34,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 22,
+        "source_version": 1,
+        "position": 21,
+        "included": 1,
+        "data": {
+          "name": "VS Code",
+          "category": "DevOps & Tools"
+        }
+      },
+      {
+        "id": 35,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 23,
+        "source_version": 1,
+        "position": 22,
+        "included": 1,
+        "data": {
+          "name": "Postman",
+          "category": "DevOps & Tools"
+        }
+      },
+      {
+        "id": 36,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 24,
+        "source_version": 1,
+        "position": 23,
+        "included": 1,
+        "data": {
+          "name": "PyInstaller",
+          "category": "DevOps & Tools"
+        }
+      },
+      {
+        "id": 37,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 25,
+        "source_version": 1,
+        "position": 24,
+        "included": 1,
+        "data": {
+          "name": "Firebase",
+          "category": "Cloud & Integrations"
+        }
+      },
+      {
+        "id": 38,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 26,
+        "source_version": 1,
+        "position": 25,
+        "included": 1,
+        "data": {
+          "name": "Cloudinary",
+          "category": "Cloud & Integrations"
+        }
+      },
+      {
+        "id": 39,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 27,
+        "source_version": 1,
+        "position": 26,
+        "included": 1,
+        "data": {
+          "name": "Razorpay",
+          "category": "Cloud & Integrations"
+        }
+      },
+      {
+        "id": 40,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 28,
+        "source_version": 1,
+        "position": 27,
+        "included": 1,
+        "data": {
+          "name": "Resend",
+          "category": "Cloud & Integrations"
+        }
+      },
+      {
+        "id": 41,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 29,
+        "source_version": 1,
+        "position": 28,
+        "included": 1,
+        "data": {
+          "name": "Google OAuth",
+          "category": "Cloud & Integrations"
+        }
+      },
+      {
+        "id": 42,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 30,
+        "source_version": 1,
+        "position": 29,
+        "included": 1,
+        "data": {
+          "name": "PyQt6",
+          "category": "Desktop & 3D"
+        }
+      },
+      {
+        "id": 43,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 31,
+        "source_version": 1,
+        "position": 30,
+        "included": 1,
+        "data": {
+          "name": "Open3D",
+          "category": "Desktop & 3D"
+        }
+      },
+      {
+        "id": 44,
+        "resume_id": 1,
+        "section": "skills",
+        "source_type": "skill",
+        "source_id": 32,
+        "source_version": 1,
+        "position": 31,
+        "included": 1,
+        "data": {
+          "name": "NumPy",
+          "category": "Desktop & 3D"
+        }
+      },
+      {
+        "id": 45,
+        "resume_id": 1,
+        "section": "projects",
+        "source_type": "project",
+        "source_id": 1,
+        "source_version": 1,
+        "position": 0,
+        "included": 1,
+        "data": {
+          "name": "IWLARS – Intelligent Wagon Load Analysis & Reporting System",
+          "techLine": "Python, Open3D, NumPy, Next.js 16, Firebase, Matplotlib, WeasyPrint",
+          "yearLabel": "2025",
+          "overview": "",
+          "links": [],
+          "bullets": [
+            {
+              "text": "Engineered a dual-component platform combining a Python desktop application for 3D point cloud processing with a Next.js web dashboard for viewing analytics and generated reports.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Developed an end-to-end preprocessing pipeline using Open3D for point cloud downsampling, ground filtering, wagon segmentation, and alignment — processing large LiDAR datasets efficiently.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Designed classification algorithms to detect wagon load status (Underloaded, Overloaded, Unbalanced) with volume estimation via Digital Elevation Models (DEM), enabling automated quality control.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Built a secure Firebase dashboard with RBAC and automated PDF/HTML report generation via WeasyPrint, eliminating manual reporting overhead.",
+              "included": true,
+              "verified": true
+            }
+          ]
+        }
+      },
+      {
+        "id": 46,
+        "resume_id": 1,
+        "section": "projects",
+        "source_type": "project",
+        "source_id": 2,
+        "source_version": 1,
+        "position": 1,
+        "included": 1,
+        "data": {
+          "name": "CA-Workflow – Workflow Management Platform",
+          "techLine": "Next.js 16, Node.js 18+, Express.js 5, MongoDB/Mongoose 8, Cloudinary, Razorpay, Resend, JWT, RBAC",
+          "yearLabel": "2025",
+          "overview": "",
+          "links": [
+            {
+              "label": "caworkflow.com",
+              "url": "https://www.caworkflow.com/",
+              "show": true
+            }
+          ],
+          "bullets": [
+            {
+              "text": "Architected a secure, cloud-based workflow management system for Chartered Accountants, streamlining document exchange and client communication for professional CA firms.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Implemented dual authentication (Google OAuth for CA admins, ID-based for clients) with JWT session management and RBAC across all API routes.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Developed and maintained the API backend using Node.js and Express.js, with optimized MongoDB queries handling data operations across multiple users.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Integrated thread-based client communication with read receipts, automated Resend email notifications, and Razorpay payment gateway for three billing models (pay-per-document, invoice, subscriptions).",
+              "included": true,
+              "verified": true
+            }
+          ]
+        }
+      },
+      {
+        "id": 47,
+        "resume_id": 1,
+        "section": "projects",
+        "source_type": "project",
+        "source_id": 3,
+        "source_version": 1,
+        "position": 2,
+        "included": 1,
+        "data": {
+          "name": "Smart Healthcare – AI Skin Disease Detection",
+          "techLine": "Python, ResNet50V2, Deep Learning, Hugging Face, JavaScript — College Project",
+          "yearLabel": "2024",
+          "overview": "",
+          "links": [
+            {
+              "label": "git.new/smart-healthcare",
+              "url": "https://git.new/smart-healthcare",
+              "show": true
+            }
+          ],
+          "bullets": [
+            {
+              "text": "Built an AI diagnostic web application classifying skin conditions (malignant, benign, burns, healthy) by fine-tuning a ResNet50V2 model on a custom dataset and hosting it on Hugging Face.",
+              "included": true,
+              "verified": true
+            },
+            {
+              "text": "Integrated the Hugging Face-hosted model API into the frontend, enabling users to upload skin images and receive classification results directly in the browser.",
+              "included": true,
+              "verified": true
+            }
+          ]
+        }
+      }
+    ],
+    "resume_versions": [],
+    "app_settings": [
+      {
+        "key": "defaultPageSize",
+        "value": "\"LETTER\""
+      },
+      {
+        "key": "defaultTemplate",
+        "value": "\"classic\""
+      }
+    ]
+  }
+}
