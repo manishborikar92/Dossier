@@ -65,6 +65,8 @@ describe('Header & Sidebar Layout (Matching Reference Layout)', () => {
 
     // Top Header row in sidebar: Logo and 'Dossier'
     expect(out).toContain('Dossier');
+    expect(out).toContain('Dossier-Logo.png');
+    expect(out).toContain('alt="Dossier"');
 
     // Sidebar collapse toggle control and keyboard shortcut hint
     expect(out).toContain('Toggle sidebar (Ctrl+Shift+S)');
@@ -110,6 +112,8 @@ describe('Header & Sidebar Layout (Matching Reference Layout)', () => {
     // Top slot has toggle button with tooltip and shortcut
     expect(out).toContain('Toggle sidebar (Ctrl+Shift+S)');
     expect(out).toContain('Ctrl+Shift+S');
+    expect(out).toContain('Dossier-Logo.png');
+    expect(out).toContain('alt="Dossier"');
 
     // Nav icons present, floating tooltips removed
     expect(out).toContain('Dashboard');

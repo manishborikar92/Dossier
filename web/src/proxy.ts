@@ -23,6 +23,10 @@ const forbidden = (why: string) => new NextResponse(`Forbidden: ${why}`, { statu
 
 export function proxy(request: NextRequest) {
   const hostHeader = (request.headers.get('host') ?? '').toLowerCase();
+  // Next.js internal subrequests (such as image optimization) run in-process without an external host header.
+  if (!hostHeader) {
+    return NextResponse.next();
+  }
   const hostname = hostHeader.replace(/:\d+$/, '');
   if (!LOCAL_HOSTS.has(hostname) && !extraHosts().has(hostname)) {
     return forbidden('this app only answers requests addressed to localhost');
@@ -44,4 +48,4 @@ export function proxy(request: NextRequest) {
   return NextResponse.next();
 }
 
-export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico).*)'] };
+export const config = { matcher: ['/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)'] };

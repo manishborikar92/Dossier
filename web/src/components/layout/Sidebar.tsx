@@ -1,6 +1,7 @@
 'use client';
 
-import { FolderArchive, Settings, X } from 'lucide-react';
+import { Settings, X } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
@@ -147,9 +148,7 @@ export function Sidebar({
                   className="flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
                 >
                   {/* Default state: Logo asset */}
-                  <span className="bg-brand flex size-8 items-center justify-center rounded-lg text-white shadow-xs group-hover/topbtn:hidden group-focus-visible/topbtn:hidden transition-transform">
-                    <FolderArchive className="size-4.5" aria-hidden />
-                  </span>
+                  <Image src="/Dossier-Logo.png" alt="Dossier" width={32} height={32} className="size-8 object-contain" priority />
 
                   {/* Hover/focus state: SidebarIcon with divider line on left */}
                   <span className="hidden items-center justify-center text-ink-2 group-hover/topbtn:flex group-focus-visible/topbtn:flex">
@@ -162,9 +161,7 @@ export function Sidebar({
                   aria-label="Dossier home"
                   className="flex size-10 items-center justify-center rounded-lg transition-opacity hover:opacity-90"
                 >
-                  <span className="bg-brand flex size-8 items-center justify-center rounded-lg text-white shadow-xs">
-                    <FolderArchive className="size-4.5" aria-hidden />
-                  </span>
+                  <Image src="/Dossier-Logo.png" alt="Dossier" width={32} height={32} className="size-8 object-contain" priority />
                 </Link>
               )}
             </div>
@@ -368,9 +365,7 @@ export function Sidebar({
             {/* Top row in mobile drawer with Logo + Brand */}
             <div className="border-line flex h-14 items-center justify-between border-b px-4">
               <Link href="/" onClick={onCloseMobile} className="flex items-center gap-2.5">
-                <span className="bg-brand flex size-8 shrink-0 items-center justify-center rounded-lg text-white shadow-xs">
-                  <FolderArchive className="size-4.5" aria-hidden />
-                </span>
+                <Image src="/Dossier-Logo.png" alt="Dossier" width={32} height={32} className="size-8 object-contain" priority />
                 <span className="text-ink text-base font-semibold tracking-tight">Dossier</span>
               </Link>
               <button

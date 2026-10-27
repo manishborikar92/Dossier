@@ -10,6 +10,9 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: { default: 'Dossier', template: '%s · Dossier' },
   description: 'A local-first career library and tailored resume engine.',
+  appleWebApp: {
+    title: 'Dossier',
+  },
 };
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1 };
