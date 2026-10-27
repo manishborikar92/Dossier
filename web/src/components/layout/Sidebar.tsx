@@ -145,13 +145,15 @@ export function Sidebar({
                   onClick={onToggleCollapse}
                   title="Expand sidebar (Ctrl+Shift+S)"
                   aria-label="Toggle sidebar (Ctrl+Shift+S)"
-                  className="flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
+                  className="group relative flex size-10 items-center justify-center rounded-lg transition-colors hover:bg-sunken focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand cursor-pointer"
                 >
                   {/* Default state: Logo asset */}
-                  <Image src="/Dossier-Logo.png" alt="Dossier" width={32} height={32} className="size-8 object-contain" priority />
+                  <span className="relative flex size-8 shrink-0 items-center justify-center group-hover/topbtn:hidden group-focus-visible/topbtn:hidden group-hover:hidden group-focus-visible:hidden transition-transform">
+                    <Image src="/Dossier-Logo.png" alt="Dossier" width={32} height={32} className="size-8 object-contain" priority />
+                  </span>
 
                   {/* Hover/focus state: SidebarIcon with divider line on left */}
-                  <span className="hidden items-center justify-center text-ink-2 group-hover/topbtn:flex group-focus-visible/topbtn:flex">
+                  <span className="hidden items-center justify-center text-ink-2 group-hover/topbtn:flex group-focus-visible/topbtn:flex group-hover:flex group-focus-visible:flex">
                     <SidebarIcon isCollapsed={true} className="size-5" />
                   </span>
                 </button>
@@ -170,10 +172,10 @@ export function Sidebar({
             <div
               className={cx(
                 'flex items-center min-w-0 overflow-hidden transition-[opacity,max-width,transform] duration-300 ease-in-out',
-                collapsed ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none' : 'max-w-[140px] opacity-100 translate-x-0 pl-1',
+                collapsed ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none' : 'max-w-[160px] opacity-100 translate-x-0 pl-1.5',
               )}
             >
-              <Link href="/" className="text-ink font-semibold text-[15px] tracking-tight truncate whitespace-nowrap">
+              <Link href="/" className="text-ink font-bold text-xl tracking-tight truncate whitespace-nowrap">
                 Dossier
               </Link>
             </div>
@@ -366,7 +368,7 @@ export function Sidebar({
             <div className="border-line flex h-14 items-center justify-between border-b px-4">
               <Link href="/" onClick={onCloseMobile} className="flex items-center gap-2.5">
                 <Image src="/Dossier-Logo.png" alt="Dossier" width={32} height={32} className="size-8 object-contain" priority />
-                <span className="text-ink text-base font-semibold tracking-tight">Dossier</span>
+                <span className="text-ink text-xl font-bold tracking-tight">Dossier</span>
               </Link>
               <button
                 type="button"
