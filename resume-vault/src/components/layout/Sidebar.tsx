@@ -223,7 +223,7 @@ export function Sidebar({
 
         {/* NAVIGATION CONTAINER */}
         <nav
-          aria-label={collapsed ? 'Main collapsed navigation' : 'Main'}
+          aria-label="Main"
           className="flex flex-col flex-1 min-h-0 justify-between"
         >
           {/* MIDDLE NAVIGATION CONTAINER (fixed px-3, overflow-y-auto, overflow-x-hidden) */}

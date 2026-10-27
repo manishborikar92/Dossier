@@ -135,4 +135,26 @@ describe('Header & Sidebar Layout (Matching Reference Layout)', () => {
     expect(expandedSvg).toContain('x1="16"');
     expect(expandedSvg).toContain('y1="7"');
   });
+
+  it('keeps navigation accessible landmark name "Main" across expanded and collapsed states', () => {
+    const expanded = renderWithProviders(
+      <Sidebar
+        mobileOpen={false}
+        onCloseMobile={() => undefined}
+        collapsed={false}
+        onToggleCollapse={() => undefined}
+      />,
+    );
+    expect(expanded).toContain('aria-label="Main"');
+
+    const collapsed = renderWithProviders(
+      <Sidebar
+        mobileOpen={false}
+        onCloseMobile={() => undefined}
+        collapsed={true}
+        onToggleCollapse={() => undefined}
+      />,
+    );
+    expect(collapsed).toContain('aria-label="Main"');
+  });
 });
