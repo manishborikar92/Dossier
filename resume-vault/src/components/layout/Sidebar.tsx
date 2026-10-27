@@ -81,7 +81,7 @@ export function Sidebar({
 
   // Mobile Drawer Navigation List (Always expanded in mobile dialog)
   const renderMobileNavList = () => (
-    <nav aria-label="Main" className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5">
       {MAIN_NAV_GROUPS.map((group, groupIdx) => (
         <div key={group.label ?? groupIdx}>
           {group.label ? (
@@ -137,7 +137,7 @@ export function Sidebar({
           </ul>
         </div>
       ))}
-    </nav>
+    </div>
   );
 
   return (
@@ -221,144 +221,150 @@ export function Sidebar({
           </div>
         </div>
 
-        {/* MIDDLE NAVIGATION CONTAINER (fixed px-3, overflow-y-auto, overflow-x-hidden) */}
-        <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 px-3">
-          <nav aria-label={collapsed ? 'Main collapsed navigation' : 'Main'} className="flex flex-col gap-3">
-            {MAIN_NAV_GROUPS.map((group, groupIdx) => (
-              <div key={group.label ?? groupIdx} className="flex flex-col">
-                {/* Category label container with smooth height & opacity transition */}
-                {group.label ? (
-                  <div
-                    className={cx(
-                      'overflow-hidden transition-[max-height,opacity,margin] duration-300 ease-in-out',
-                      collapsed ? 'max-h-0 opacity-0 mb-0' : 'max-h-6 opacity-100 mb-1.5',
-                    )}
-                  >
-                    <p className="text-muted/80 px-3 text-[11px] font-semibold tracking-wider uppercase truncate">
-                      {group.label}
-                    </p>
-                  </div>
-                ) : null}
+        {/* NAVIGATION CONTAINER */}
+        <nav
+          aria-label={collapsed ? 'Main collapsed navigation' : 'Main'}
+          className="flex flex-col flex-1 min-h-0 justify-between"
+        >
+          {/* MIDDLE NAVIGATION CONTAINER (fixed px-3, overflow-y-auto, overflow-x-hidden) */}
+          <div className="flex-1 min-h-0 overflow-y-auto overflow-x-hidden py-4 px-3">
+            <div className="flex flex-col gap-3">
+              {MAIN_NAV_GROUPS.map((group, groupIdx) => (
+                <div key={group.label ?? groupIdx} className="flex flex-col">
+                  {/* Category label container with smooth height & opacity transition */}
+                  {group.label ? (
+                    <div
+                      className={cx(
+                        'overflow-hidden transition-[max-height,opacity,margin] duration-300 ease-in-out',
+                        collapsed ? 'max-h-0 opacity-0 mb-0' : 'max-h-6 opacity-100 mb-1.5',
+                      )}
+                    >
+                      <p className="text-muted/80 px-3 text-[11px] font-semibold tracking-wider uppercase truncate">
+                        {group.label}
+                      </p>
+                    </div>
+                  ) : null}
 
-                {/* Subtle divider in collapsed mode between groups */}
-                {groupIdx > 0 ? (
-                  <div
-                    className={cx(
-                      'mx-auto border-t border-line transition-[max-height,opacity,margin,width] duration-300 ease-in-out overflow-hidden',
-                      collapsed ? 'max-h-4 opacity-100 my-1.5 w-8' : 'max-h-0 opacity-0 my-0 w-0',
-                    )}
-                    aria-hidden
-                  />
-                ) : null}
+                  {/* Subtle divider in collapsed mode between groups */}
+                  {groupIdx > 0 ? (
+                    <div
+                      className={cx(
+                        'mx-auto border-t border-line transition-[max-height,opacity,margin,width] duration-300 ease-in-out overflow-hidden',
+                        collapsed ? 'max-h-4 opacity-100 my-1.5 w-8' : 'max-h-0 opacity-0 my-0 w-0',
+                      )}
+                      aria-hidden
+                    />
+                  ) : null}
 
-                <ul className="flex flex-col gap-1 w-full">
-                  {group.items.map(({ href, label, icon: Icon, exact }) => {
-                    const active = isNavActive(pathname, href, exact);
-                    const { text: badgeText, tone: badgeTone } = getBadgeInfo(href);
-                    const navLabel = badgeText !== null ? `${label} (${badgeText})` : label;
+                  <ul className="flex flex-col gap-1 w-full">
+                    {group.items.map(({ href, label, icon: Icon, exact }) => {
+                      const active = isNavActive(pathname, href, exact);
+                      const { text: badgeText, tone: badgeTone } = getBadgeInfo(href);
+                      const navLabel = badgeText !== null ? `${label} (${badgeText})` : label;
 
-                    return (
-                      <li key={href} className="w-full">
-                        <Link
-                          href={href}
-                          aria-label={navLabel}
-                          aria-current={active ? 'page' : undefined}
-                          className={cx(
-                            'relative flex h-10 w-full items-center rounded-lg transition-colors overflow-hidden',
-                            active
-                              ? 'bg-brand-soft text-brand font-semibold'
-                              : 'text-ink-2 hover:bg-sunken hover:text-ink',
-                          )}
-                        >
-                          {/* Left Icon Container: size-10 (40px) exactly centered at 32px */}
-                          <div className="relative size-10 shrink-0 flex items-center justify-center">
-                            <Icon
-                              className={cx('size-5 shrink-0 transition-colors', active ? 'text-brand' : 'text-muted')}
-                              aria-hidden
-                            />
-                            {/* Collapsed indicator dot */}
-                            {badgeText !== null ? (
-                              <span
-                                className={cx(
-                                  'absolute top-2 right-2 size-2 rounded-full transition-opacity duration-300',
-                                  collapsed ? 'opacity-100' : 'opacity-0 pointer-events-none',
-                                  badgeTone === 'warn' ? 'bg-warn' : 'bg-brand',
-                                )}
-                                aria-hidden
-                              />
-                            ) : null}
-                          </div>
-
-                          {/* Label & Expanded Badge Pill with smooth slide & fade */}
-                          <div
+                      return (
+                        <li key={href} className="w-full">
+                          <Link
+                            href={href}
+                            aria-label={navLabel}
+                            aria-current={active ? 'page' : undefined}
                             className={cx(
-                              'flex items-center justify-between min-w-0 flex-1 overflow-hidden transition-[opacity,max-width,transform] duration-300 ease-in-out',
-                              collapsed
-                                ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none'
-                                : 'max-w-[190px] opacity-100 translate-x-0 pr-2.5',
+                              'relative flex h-10 w-full items-center rounded-lg transition-colors overflow-hidden',
+                              active
+                                ? 'bg-brand-soft text-brand font-semibold'
+                                : 'text-ink-2 hover:bg-sunken hover:text-ink',
                             )}
                           >
-                            <span className="truncate text-sm font-medium whitespace-nowrap">{label}</span>
-                            {badgeText !== null ? (
-                              <span
-                                className={cx(
-                                  'ml-2 shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium tabular-nums whitespace-nowrap',
-                                  badgeTone === 'warn'
-                                    ? 'bg-warn-soft text-warn'
-                                    : 'bg-sunken text-muted border border-line',
-                                )}
-                              >
-                                {badgeText}
-                              </span>
-                            ) : null}
-                          </div>
-                        </Link>
-                      </li>
-                    );
-                  })}
-                </ul>
-              </div>
-            ))}
-          </nav>
-        </div>
+                            {/* Left Icon Container: size-10 (40px) exactly centered at 32px */}
+                            <div className="relative size-10 shrink-0 flex items-center justify-center">
+                              <Icon
+                                className={cx('size-5 shrink-0 transition-colors', active ? 'text-brand' : 'text-muted')}
+                                aria-hidden
+                              />
+                              {/* Collapsed indicator dot */}
+                              {badgeText !== null ? (
+                                <span
+                                  className={cx(
+                                    'absolute top-2 right-2 size-2 rounded-full transition-opacity duration-300',
+                                    collapsed ? 'opacity-100' : 'opacity-0 pointer-events-none',
+                                    badgeTone === 'warn' ? 'bg-warn' : 'bg-brand',
+                                  )}
+                                  aria-hidden
+                                />
+                              ) : null}
+                            </div>
 
-        {/* BOTTOM FIXED SETTINGS (smooth slide and fade, icon centered at 32px) */}
-        <div className="shrink-0 border-t border-line p-3 overflow-hidden">
-          <Link
-            href={SETTINGS_NAV_ITEM.href}
-            aria-label="Settings"
-            aria-current={isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'page' : undefined}
-            className={cx(
-              'flex h-10 w-full items-center rounded-lg transition-colors overflow-hidden',
-              isNavActive(pathname, SETTINGS_NAV_ITEM.href)
-                ? 'bg-brand-soft text-brand font-semibold'
-                : 'text-ink-2 hover:bg-sunken hover:text-ink',
-            )}
-          >
-            {/* Left Icon Container: size-10 (40px) exactly centered at 32px */}
-            <div className="size-10 shrink-0 flex items-center justify-center">
-              <Settings
-                className={cx(
-                  'size-5 shrink-0 transition-colors',
-                  isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'text-brand' : 'text-muted',
-                )}
-                aria-hidden
-              />
+                            {/* Label & Expanded Badge Pill with smooth slide & fade */}
+                            <div
+                              className={cx(
+                                'flex items-center justify-between min-w-0 flex-1 overflow-hidden transition-[opacity,max-width,transform] duration-300 ease-in-out',
+                                collapsed
+                                  ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none'
+                                  : 'max-w-[190px] opacity-100 translate-x-0 pr-2.5',
+                              )}
+                            >
+                              <span className="truncate text-sm font-medium whitespace-nowrap">{label}</span>
+                              {badgeText !== null ? (
+                                <span
+                                  className={cx(
+                                    'ml-2 shrink-0 rounded-full px-2 py-0.5 text-[11px] font-medium tabular-nums whitespace-nowrap',
+                                    badgeTone === 'warn'
+                                      ? 'bg-warn-soft text-warn'
+                                      : 'bg-sunken text-muted border border-line',
+                                  )}
+                                >
+                                  {badgeText}
+                                </span>
+                              ) : null}
+                            </div>
+                          </Link>
+                        </li>
+                      );
+                    })}
+                  </ul>
+                </div>
+              ))}
             </div>
+          </div>
 
-            {/* Label with smooth slide & fade */}
-            <div
+          {/* BOTTOM FIXED SETTINGS (smooth slide and fade, icon centered at 32px) */}
+          <div className="shrink-0 border-t border-line p-3 overflow-hidden">
+            <Link
+              href={SETTINGS_NAV_ITEM.href}
+              aria-label={SETTINGS_NAV_ITEM.label}
+              aria-current={isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'page' : undefined}
               className={cx(
-                'flex items-center min-w-0 overflow-hidden transition-[opacity,max-width,transform] duration-300 ease-in-out',
-                collapsed
-                  ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none'
-                  : 'max-w-[140px] opacity-100 translate-x-0 pr-2.5',
+                'flex h-10 w-full items-center rounded-lg transition-colors overflow-hidden',
+                isNavActive(pathname, SETTINGS_NAV_ITEM.href)
+                  ? 'bg-brand-soft text-brand font-semibold'
+                  : 'text-ink-2 hover:bg-sunken hover:text-ink',
               )}
             >
-              <span className="truncate text-sm font-medium whitespace-nowrap">Settings</span>
-            </div>
-          </Link>
-        </div>
+              {/* Left Icon Container: size-10 (40px) exactly centered at 32px */}
+              <div className="size-10 shrink-0 flex items-center justify-center">
+                <Settings
+                  className={cx(
+                    'size-5 shrink-0 transition-colors',
+                    isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'text-brand' : 'text-muted',
+                  )}
+                  aria-hidden
+                />
+              </div>
+
+              {/* Label with smooth slide & fade */}
+              <div
+                className={cx(
+                  'flex items-center min-w-0 overflow-hidden transition-[opacity,max-width,transform] duration-300 ease-in-out',
+                  collapsed
+                    ? 'max-w-0 opacity-0 -translate-x-2 pointer-events-none'
+                    : 'max-w-[190px] opacity-100 translate-x-0 pr-2.5',
+                )}
+              >
+                <span className="truncate text-sm font-medium whitespace-nowrap">{SETTINGS_NAV_ITEM.label}</span>
+              </div>
+            </Link>
+          </div>
+        </nav>
       </aside>
 
       {/* MOBILE DRAWER */}
@@ -400,34 +406,38 @@ export function Sidebar({
               </button>
             </div>
 
-            {/* Middle navigation area */}
-            <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4">
-              {renderMobileNavList()}
-            </div>
+            {/* Mobile navigation landmark covering main links and settings */}
+            <nav aria-label="Main" className="flex flex-col flex-1 min-h-0 justify-between">
+              {/* Middle navigation area */}
+              <div className="flex-1 min-h-0 overflow-y-auto px-3 py-4">
+                {renderMobileNavList()}
+              </div>
 
-            {/* Bottom fixed Settings */}
-            <div className="shrink-0 border-t border-line p-3">
-              <Link
-                href={SETTINGS_NAV_ITEM.href}
-                onClick={onCloseMobile}
-                aria-current={isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'page' : undefined}
-                className={cx(
-                  'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
-                  isNavActive(pathname, SETTINGS_NAV_ITEM.href)
-                    ? 'bg-brand-soft text-brand font-semibold'
-                    : 'text-ink-2 hover:bg-sunken hover:text-ink',
-                )}
-              >
-                <Settings
+              {/* Bottom fixed Settings */}
+              <div className="shrink-0 border-t border-line p-3">
+                <Link
+                  href={SETTINGS_NAV_ITEM.href}
+                  onClick={onCloseMobile}
+                  aria-label={SETTINGS_NAV_ITEM.label}
+                  aria-current={isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'page' : undefined}
                   className={cx(
-                    'size-4.5 shrink-0',
-                    isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'text-brand' : 'text-muted',
+                    'flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors',
+                    isNavActive(pathname, SETTINGS_NAV_ITEM.href)
+                      ? 'bg-brand-soft text-brand font-semibold'
+                      : 'text-ink-2 hover:bg-sunken hover:text-ink',
                   )}
-                  aria-hidden
-                />
-                <span className="truncate">Settings</span>
-              </Link>
-            </div>
+                >
+                  <Settings
+                    className={cx(
+                      'size-4.5 shrink-0',
+                      isNavActive(pathname, SETTINGS_NAV_ITEM.href) ? 'text-brand' : 'text-muted',
+                    )}
+                    aria-hidden
+                  />
+                  <span className="truncate">{SETTINGS_NAV_ITEM.label}</span>
+                </Link>
+              </div>
+            </nav>
           </div>
         ) : null}
       </dialog>

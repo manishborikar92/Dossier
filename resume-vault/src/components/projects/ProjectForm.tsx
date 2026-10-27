@@ -8,7 +8,6 @@ import { issuesToFields, projectSchema } from '@/lib/schemas';
 import type { Project } from '@/lib/types';
 import { BulletList, type EditableBullet } from '../shared/BulletList';
 import { Badge, Button, ConfirmDialog, Notice, SectionCard, SelectField, TagInput, TextArea, TextField, useToast } from '../ui';
-import { useHeader } from '../layout/HeaderContext';
 
 interface Draft {
   name: string;
@@ -134,13 +133,6 @@ export function ProjectForm({ initial }: { initial: Project | null }) {
   }
 
   const saveLabel = initial ? 'Save changes' : 'Add project';
-
-  useHeader({
-    crumbs: initial
-      ? [{ label: 'Projects', href: '/projects' }, { label: draft.name || initial.name }]
-      : [{ label: 'Projects', href: '/projects' }, { label: 'New project' }],
-    title: initial ? draft.name || initial.name : 'Add a project',
-  });
 
   return (
     <div className="grid items-start gap-6 lg:grid-cols-[minmax(0,1fr)_17rem]">

@@ -79,6 +79,7 @@ describe('Header & Sidebar Layout (Matching Reference Layout)', () => {
     expect(out).toContain('Library');
     expect(out).toContain('Resumes');
     expect(out).toContain('Dashboard');
+    expect(out).toContain('Profile');
     expect(out).toContain('Experience &amp; skills');
     expect(out).toContain('Projects');
 
@@ -87,7 +88,7 @@ describe('Header & Sidebar Layout (Matching Reference Layout)', () => {
     expect(out).toContain('2');
 
     // Fixed bottom Settings matching reference
-    expect(out).toContain('Settings');
+    expect(out).toContain('Settings &amp; backup');
 
     // Completely removed features (including floating tooltips):
     expect(out).not.toContain('Local SQLite');
@@ -116,8 +117,9 @@ describe('Header & Sidebar Layout (Matching Reference Layout)', () => {
 
     // Nav icons present, floating tooltips removed
     expect(out).toContain('Dashboard');
+    expect(out).toContain('Profile');
     expect(out).toContain('Projects');
-    expect(out).toContain('Settings');
+    expect(out).toContain('Settings &amp; backup');
     expect(out).not.toContain('bg-neutral-900');
 
     // Does not render expanded group label headers in collapsed rail

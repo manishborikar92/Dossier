@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import type { Certification, Education, Experience, Skill } from '@/lib/types';
 import { Badge, Tabs, tabId, tabPanelId } from '../ui';
-import { useHeader } from '../layout/HeaderContext';
 import { CertificationsSection } from './CertificationsSection';
 import { EducationSection } from './EducationSection';
 import { ExperienceSection } from './ExperienceSection';
@@ -20,11 +19,6 @@ interface Props {
 
 export function CareerManager({ initialTab, experiences, education, skills, certifications }: Props) {
   const [tab, setTab] = useState<CareerTab>(initialTab);
-
-  useHeader({
-    crumbs: [{ label: 'Experience & skills' }],
-    title: 'Experience & skills',
-  });
   return (
     <div>
       <Tabs

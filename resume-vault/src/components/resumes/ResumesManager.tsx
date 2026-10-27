@@ -12,7 +12,6 @@ import { TEMPLATES } from '@/lib/templates';
 import type { ResumeListEntry, TemplateId } from '@/lib/types';
 import { Badge, Button, Card, ConfirmDialog, Dialog, EmptyState, Notice, TextArea, TextField, useToast } from '../ui';
 import { TemplatePicker } from './TemplatePicker';
-import { useHeader } from '../layout/HeaderContext';
 
 type Preselect = 'none' | 'top' | 'match';
 
@@ -101,11 +100,6 @@ export function ResumesManager({ initial, canCreate, defaultTemplate }: Props) {
       New resume
     </Button>
   );
-
-  useHeader({
-    crumbs: [{ label: 'Resumes' }],
-    title: 'Resumes',
-  });
 
   return (
     <div>
