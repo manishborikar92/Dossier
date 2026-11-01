@@ -44,6 +44,17 @@ Dossier/
 - **Node.js**: `v20.19.0` or later (`v22` LTS recommended)
 - **npm**: `v10` or later
 
+### Desktop Shortcut & One-Click Launch
+
+Dossier includes a single consolidated launcher: **`launch.bat`** (at the root of the project).
+
+Double-clicking the **Dossier** shortcut on your desktop (or double-clicking **`launch.bat`** in the project folder) will automatically:
+1. Ensure the **Dossier** desktop shortcut with the official app icon is present on your desktop.
+2. Check dependencies and run `npm install` if missing.
+3. Check the production build and run `npm run build` if missing or if source files changed.
+4. Start the Next.js production server on `127.0.0.1:3000`.
+5. Automatically open Dossier in Google Chrome.
+
 ### Installation & Execution
 
 You can run commands from the repository root:
@@ -120,6 +131,7 @@ For in-depth architectural details, see [docs/ARCHITECTURE.md](docs/ARCHITECTURE
 
 | Command | Action |
 | ------- | ------ |
+| `launch.bat` (or `npm run launch`) | Automatically checks dependencies, builds if needed, starts the app, and opens Chrome |
 | `npm run dev` | Starts the `web/` development server on `127.0.0.1:3000` |
 | `npm run build` | Compiles and builds the `web/` production application |
 | `npm start` | Launches the built production server |

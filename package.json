@@ -11,6 +11,7 @@
     "dev": "npm --prefix web run dev",
     "build": "npm --prefix web run build",
     "start": "npm --prefix web start",
+    "launch": "launch.bat",
     "lint": "npm --prefix web run lint",
     "typecheck": "npm --prefix web run typecheck",
     "test": "npm --prefix web test",
